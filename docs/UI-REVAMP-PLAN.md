@@ -1,6 +1,6 @@
 # StorySketch — UI revamp plan
 
-**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) are done; next is Phase 3 (ribbon, mini bar, Details panel). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
+**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) and Phase 3 (ribbon, mini bar, Details panel, arrange, snapping) are done; next is Phase 4 (text tool). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
 Goal: an interface that is as simple as **Canva's**: clear logical groups, graphical icons, controls shown only when relevant, a first-class **text tool**
 and a small set of **shape / arrow / pencil** tools.
 
@@ -296,3 +296,14 @@ Temporary, to be removed in later phases:
 - Rail order is Characters · Props · Layers · Add-ons for now; confirm once Shapes and Text exist.
 
 Not done from §4 yet: drag-to-reorder pages (the page menu has Move earlier / later), recent projects on the start screen, and a first-run tour. (The empty-page hint is shown until the page has something on it.)
+
+## 13. Phase 3 notes
+Built: contextual ribbon (`src/app/ribbon.js`), mini bar, Details panel with Look / Pose / Arrange tabs (`src/app/inspector.js`), Position / Line up / Space evenly (`src/app/arrange.js` over the pure maths in `src/core/arrange.js`), snapping with guides (`src/app/pointer.js`), dynamic popovers for rebuilt buttons (`UI.showPopover`).
+
+Decisions and limits:
+- **Details is not auto-hidden.** The plan said "on demand, pinnable"; it opens on demand and then stays until you close it (the choice is remembered), which is the pinned behaviour. A separate auto-closing mode can come later if people want it.
+- **Prop ribbon** shows only the prop's first choice (a `select` parameter). Everything else is in Details ▸ Look. Revisit when text and shapes exist (they will have their own ribbon sections).
+- **The page settings** (style, page colour, size) show only when nothing is selected; press Esc or click empty space to get back to them.
+- **Snapping** applies to moving only (not resize or turn) and uses the outline box of the selection (a rotated item's box is its outer rectangle). Guides show edges and centres, not equal-spacing hints.
+- **Details content** is still the old form controls with new tabs and wording; it is restyled with the rest of the dialogs in phase 5.
+- Still to do from §4.5: "Character type" as one visual picker (phase 5).

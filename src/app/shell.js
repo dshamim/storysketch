@@ -16,7 +16,7 @@ const ACTIONS = {
   undo: doUndo, redo: doRedo, cut: () => copySel(true), copy: () => copySel(false), paste: () => pasteInto(), duplicate: () => duplicateSel(), delete: () => deleteSel(),
   selectall: selectAll, group: () => groupSel(), ungroup: () => ungroupSel(), lock: () => toggleLockSel(),
   preview: () => setPreview(!app.preview), zoomin: () => zoomTo(app.view.z * 1.25), zoomout: () => zoomTo(app.view.z / 1.25), zoomfit: () => zoomFit(), zoomsel: () => zoomSel(),
-  library: () => (flyoutOpen() ? hideFlyout() : showFlyout()), details: () => (detailsOpen() ? hideDetails() : showDetails()),
+  library: () => (flyoutOpen() ? hideFlyout() : showFlyout()), details: () => (detailsOpen() ? hideDetails() : showDetails()), snap: () => setSnap(!app.snap),
   about: () => showAbout(),
   'page-rename': () => openNotes(true), 'page-dup': () => duplicatePage(), 'page-earlier': () => movePage(app.page, -1), 'page-later': () => movePage(app.page, 1), 'page-del': () => deletePage(),
 };
@@ -50,6 +50,9 @@ function initShell() {
   $('#undo').onclick = doUndo; $('#redo').onclick = doRedo;
   $('#preview-sw').onchange = (e) => setPreview(e.target.checked);
   $('#load-file').onchange = (e) => { if (e.target.files[0]) loadProject(e.target.files[0]); e.target.value = ''; };
+
+  initRibbon();
+  try { app.snap = localStorage.getItem('storysketch/snap') !== 'off'; } catch (e) { /* ignore */ }
 
   // left rail + flyout: choosing a tab opens the flyout, choosing the open one again folds it away
   UI.tabs($('#rail'));
@@ -97,7 +100,8 @@ function syncEditMenu() {
   for (const a of ['cut', 'copy', 'duplicate', 'delete', 'lock']) setItemEnabled(a, n > 0);
   setItemEnabled('group', n > 1); setItemEnabled('ungroup', selItems().some((i) => i.group)); setItemEnabled('paste', !!getClip());
 }
-function syncViewMenu() { $('#menu-details')?.setAttribute('aria-checked', String(detailsOpen()));  $('#menu-preview').setAttribute('aria-checked', String(!!app.preview)); $('#menu-library').setAttribute('aria-checked', String(flyoutOpen())); }
+function setSnap(on) { app.snap = on; try { localStorage.setItem('storysketch/snap', on ? 'on' : 'off'); } catch (e) { /* ignore */ } syncViewMenu(); toast(on ? 'Snapping on — hold Alt to move freely' : 'Snapping off'); }
+function syncViewMenu() { $('#menu-snap').setAttribute('aria-checked', String(app.snap)); $('#menu-details')?.setAttribute('aria-checked', String(detailsOpen()));  $('#menu-preview').setAttribute('aria-checked', String(!!app.preview)); $('#menu-library').setAttribute('aria-checked', String(flyoutOpen())); }
 
 // ---- flyout ----
 const flyoutOpen = () => !$('#left').hidden;

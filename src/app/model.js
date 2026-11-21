@@ -4,7 +4,7 @@ const $ = (s, el = document) => el.querySelector(s);
 const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 const MARGIN = 110;
 
-const app = { handMode: 'reach', tab: 'tab-cast', dtab: 'look', filters: {}, P: null, page: 0, sel: [], preview: false, drag: null, raf: 0, designerCast: null, designerPose: 'stand', designerCrayon: true, addCount: 0 };
+const app = { handMode: 'reach', tab: 'tab-cast', dtab: 'look', snap: true, guides: null, filters: {}, P: null, page: 0, sel: [], preview: false, drag: null, raf: 0, designerCast: null, designerPose: 'stand', designerCrayon: true, addCount: 0 };
 
 // ---------- model helpers ----------
 const castById = (id) => app.P.cast.find((c) => c.id === id);

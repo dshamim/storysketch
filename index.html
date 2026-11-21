@@ -77,7 +77,8 @@
 
   <section id="center">
     <div id="stage-wrap"><svg id="stage" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
-      <p id="empty-hint" class="empty-hint" hidden>Add a character or a prop from the left to begin.</p></div>
+      <p id="empty-hint" class="empty-hint" hidden>Add a character or a prop from the left to begin.</p>
+      <div class="ui-minibar" id="minibar" role="toolbar" aria-label="Selection" hidden></div></div>
   </section>
 
   <aside id="right" aria-label="Details" hidden>
@@ -139,6 +140,7 @@
   <button role="menuitem" data-act="zoomfit"><span data-icon="fit"></span><span class="grow">Fit the whole page</span><kbd class="ui-kbd">Ctrl+0</kbd></button>
   <button role="menuitem" data-act="zoomsel"><span data-icon="fit"></span><span class="grow">Zoom to the selection</span><kbd class="ui-kbd">Shift+2</kbd></button>
   <hr>
+  <button role="menuitemcheckbox" id="menu-snap" aria-checked="true" data-act="snap"><span data-icon="check" class="tick"></span><span class="grow">Snapping</span></button>
   <button role="menuitemcheckbox" id="menu-library" aria-checked="true" data-act="library"><span data-icon="check" class="tick"></span><span class="grow">Library panel</span></button>
   <button role="menuitemcheckbox" id="menu-details" aria-checked="false" data-act="details"><span data-icon="check" class="tick"></span><span class="grow">Details panel</span></button>
 </div>
@@ -153,6 +155,46 @@
   <hr>
   <button role="menuitem" id="del-page" data-act="page-del" class="danger"><span data-icon="delete"></span><span class="grow">Delete page</span></button>
 </div>
+
+
+<!-- ribbon menus (opened by buttons the ribbon rebuilds) -->
+<div class="ui-popover ui-menu" role="menu" id="menu-position" aria-label="Position" hidden>
+  <button role="menuitem" data-act="z-front"><span data-icon="to-front"></span><span class="grow">Bring to front</span><kbd class="ui-kbd">Shift+]</kbd></button>
+  <button role="menuitem" data-act="z-up"><span data-icon="forward"></span><span class="grow">Bring forward</span><kbd class="ui-kbd">]</kbd></button>
+  <button role="menuitem" data-act="z-down"><span data-icon="backward"></span><span class="grow">Send backward</span><kbd class="ui-kbd">[</kbd></button>
+  <button role="menuitem" data-act="z-back"><span data-icon="to-back"></span><span class="grow">Send to back</span><kbd class="ui-kbd">Shift+[</kbd></button>
+  <hr>
+  <div class="ui-menu-label" role="presentation">Line up with the page</div>
+  <button role="menuitem" data-act="align-page-left"><span data-icon="align-left"></span><span class="grow">Left</span></button>
+  <button role="menuitem" data-act="align-page-hcenter"><span data-icon="align-hcenter"></span><span class="grow">Centre</span></button>
+  <button role="menuitem" data-act="align-page-right"><span data-icon="align-right"></span><span class="grow">Right</span></button>
+  <button role="menuitem" data-act="align-page-top"><span data-icon="align-top"></span><span class="grow">Top</span></button>
+  <button role="menuitem" data-act="align-page-vmiddle"><span data-icon="align-vmiddle"></span><span class="grow">Middle</span></button>
+  <button role="menuitem" data-act="align-page-bottom"><span data-icon="align-bottom"></span><span class="grow">Bottom</span></button>
+</div>
+<div class="ui-popover ui-menu" role="menu" id="menu-align" aria-label="Line up" hidden>
+  <div class="ui-menu-label" role="presentation">Line up with each other</div>
+  <button role="menuitem" data-act="align-left"><span data-icon="align-left"></span><span class="grow">Left</span></button>
+  <button role="menuitem" data-act="align-hcenter"><span data-icon="align-hcenter"></span><span class="grow">Centre</span></button>
+  <button role="menuitem" data-act="align-right"><span data-icon="align-right"></span><span class="grow">Right</span></button>
+  <button role="menuitem" data-act="align-top"><span data-icon="align-top"></span><span class="grow">Top</span></button>
+  <button role="menuitem" data-act="align-vmiddle"><span data-icon="align-vmiddle"></span><span class="grow">Middle</span></button>
+  <button role="menuitem" data-act="align-bottom"><span data-icon="align-bottom"></span><span class="grow">Bottom</span></button>
+</div>
+<div class="ui-popover ui-menu" role="menu" id="menu-distribute" aria-label="Space evenly" hidden>
+  <div class="ui-menu-label" role="presentation">Space evenly (3 or more)</div>
+  <button role="menuitem" data-act="dist-h"><span data-icon="distribute-h"></span><span class="grow">Across</span></button>
+  <button role="menuitem" data-act="dist-v"><span data-icon="distribute-v"></span><span class="grow">Down</span></button>
+</div>
+<div class="ui-popover ui-menu" role="menu" id="menu-more" aria-label="More" hidden>
+  <button role="menuitem" data-act="copy"><span data-icon="copy"></span><span class="grow">Copy</span><kbd class="ui-kbd">Ctrl+C</kbd></button>
+  <button role="menuitem" data-act="cut"><span data-icon="cut"></span><span class="grow">Cut</span><kbd class="ui-kbd">Ctrl+X</kbd></button>
+  <button role="menuitem" data-act="group"><span data-icon="group"></span><span class="grow">Group</span><kbd class="ui-kbd">Ctrl+G</kbd></button>
+  <button role="menuitem" data-act="ungroup"><span data-icon="ungroup"></span><span class="grow">Ungroup</span><kbd class="ui-kbd">Ctrl+Shift+G</kbd></button>
+  <button role="menuitem" data-act="zoomsel"><span data-icon="fit"></span><span class="grow">Zoom to it</span><kbd class="ui-kbd">Shift+2</kbd></button>
+  <button role="menuitem" data-act="details"><span data-icon="panel-right-open"></span><span class="grow">Details…</span></button>
+</div>
+<div class="ui-popover pose-pop" id="pop-pose" role="dialog" aria-label="Choose a pose" hidden><div class="poses" id="pose-grid"></div></div>
 
 <!-- export -->
 <div class="ui-popover" id="export" role="dialog" aria-label="Export" hidden>
@@ -215,9 +257,9 @@
     <div id="plug-summary"></div>
     <div id="plug-warn"></div>
     <details><summary>Everything loaded</summary><div id="plug-list"></div></details>
-    <div class="row"><button id="plug-rescan" class="primary">Rescan plugins folder</button><button id="plug-close">Close</button><span id="plug-status" class="muted"></span></div>
-    <p class="muted small">To add your own: copy an existing file in <code>plugins/&lt;type&gt;/</code>, change its <code>id</code> and name, then <b>Rescan</b>. Full guide: <code>plugins/README.md</code>.<br>
-    The first Rescan asks you to pick the <code>plugins</code> folder once (Chrome needs permission to read it). No-dialog alternative: <code>python3 tools/build_plugins.py</code>, then refresh.</p>
+    <div class="row"><button id="plug-rescan" class="primary">Refresh add-ons</button><button id="plug-close">Close</button><span id="plug-status" class="muted"></span></div>
+    <p class="muted small">To add your own: copy an existing file in <code>plugins/&lt;type&gt;/</code>, change its <code>id</code> and name, then <b>Refresh add-ons</b>. Full guide: <code>plugins/README.md</code>.<br>
+    The first refresh asks you to pick the <code>plugins</code> folder once (Chrome needs permission to read it). No-dialog alternative: <code>python3 tools/build_plugins.py</code>, then refresh.</p>
   </div>
 </dialog>
 
@@ -280,7 +322,7 @@
 <script src="src/core/props-core.js"></script>
 <script src="src/core/store.js"></script>
 <script src="src/core/arrange.js"></script>
-<!-- plugin index (rebuilt by "Rescan plugins" or tools/build_plugins.py); plugins load before the editor starts -->
+<!-- plugin index (rebuilt by "Refresh add-ons" or tools/build_plugins.py); plugins load before the editor starts -->
 <script src="plugins/manifest.js"></script>
 <script src="src/app/model.js"></script>
 <script src="src/app/history.js"></script>

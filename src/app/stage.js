@@ -16,6 +16,7 @@ function applyView() {
   $('#stage').setAttribute('viewBox', viewBox().map((n) => +n.toFixed(2)).join(' '));
   const pct = $('#zoom-pct'); if (pct) pct.textContent = Math.round(app.view.z * 100) + '%';
   $('#stage-wrap')?.classList.toggle('zoomed', app.view.z > 1);
+  positionMiniBar();
 }
 // zoom to z; with a pointer position, the spot under the pointer stays put
 function zoomTo(z, at) {
@@ -85,7 +86,8 @@ function renderOverlay() {
     if (group.some((i) => !i.locked)) s += `<rect data-h="gscale" x="${gb.x + gb.w - hs / 2}" y="${gb.y + gb.h - hs / 2}" width="${hs}" height="${hs}" fill="#fff" stroke="#7c3aed" stroke-width="${1.8 * k}" class="h-scale"/>` +
       `<line x1="${cx}" y1="${gb.y}" x2="${cx}" y2="${ty}" stroke="#7c3aed" stroke-width="${1.3 * k}"/><circle data-h="grot" cx="${cx}" cy="${ty}" r="${7.5 * k}" fill="#fff" stroke="#7c3aed" stroke-width="${1.8 * k}" class="h-rot"/>`;
   }
-  ov.innerHTML = s;
+  for (const g of app.guides || []) { const k1 = 1 / z; s += g.axis === 'x' ? `<line x1="${g.pos}" y1="${g.from - 12 * k1}" x2="${g.pos}" y2="${g.to + 12 * k1}" stroke="#e5389a" stroke-width="${1.3 * k1}" pointer-events="none"/>` : `<line x1="${g.from - 12 * k1}" y1="${g.pos}" x2="${g.to + 12 * k1}" y2="${g.pos}" stroke="#e5389a" stroke-width="${1.3 * k1}" pointer-events="none"/>`; }
+  ov.innerHTML = s; positionMiniBar();
 }
 const movable = (items) => items.filter((it) => it && !it.locked);
 const selItems = () => app.sel.map(itemById).filter((it) => it && !it.hidden);

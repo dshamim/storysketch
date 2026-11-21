@@ -215,6 +215,7 @@ function onInspectorInput(e) {
   else if (t.dataset.color) { it.colors = { ...(it.colors || {}), [t.dataset.color]: t.value }; }
   else if (t.dataset.detach) { setDetach(it, t.dataset.detach, t.checked); renderInspector(); return; }
   scheduleRender(); renderLayers(); commit(false);
+  if (t.dataset.k === 'rot') syncRibbon();
   if (t.dataset.k === 'cast') renderInspector();
 }
 function onInspectorClick(e) {

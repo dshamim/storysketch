@@ -24,7 +24,7 @@ plugins/
 
 1. **Copy** a similar file in the right folder (for example `hair/braids.js` or `characters/maya.json`).
 2. **Change** its `id` (unique, lowercase, no spaces) and `name`, then edit the drawing or the values.
-3. **Rescan**: in the tool click **Add-ons → Rescan plugins folder** (left rail) (the first time, pick this
+3. **Rescan**: in the tool click **Add-ons → Refresh add-ons** (left rail) (the first time, pick this
    `plugins` folder; Chrome remembers it). The tool rebuilds `manifest.js` and reloads.
    No-dialog alternative: `python3 tools/build_plugins.py`, then refresh the page.
 

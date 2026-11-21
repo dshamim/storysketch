@@ -16,11 +16,11 @@ function openPlugins() {
   $('#plug-status').textContent = ''; $('#plugins').showModal();
 }
 async function rescanPlugins() {
-  if (!STORAGE.current.supported) { $('#plug-status').textContent = 'This browser can\'t write files — run python3 tools/build_plugins.py, then refresh.'; return; }
+  if (!STORAGE.current.supported) { $('#plug-status').textContent = 'This browser can\'t write files — run python3 tools/build_plugins.py, then reload the page.'; return; }
   try {
     $('#plug-status').textContent = 'Scanning…';
     const n = await CP.rescan(); if (n == null) { $('#plug-status').textContent = ''; return; }
     try { localStorage.setItem('storysketch/project', JSON.stringify(app.P)); } catch (e) { /* ignore */ }
     $('#plug-status').textContent = `Index rebuilt (${n} files). Reloading…`; setTimeout(() => location.reload(), 700);
-  } catch (e) { $('#plug-status').textContent = 'Rescan failed: ' + e.message; }
+  } catch (e) { $('#plug-status').textContent = 'Refresh failed: ' + e.message; }
 }

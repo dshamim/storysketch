@@ -5,6 +5,18 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
+## Unreleased — selection tools (revamp phase 3)
+The controls for what you have selected move out of the always-open right-hand panel into a ribbon, a small floating bar and an on-demand Details panel. Drawings, poses and files are unchanged.
+- **Ribbon** (under the top bar) follows the selection. *Nothing selected:* page settings (style, page colour, page size, styled view). *A character:* Expression, **Pose** (a picture grid), Mirror, Colour (full / faded / grey), **Position**, and a Turn box in degrees. *A prop:* its first choice (if it has one), Colour, Flip, Position, Turn. *Several:* **Line up**, **Space evenly**, Group / Ungroup, Lock, Colour, Position.
+- **Position** menu: bring to front / forward, send backward / to back, and **line up with the page** (left, centre, right, top, middle, bottom).
+- **Line up** and **Space evenly** for several things (spacing needs three). Locked items stay where they are; a character's front arms and legs count as part of it; a selected group moves as one.
+- **Mini bar** under the selection: Duplicate, Lock, Delete and More (copy, cut, group, ungroup, zoom to it, details). It sits below the selection so it never covers the turn handle, hides while you drag, and shows only Unlock on a locked item.
+- **Details panel** on the right, hidden until you want it (ribbon **Details**, double-click something on the page, mini bar ▸ More, or View ▸ Details panel). Tabs follow the selection: **Look · Pose · Arrange** for a character, **Look · Arrange** for a prop or several things; with nothing selected it shows the tips. **Arrange** has size, turn, flip, order, line up, duplicate, lock, copy to page.
+- **Snapping and guides**: while you drag, things snap to the page's edges and centre and to the edges and centres of other items, with pink guide lines. Hold **Alt** to move freely; **View ▸ Snapping** turns it off (remembered).
+- **Plainer words**: *Reach (elbow follows)* → **Move whole arm**, *Rotate forearm / shin* → **Turn lower arm**, *Flip bend* → **Flip elbow / knee**, *Layering* → **Put arms / legs in front**, *Colour (normal)* → **Full colour**, *Rescan plugins folder* → **Refresh add-ons**, *Skeleton* → **Character type**, *template* → **starting look**.
+- Fixed: pressing Esc with a ribbon menu open (and every item greyed out) used to deselect everything.
+- Tests: `tests/unit/arrange.test.mjs` (align, distribute and snap maths), `tests/e2e/selection.test.mjs` (ribbon, mini bar, Details, arrange, snapping, locks, keyboard), the pose tests now go through Details ▸ Pose, and the screenshot baselines grew from 19 to 25 (ribbon, menus, Details tabs).
+
 ## Unreleased — new shell (revamp phase 2)
 The first visible part of the interface revamp: the outer frame of the app is rebuilt with the new design system. Nothing about how drawings, poses or files work has changed.
 - **Top bar**: **File** (New…, Open…, Save, Save as…, Export…, Add-ons…), **Edit** (undo/redo, cut/copy/paste, duplicate, delete, select all, group, ungroup, lock — greyed out when they don't apply), **View** (styled view, zoom, library panel), project name with a **Saved ✓ / Unsaved ●** badge, Undo and Redo icons, **Export** and **Help** (About, with the version).

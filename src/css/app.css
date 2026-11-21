@@ -169,3 +169,14 @@ form.pad { padding: 18px 20px; max-width: 520px; }
 #inspector :where(select, input[type=text], input[type=search]) { height: 36px; border-radius: var(--ui-r-sm); border: 1px solid var(--ui-border-input); padding: 0 var(--ui-s-2); }
 .iconrow { display: flex; gap: 2px; margin: 0 0 var(--ui-s-2); }
 .rb-group { display: flex; align-items: center; gap: var(--ui-s-1); }
+
+/* ribbon (selection) and mini bar */
+#ribbon-sel .ui-select { min-width: 130px; }
+#ribbon-sel .rb { margin-right: 0; }
+#ribbon-sel .rb.rot { gap: var(--ui-s-1); color: var(--ui-text-muted); }
+#ribbon-sel .ui-input.num { width: 64px; }
+.ui-menu .ui-menu-label { padding: var(--ui-s-2) var(--ui-s-3) var(--ui-s-1); font-size: var(--ui-fs-sm); color: var(--ui-text-muted); }
+.ui-menu [role=menuitem] > .ui-i:empty { width: var(--ui-icon); height: var(--ui-icon); }
+.pose-pop { width: 380px; max-height: min(520px, calc(100vh - 140px)); overflow-y: auto; padding: var(--ui-s-3); }
+.pose-pop .poses { max-height: none; grid-template-columns: repeat(4, 1fr); }
+#minibar { position: absolute; z-index: 6; }

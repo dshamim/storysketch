@@ -62,7 +62,7 @@ test('pose: a preset pose button changes the figure; mirror flips it; detaching 
   const arm = () => page.evaluate(() => JSON.stringify(pg().items[0].pose.armR));
   await page.click('#details-toggle'); await page.click('#dtab-pose');
   const before = await arm(); await page.click('.poses [data-pose="wave"]'); const waved = await arm(); assert.notEqual(before, waved);
-  await page.click('[data-act="mirror"]'); assert.equal(await page.evaluate(() => pg().items[0].pose.armL.length), 2);
+  await page.click('#inspector [data-act="mirror"]'); assert.equal(await page.evaluate(() => pg().items[0].pose.armL.length), 2);
   await page.check('[data-detach="armL"]'); assert.ok((await items(page)).some((i) => i.type === 'limbs'), 'a limbs layer was added');
   await page.close();
 });
@@ -80,6 +80,7 @@ test('style: the preview toggle (P) switches between clean and styled drawing', 
   const svg = () => page.evaluate(() => document.querySelector('#items').innerHTML);
   const clean = await svg(); await page.keyboard.press('p'); const styled = await svg();
   assert.notEqual(clean, styled); assert.match(styled, /filter="url\(#crayon-grain\)"/);
+  await page.evaluate(() => select([])); // page settings show when nothing is selected
   await page.selectOption('#style-sel', 'marker'); assert.match(await svg(), /marker-edge/);
   await page.close();
 });

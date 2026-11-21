@@ -7,7 +7,7 @@ function renderDesigner() {
   const c = castById(app.designerCast) || app.P.cast[0]; if (!c) return; app.designerCast = c.id;
   const used = app.P.pages.reduce((n, p) => n + p.items.filter((i) => i.type === 'figure' && i.cast === c.id).length, 0);
   $('#d-cast').innerHTML = app.P.cast.map((x) => `<button class="tile ${x.id === c.id ? 'on' : ''}" data-dcast="${x.id}">${figureThumb(x)}<span>${U.esc(x.name)}</span></button>`).join('');
-  $('#d-templates').innerHTML = '<option value="">+ New character from template…</option>' + TEMPLATES.map((t) => `<option value="${t.id}">${U.esc(t.name)}</option>`).join('') + (app.P.templates.length ? '<optgroup label="My templates">' + app.P.templates.map((t) => `<option value="${t.id}">${U.esc(t.name)}</option>`).join('') + '</optgroup>' : '');
+  $('#d-templates').innerHTML = '<option value="">+ New character from a starting look…</option>' + TEMPLATES.map((t) => `<option value="${t.id}">${U.esc(t.name)}</option>`).join('') + (app.P.templates.length ? '<optgroup label="My templates">' + app.P.templates.map((t) => `<option value="${t.id}">${U.esc(t.name)}</option>`).join('') + '</optgroup>' : '');
   $('#d-preview').innerHTML = figureThumb(c, app.designerPose, app.designerCrayon);
   $('#d-pose').innerHTML = opts(Object.fromEntries(posesFor(castById(app.designerCast)).map((p) => [p.id, p.name])), app.designerPose);
   $('#d-crayon').checked = app.designerCrayon;
@@ -27,7 +27,7 @@ function renderDesigner() {
     field('Name', `<input type="text" data-d="name" value="${U.esc(c.name)}">`) +
     field('Main colour', `<span class="cf"><input type="color" data-d="color" value="${c.color}"><span class="sw">${SWATCHES.map((s) => `<button style="background:${s}" data-swatch="${s}" title="${s}"></button>`).join('')}</span></span>`) +
     `<h4>Body</h4>` +
-    (FIG.rigs().length > 1 ? field('Skeleton', `<select data-d="rig">${opts(Object.fromEntries(FIG.rigs().map((r) => [r.id, r.name])), rig.id)}</select>`) : '') +
+    (FIG.rigs().length > 1 ? field('Character type', `<select data-d="rig">${opts(Object.fromEntries(FIG.rigs().map((r) => [r.id, r.name])), rig.id)}</select>`) : '') +
     field('Build', `<select data-d="build">${opts(rig.buildNames || { [c.build]: c.build }, c.build)}</select>`) +
     field(`Height <output>${(+c.height).toFixed(2)}</output>`, `<input type="range" min="0.7" max="1.4" step="0.01" data-d="height" value="${c.height}">`) +
     field(`Line weight <output>${(+c.weight).toFixed(2)}</output>`, `<input type="range" min="0.6" max="1.8" step="0.05" data-d="weight" value="${c.weight}">`) +

@@ -68,7 +68,12 @@ function onMove(e) {
     const c = d.center; let da = U.angleOf(U.sub(P, c)) - U.angleOf(U.sub(d.P0, c)); if (e.shiftKey) da = Math.round(da / 15) * 15;
     const ca = Math.cos(U.rad(da)), sa = Math.sin(U.rad(da));
     for (const [it, x0, y0, , r0] of d.starts) { const dx = x0 - c[0], dy = y0 - c[1]; it.x = Math.round(c[0] + dx * ca - dy * sa); it.y = Math.round(c[1] + dx * sa + dy * ca); it.rot = Math.round(U.normA(r0 + da)); }
-  } else if (d.kind === 'move') { const dx = P[0] - d.P0[0], dy = P[1] - d.P0[1]; for (const [it, x0, y0] of d.starts) { it.x = Math.round(x0 + dx); it.y = Math.round(y0 + dy); } }
+  } else if (d.kind === 'move') {
+    let dx = P[0] - d.P0[0], dy = P[1] - d.P0[1];
+    const sn = app.snap && !e.altKey && d.starts.length ? snapMove(d, dx, dy) : null; // hold Alt to move freely
+    if (sn) { dx += sn.dx; dy += sn.dy; } app.guides = sn && sn.guides.length ? sn.guides : null;
+    for (const [it, x0, y0] of d.starts) { it.x = Math.round(x0 + dx); it.y = Math.round(y0 + dy); }
+  }
   else if (d.kind === 'scale') { const it = d.it; const r0 = U.len([d.P0[0] - it.x, d.P0[1] - it.y]), r1 = U.len([P[0] - it.x, P[1] - it.y]); it.s = U.clamp(+(d.s0 * r1 / Math.max(r0, 1)).toFixed(3), 0.1, 8); }
   else if (d.kind === 'rot') { const it = d.it; const box = localBBox(it); const c = toPageXY(it, [(box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2]); let a = d.rot0 + U.angleOf(U.sub(P, c)) - U.angleOf(U.sub(d.P0, c)); if (e.shiftKey) a = Math.round(a / 15) * 15; it.rot = Math.round(U.normA(a)); }
   else {
@@ -80,6 +85,7 @@ function onMove(e) {
 }
 function onUp() {
   const d = app.drag; app.drag = null; if (!d) return;
+  if (app.guides) { app.guides = null; renderOverlay(); }
   if (d.kind === 'pan') { $('#stage').classList.remove('panning'); return; }
   if (d.kind === 'marquee') { $('#marquee')?.setAttribute('visibility', 'hidden'); select(app.sel); return; }
   if (d.moved) { commit(); renderInspector(); app.lastClick = null; return; }
@@ -91,4 +97,15 @@ function onUp() {
     if (!it?.group && app.lastClick?.id === d.hit && now - app.lastClick.t < 450) { app.lastClick = null; showDetails(); return; }
     app.lastClick = { id: d.hit, t: now };
   }
+}
+
+// Snapping: while moving, the selection's edges and centre are pulled onto the page's and the other items' edges and centres (6 screen pixels away at most).
+function snapMove(d, dx, dy) {
+  if (!d.box0) {
+    const moving = new Set(d.starts.map((s) => s[0].id)); d.box0 = boxOfItems(d.starts.map((s) => s[0]));
+    const { pageW: W, pageH: H } = app.P.settings;
+    d.targets = [{ x: 0, y: 0, w: W, h: H }, ...pg().items.filter((it) => it.type !== 'limbs' && !it.hidden && !moving.has(it.id)).map((it) => boxOfItems([it]))];
+  }
+  const b = d.box0;
+  return ARR.snap({ x: b.x + dx, y: b.y + dy, w: b.w, h: b.h }, d.targets, 6 / zoom());
 }

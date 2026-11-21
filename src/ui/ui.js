@@ -140,6 +140,8 @@ const UI = (() => {
   function initDynamicPopovers() {
     document.addEventListener('pointerdown', (e) => { if (dyn && !dyn.panel.contains(e.target) && !dyn.trigger.contains(e.target)) closePopover(false); }, true);
     window.addEventListener('resize', () => { if (dyn) place(dyn.panel, dyn.trigger, 'bottom-start'); });
+    // Esc closes it wherever focus is (e.g. still on the button when every menu item is disabled), and is not passed on to the page
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && dyn) { e.preventDefault(); e.stopPropagation(); closePopover(); } }, true);
   }
 
   // ---------- tabs (also the left rail) and segmented controls ----------

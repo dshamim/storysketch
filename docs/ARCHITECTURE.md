@@ -32,7 +32,13 @@ src/app/               the editor UI (DOM), split by job; plain <script>s that s
   project.js             project files, in-app dialogs, Save / Open
   plugins-panel.js       plugins dialog
   main.js                shortcuts, init, DOMContentLoaded
-src/css/app.css
+src/css/app.css            the current (older) stylesheet, migrated to the tokens during the interface revamp
+src/ui/                the new interface foundation (see docs/ui-kit.html for every component, live)
+  tokens.css               design tokens: colour, spacing, type, radii, shadows, control sizes (light theme)
+  components.css           .ui-* components built on the tokens
+  ui.js                    UI.icon, tooltips, popovers/menus, tabs, segmented controls, sections, toasts
+  icons.js                 generated from vendor/lucide/ by tools/build_icons.py
+vendor/lucide/         the Lucide icons we use (ISC licence)
 plugins/               everything that can be added without touching the core (see plugins/README.md)
   styles/ rigs/ projects/ (samples) hair/ clothes/ accessories/ props/ addons/ characters/ poses/ templates/
   manifest.js            generated index (tools/build_plugins.py or "Rescan plugins" in the app)

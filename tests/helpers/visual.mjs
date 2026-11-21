@@ -11,8 +11,8 @@ export const platform = () => `${os.platform()}-${os.arch()}`;
 export const STILL = '*, *::before, *::after { animation: none !important; transition: none !important; caret-color: transparent !important; scroll-behavior: auto !important; }';
 
 /** Compare a viewport screenshot with its baseline. Returns { ok, ratio, missing }. */
-export async function compare(page, name, { tolerance = 0.002, channel = 10 } = {}) {
-  const shot = await page.screenshot({ animations: 'disabled' });
+export async function compare(page, name, { tolerance = 0.002, channel = 10, fullPage = false } = {}) {
+  const shot = await page.screenshot({ animations: 'disabled', fullPage });
   const file = path.join(BASE, name + '.png');
   if (process.env.UPDATE_BASELINES) { fs.mkdirSync(BASE, { recursive: true }); fs.writeFileSync(file, shot); fs.writeFileSync(path.join(BASE, 'PLATFORM'), platform()); return { ok: true, ratio: 0, updated: true }; }
   if (!fs.existsSync(file)) return { ok: false, missing: true, ratio: 1 };

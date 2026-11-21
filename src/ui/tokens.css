@@ -1,0 +1,86 @@
+/* StorySketch design tokens — the single source of colours, spacing, type, radii, shadows and sizes for the new interface.
+   Light theme only for now; every colour is a token so a dark theme stays possible later.
+   Prefix --ui- on purpose: the older stylesheet (app.css) has its own variables (--panel, --line…) until it is migrated.
+   Contrast of the text/background pairs is checked by tests/unit/ui-tokens.test.mjs. */
+:root {
+  /* ---- colour: neutrals ---- */
+  --ui-gray-0: #ffffff;
+  --ui-gray-50: #f6f7f9;
+  --ui-gray-100: #eef0f3;
+  --ui-gray-150: #e4e7ec;
+  --ui-gray-200: #dfe3e8;
+  --ui-gray-300: #c5cbd4;
+  --ui-gray-500: #7d8696;   /* input borders: ≥3:1 on white and on the light grey surface */
+  --ui-gray-600: #5b6370;   /* muted text */
+  --ui-gray-900: #1b1f27;   /* text */
+  /* ---- colour: accent (violet) and status ---- */
+  --ui-violet-50: #efeaff;
+  --ui-violet-600: #5b3df5;
+  --ui-violet-700: #4a2fd6;
+  --ui-violet-800: #3b25a8;
+  --ui-red-600: #c92a1e;
+  --ui-red-50: #fdecea;
+  --ui-green-700: #0f7a55;
+  --ui-green-50: #e6f6ef;
+  --ui-amber-800: #8a5a00;
+  --ui-amber-50: #fff4d6;
+
+  /* ---- semantic colour (use these in components) ---- */
+  --ui-bg-app: #eceef2;          /* around the page / canvas */
+  --ui-surface: var(--ui-gray-0);
+  --ui-surface-2: var(--ui-gray-50);
+  --ui-surface-hover: var(--ui-gray-100);
+  --ui-surface-active: var(--ui-gray-150);
+  --ui-border: var(--ui-gray-200);
+  --ui-border-strong: var(--ui-gray-300);
+  --ui-border-input: var(--ui-gray-500);
+  --ui-text: var(--ui-gray-900);
+  --ui-text-muted: var(--ui-gray-600);
+  --ui-text-on-accent: #ffffff;
+  --ui-accent: var(--ui-violet-600);
+  --ui-accent-hover: var(--ui-violet-700);
+  --ui-accent-weak: var(--ui-violet-50);
+  --ui-accent-weak-text: var(--ui-violet-800);
+  --ui-danger: var(--ui-red-600);
+  --ui-danger-weak: var(--ui-red-50);
+  --ui-success: var(--ui-green-700);
+  --ui-success-weak: var(--ui-green-50);
+  --ui-warning: var(--ui-amber-800);
+  --ui-warning-weak: var(--ui-amber-50);
+  --ui-focus: var(--ui-violet-600);
+  --ui-overlay: rgba(27, 31, 39, 0.45);
+  --ui-tooltip-bg: #1b1f27;
+  --ui-tooltip-text: #ffffff;
+
+  /* ---- spacing: 4 px scale ---- */
+  --ui-s-1: 4px; --ui-s-2: 8px; --ui-s-3: 12px; --ui-s-4: 16px; --ui-s-5: 20px; --ui-s-6: 24px; --ui-s-8: 32px; --ui-s-10: 40px;
+
+  /* ---- shape ---- */
+  --ui-r-sm: 6px; --ui-r-md: 10px; --ui-r-lg: 14px; --ui-r-full: 999px;
+  --ui-sh-1: 0 1px 2px rgba(16, 24, 40, 0.08);
+  --ui-sh-2: 0 4px 16px rgba(16, 24, 40, 0.12);   /* popovers, floating bars */
+  --ui-sh-3: 0 12px 40px rgba(16, 24, 40, 0.18);  /* dialogs */
+
+  /* ---- type: system fonts (work offline, no licence) ---- */
+  --ui-font: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  --ui-fs-xs: 12px; --ui-fs-sm: 13px; --ui-fs-md: 14px; --ui-fs-lg: 16px; --ui-fs-xl: 20px; --ui-fs-2xl: 24px;
+  --ui-lh: 1.4;
+  --ui-fw-normal: 400; --ui-fw-medium: 500; --ui-fw-bold: 600;
+
+  /* ---- control sizes (grow on touch screens, below) ---- */
+  --ui-control-h: 32px;
+  --ui-control-h-sm: 28px;
+  --ui-icon: 20px;
+  --ui-icon-sm: 16px;
+
+  /* ---- motion and layering ---- */
+  --ui-dur: 120ms; --ui-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ui-z-popover: 50; --ui-z-tooltip: 60; --ui-z-dialog: 70; --ui-z-toast: 80;
+}
+/* fingers need bigger targets: 44 px minimum (WCAG 2.5.5), applied wherever the main pointer is coarse */
+@media (pointer: coarse) {
+  :root { --ui-control-h: 44px; --ui-control-h-sm: 40px; --ui-icon: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  :root { --ui-dur: 0ms; }
+}

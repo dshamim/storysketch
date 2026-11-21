@@ -1,6 +1,6 @@
 # StorySketch — UI revamp plan
 
-**Status:** plan, not built. Written 2026-11-21 against v0.21.0, updated the same day with the owner's decisions (below).
+**Status:** in progress. Phase 0 (safety net + `app.js` split) and Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) are done; next is Phase 2 (shell). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
 Goal: an interface that is as simple as **Canva's**: clear logical groups, graphical icons, controls shown only when relevant, a first-class **text tool**
 and a small set of **shape / arrow / pencil** tools.
 

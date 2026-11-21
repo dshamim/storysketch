@@ -11,6 +11,7 @@ npm test                   # unit tests: fast, no browser
 npm run test:e2e           # needs a Chromium that playwright-core can launch
 npm run test:visual        # pixel comparison of 13 UI states against tests/e2e/baselines (only on the platform that made them)
 npm run update:baselines   # regenerate them — only for an intended visual change; review the images
+npm run check:icons        # src/ui/icons.js is up to date; add an icon in tools/build_icons.py then `npm run build:icons`
 npm run check:plugins      # fails if plugins/manifest.js is stale — run `npm run build:plugins` after adding/removing plugin files
 ```
 

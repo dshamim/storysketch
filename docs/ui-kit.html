@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StorySketch UI kit</title>
+<link rel="stylesheet" href="../src/ui/tokens.css">
+<link rel="stylesheet" href="../src/ui/components.css">
+<style>
+  /* kit page layout only — components come from src/ui/components.css */
+  body { margin: 0; background: var(--ui-bg-app); font-family: var(--ui-font); color: var(--ui-text); }
+  .kit { max-width: 1120px; margin: 0 auto; padding: var(--ui-s-8) var(--ui-s-4) 80px; }
+  .kit h1 { margin: 0 0 var(--ui-s-1); font-size: var(--ui-fs-2xl); }
+  .kit > p { margin: 0 0 var(--ui-s-6); color: var(--ui-text-muted); max-width: 70ch; }
+  .kit h2 { margin: var(--ui-s-8) 0 var(--ui-s-3); font-size: var(--ui-fs-xl); }
+  .kit h3.sub { margin: var(--ui-s-4) 0 var(--ui-s-2); font-size: var(--ui-fs-md); color: var(--ui-text-muted); font-weight: var(--ui-fw-medium); }
+  .card { background: var(--ui-surface); border: 1px solid var(--ui-border); border-radius: var(--ui-r-md); padding: var(--ui-s-5); }
+  .grid { display: grid; gap: var(--ui-s-4); }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .chips { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--ui-s-3); }
+  .chip { display: flex; align-items: center; gap: var(--ui-s-2); font-size: var(--ui-fs-xs); }
+  .chip i { width: 32px; height: 32px; border-radius: var(--ui-r-sm); border: 1px solid var(--ui-border); flex: none; }
+  .chip code, .ico code { font-size: 11px; color: var(--ui-text-muted); display: block; }
+  .icons { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: var(--ui-s-2); }
+  .ico { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: var(--ui-s-3) var(--ui-s-1); border-radius: var(--ui-r-sm); text-align: center; }
+  .ico:hover { background: var(--ui-surface-hover); }
+  .ico .ui-i { width: 24px; height: 24px; }
+  .spacing { display: flex; align-items: flex-end; gap: var(--ui-s-3); }
+  .spacing div { background: var(--ui-accent); width: 24px; border-radius: 2px; }
+  .state-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--ui-s-3); }
+  .demo-bar { border: 1px solid var(--ui-border); border-radius: var(--ui-r-md); overflow: hidden; background: var(--ui-bg-app); }
+  .shell { display: flex; height: 260px; } .shell .main { flex: 1; display: grid; place-items: center; color: var(--ui-text-muted); }
+  .shadow-demo { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--ui-s-4); } .shadow-demo div { height: 64px; background: var(--ui-surface); border-radius: var(--ui-r-md); display: grid; place-items: center; font-size: var(--ui-fs-xs); }
+</style>
+</head>
+<body class="ui">
+<main class="kit">
+  <h1>StorySketch UI kit</h1>
+  <p>Every component of the new interface in one place: tokens, icons and live, keyboard-operable examples. Light theme only. Source: <code>src/ui/tokens.css</code>, <code>components.css</code>, <code>ui.js</code>. Hover an icon button for a tooltip; Tab through everything to see focus.</p>
+
+  <!-- ===================== TOKENS ===================== -->
+  <h2 id="tokens">Tokens</h2>
+  <div class="card">
+    <h3 class="sub">Colour (semantic)</h3>
+    <div class="chips" id="chips"></div>
+    <h3 class="sub">Spacing (4 px scale)</h3>
+    <div class="spacing" id="spacing"></div>
+    <h3 class="sub">Type</h3>
+    <div class="ui-stack" style="gap:4px">
+      <div style="font-size:var(--ui-fs-2xl);font-weight:600">Heading 24 — The day the arts disappeared</div>
+      <div style="font-size:var(--ui-fs-xl);font-weight:600">Heading 20 — Pages and scenes</div>
+      <div style="font-size:var(--ui-fs-lg)">Large 16 — Body copy for panels and dialogs</div>
+      <div style="font-size:var(--ui-fs-md)">Default 14 — Labels, buttons, menu items</div>
+      <div style="font-size:var(--ui-fs-sm)" class="ui-muted">Small 13 — Hints and secondary text</div>
+      <div style="font-size:var(--ui-fs-xs)" class="ui-muted">Extra small 12 — Captions, badges</div>
+    </div>
+    <h3 class="sub">Shadows and radii</h3>
+    <div class="shadow-demo"><div style="box-shadow:var(--ui-sh-1)">shadow 1 · inputs, cards</div><div style="box-shadow:var(--ui-sh-2)">shadow 2 · popovers, floating bars</div><div style="box-shadow:var(--ui-sh-3);border-radius:var(--ui-r-lg)">shadow 3 · dialogs</div></div>
+  </div>
+
+  <!-- ===================== ICONS ===================== -->
+  <h2 id="icons">Icons <span class="ui-badge" id="icon-count"></span></h2>
+  <div class="card"><p class="ui-muted" style="margin-top:0">Lucide (ISC licence). Use <code>UI.icon('name')</code> or <code>&lt;span data-icon="name"&gt;&lt;/span&gt;</code>. Icons are decorative; the button carries the accessible name.</p><div class="icons" id="icons-grid"></div></div>
+
+  <!-- ===================== BUTTONS ===================== -->
+  <h2 id="buttons">Buttons</h2>
+  <div class="card ui-stack">
+    <div class="state-row" id="btns">
+      <button class="ui-btn primary">Primary</button>
+      <button class="ui-btn">Secondary</button>
+      <button class="ui-btn ghost">Ghost</button>
+      <button class="ui-btn danger">Danger</button>
+      <button class="ui-btn primary" disabled>Disabled</button>
+      <button class="ui-btn sm">Small</button>
+      <button class="ui-btn primary"><span data-icon="export"></span>With icon</button>
+    </div>
+    <div class="state-row" id="iconbtns">
+      <button class="ui-iconbtn" aria-label="Undo" data-tip="Undo" data-kbd="Ctrl+Z"><span data-icon="undo"></span></button>
+      <button class="ui-iconbtn" aria-label="Redo" data-tip="Redo" data-kbd="Ctrl+Shift+Z"><span data-icon="redo"></span></button>
+      <button class="ui-iconbtn" aria-label="Rotate" data-tip="Rotate" data-kbd="R"><span data-icon="rotate"></span></button>
+      <button class="ui-iconbtn" aria-label="Duplicate" data-tip="Duplicate" data-kbd="Ctrl+D"><span data-icon="copy"></span></button>
+      <button class="ui-iconbtn" aria-label="Lock" aria-pressed="true" data-tip="Lock" data-kbd="Ctrl+Shift+L"><span data-icon="lock"></span></button>
+      <button class="ui-iconbtn danger" aria-label="Delete" data-tip="Delete" data-kbd="Del"><span data-icon="delete"></span></button>
+      <button class="ui-iconbtn" aria-label="Disabled example" disabled><span data-icon="paste"></span></button>
+      <button class="ui-iconbtn has-label" aria-label="Align" data-tip="Align"><span data-icon="align-left"></span>Align<span data-icon="chevron-down" data-icon-class="sm"></span></button>
+    </div>
+    <p class="ui-muted" style="margin:0">Icon buttons always have <code>aria-label</code>; <code>data-tip</code> + <code>data-kbd</code> add the tooltip with its shortcut. <code>aria-pressed</code> gives the toggled look.</p>
+  </div>
+
+  <!-- ===================== FORM CONTROLS ===================== -->
+  <h2 id="forms">Form controls</h2>
+  <div class="card grid g2">
+    <div class="ui-stack">
+      <div class="ui-field"><label for="f-name">Text field</label><input id="f-name" class="ui-input" value="Reading time"></div>
+      <div class="ui-field"><label for="f-sel">Select</label><div class="ui-select"><select id="f-sel"><option>Crayon</option><option>Marker</option><option>Ink pen</option><option>Chalk</option></select><span data-icon="chevron-down"></span></div></div>
+      <div class="ui-field"><label for="f-rng">Slider with value</label><div class="ui-range" data-unit="px"><input id="f-rng" type="range" min="12" max="120" value="48"><output></output></div></div>
+      <div class="ui-field"><label for="f-num">Number</label><input id="f-num" class="ui-input num" type="number" value="48" min="1"></div>
+    </div>
+    <div class="ui-stack">
+      <label class="ui-switch"><input type="checkbox" role="switch" checked><span class="ui-switch-track"></span><span>Show grid</span></label>
+      <label class="ui-switch"><input type="checkbox" role="switch"><span class="ui-switch-track"></span><span>Snap to objects</span></label>
+      <label class="ui-check"><input type="checkbox" checked><span class="ui-check-box"><span data-icon="check"></span></span><span>Put arms in front</span></label>
+      <label class="ui-check"><input type="checkbox"><span class="ui-check-box"><span data-icon="check"></span></span><span>Rounded corners</span></label>
+      <label class="ui-check"><input type="checkbox" disabled><span class="ui-check-box"><span data-icon="check"></span></span><span>Disabled</span></label>
+      <div class="ui-field"><span class="ui-label" id="seg-l">Segmented control</span>
+        <div class="ui-seg" role="radiogroup" aria-labelledby="seg-l"><button role="radio" aria-checked="true">Styled</button><button role="radio" aria-checked="false">Clean</button></div></div>
+      <div class="ui-field"><span class="ui-label" id="sw-l">Colour</span>
+        <div class="ui-swatches" role="radiogroup" aria-labelledby="sw-l">
+          <button class="ui-swatch" role="radio" aria-checked="true" aria-label="Red" style="--sw:#e53935"></button>
+          <button class="ui-swatch" role="radio" aria-checked="false" aria-label="Orange" style="--sw:#fb8c00"></button>
+          <button class="ui-swatch" role="radio" aria-checked="false" aria-label="Green" style="--sw:#43a047"></button>
+          <button class="ui-swatch" role="radio" aria-checked="false" aria-label="Blue" style="--sw:#1e88e5"></button>
+          <button class="ui-swatch" role="radio" aria-checked="false" aria-label="Purple" style="--sw:#8e24aa"></button>
+          <label class="ui-swatch ui-swatch-custom" aria-label="Custom colour"><input type="color" value="#00897b"></label>
+        </div></div>
+    </div>
+  </div>
+
+  <!-- ===================== NAVIGATION ===================== -->
+  <h2 id="nav">Tabs, rail, sections</h2>
+  <div class="card grid g2">
+    <div>
+      <h3 class="sub" style="margin-top:0">Tabs (arrow keys, Home/End)</h3>
+      <div class="ui-tabs" role="tablist" aria-label="Details" id="tabs-demo">
+        <button class="ui-tab" role="tab" id="tab-look" aria-selected="true" aria-controls="panel-look">Look</button>
+        <button class="ui-tab" role="tab" id="tab-pose" aria-selected="false" aria-controls="panel-pose">Pose</button>
+        <button class="ui-tab" role="tab" id="tab-arrange" aria-selected="false" aria-controls="panel-arrange">Arrange</button>
+      </div>
+      <div role="tabpanel" id="panel-look" aria-labelledby="tab-look" style="padding:12px 0">Colours, expression and options.</div>
+      <div role="tabpanel" id="panel-pose" aria-labelledby="tab-pose" style="padding:12px 0" hidden>Preset poses and how dragging works.</div>
+      <div role="tabpanel" id="panel-arrange" aria-labelledby="tab-arrange" style="padding:12px 0" hidden>Position, size, rotation and layer order.</div>
+      <h3 class="sub">Collapsible sections</h3>
+      <div style="border:1px solid var(--ui-border);border-radius:var(--ui-r-md);overflow:hidden" id="sections-demo">
+        <section class="ui-section"><button class="ui-section-h" aria-expanded="true">Appearance <span data-icon="chevron-down"></span></button><div class="ui-section-b"><div class="ui-field"><label for="s1">Expression</label><div class="ui-select"><select id="s1"><option>Happy</option><option>Sad</option></select><span data-icon="chevron-down"></span></div></div></div></section>
+        <section class="ui-section"><button class="ui-section-h" aria-expanded="false">Layering <span data-icon="chevron-down"></span></button><div class="ui-section-b"><label class="ui-check"><input type="checkbox"><span class="ui-check-box"><span data-icon="check"></span></span><span>Left arm in front</span></label></div></section>
+      </div>
+    </div>
+    <div>
+      <h3 class="sub" style="margin-top:0">Left rail</h3>
+      <div class="demo-bar"><div class="shell">
+        <nav class="ui-rail" role="tablist" aria-orientation="vertical" aria-label="Library" id="rail-demo">
+          <button class="ui-rail-btn" role="tab" aria-selected="true"><span data-icon="characters"></span>Characters</button>
+          <button class="ui-rail-btn" role="tab" aria-selected="false"><span data-icon="props"></span>Props</button>
+          <button class="ui-rail-btn" role="tab" aria-selected="false"><span data-icon="shapes"></span>Shapes</button>
+          <button class="ui-rail-btn" role="tab" aria-selected="false"><span data-icon="text"></span>Text</button>
+          <button class="ui-rail-btn" role="tab" aria-selected="false"><span data-icon="layers"></span>Layers</button>
+          <button class="ui-rail-btn" role="tab" aria-selected="false"><span data-icon="addons"></span>Add-ons</button>
+        </nav><div class="main">flyout + canvas</div></div></div>
+    </div>
+  </div>
+
+  <!-- ===================== OVERLAYS ===================== -->
+  <h2 id="overlays">Popover, menu, dialog, toast</h2>
+  <div class="card ui-stack">
+    <div class="state-row">
+      <button class="ui-btn" id="menu-btn"><span data-icon="file"></span>File<span data-icon="chevron-down" data-icon-class="sm"></span></button>
+      <div class="ui-popover ui-menu" role="menu" id="menu-demo" aria-label="File" hidden>
+        <button role="menuitem"><span data-icon="new"></span><span class="grow">New</span><kbd class="ui-kbd">Ctrl+N</kbd></button>
+        <button role="menuitem"><span data-icon="open"></span><span class="grow">Open…</span><kbd class="ui-kbd">Ctrl+O</kbd></button>
+        <button role="menuitem"><span data-icon="save"></span><span class="grow">Save</span><kbd class="ui-kbd">Ctrl+S</kbd></button>
+        <hr>
+        <button role="menuitem"><span data-icon="export"></span><span class="grow">Export…</span></button>
+        <button role="menuitem" class="danger"><span data-icon="delete"></span><span class="grow">Delete page</span></button>
+        <button role="menuitem" disabled><span data-icon="paste"></span><span class="grow">Paste (nothing copied)</span></button>
+      </div>
+      <button class="ui-btn" id="pop-btn"><span data-icon="style"></span>Style</button>
+      <div class="ui-popover" id="pop-demo" role="dialog" aria-label="Choose a style" hidden>
+        <div class="ui-field"><span class="ui-label" id="st-l">Drawing style</span>
+          <div class="ui-seg" role="radiogroup" aria-labelledby="st-l"><button role="radio" aria-checked="true">Crayon</button><button role="radio" aria-checked="false">Marker</button><button role="radio" aria-checked="false">Ink</button><button role="radio" aria-checked="false">Chalk</button></div></div>
+      </div>
+      <button class="ui-btn" id="dlg-btn">Open dialog</button>
+      <button class="ui-btn" id="toast-btn">Show toast</button>
+      <button class="ui-btn" id="toast-ok-btn">Success toast</button>
+    </div>
+    <dialog class="ui-dialog" id="dlg-demo" aria-labelledby="dlg-title">
+      <div class="ui-dialog-h"><h2 id="dlg-title">Delete this page?</h2><button class="ui-iconbtn" aria-label="Close" id="dlg-x"><span data-icon="close"></span></button></div>
+      <div class="ui-dialog-b">The page and everything on it will be removed. You can undo this with Ctrl+Z.</div>
+      <div class="ui-dialog-f"><button class="ui-btn" id="dlg-cancel">Cancel</button><button class="ui-btn primary" id="dlg-ok">Delete page</button></div>
+    </dialog>
+  </div>
+
+  <!-- ===================== COMPOSITES ===================== -->
+  <h2 id="composites">Bars, tiles, filmstrip, empty state</h2>
+  <div class="card ui-stack">
+    <h3 class="sub" style="margin-top:0">Top bar + ribbon</h3>
+    <div class="demo-bar">
+      <div class="ui-topbar"><span class="ui-brand"><span data-icon="style"></span>StorySketch</span>
+        <button class="ui-btn ghost sm">File</button><button class="ui-btn ghost sm">Edit</button><button class="ui-btn ghost sm">View</button>
+        <span style="flex:1"></span><span class="ui-status"><span data-icon="success" data-icon-class="sm"></span>Saved</span>
+        <button class="ui-iconbtn" aria-label="Undo" data-tip="Undo" data-kbd="Ctrl+Z"><span data-icon="undo"></span></button><button class="ui-iconbtn" aria-label="Redo" data-tip="Redo"><span data-icon="redo"></span></button>
+        <button class="ui-btn primary"><span data-icon="export"></span>Export</button></div>
+      <div class="ui-ribbon">
+        <div class="ui-select" style="min-width:130px"><select aria-label="Font"><option>Hand-drawn</option></select><span data-icon="chevron-down"></span></div>
+        <button class="ui-iconbtn" aria-label="Smaller" data-tip="Smaller"><span data-icon="remove"></span></button><input class="ui-input num" aria-label="Size" value="48"><button class="ui-iconbtn" aria-label="Larger" data-tip="Larger"><span data-icon="add"></span></button>
+        <span class="ui-divider-v"></span>
+        <button class="ui-iconbtn" aria-label="Bold" aria-pressed="true" data-tip="Bold" data-kbd="Ctrl+B"><span data-icon="bold"></span></button>
+        <button class="ui-iconbtn" aria-label="Colour" data-tip="Colour"><span data-icon="color"></span></button>
+        <button class="ui-iconbtn" aria-label="Align left" data-tip="Align left"><span data-icon="text-left"></span></button>
+        <span class="ui-divider-v"></span>
+        <button class="ui-iconbtn has-label" aria-label="Position"><span data-icon="layers"></span>Position</button>
+        <button class="ui-iconbtn" aria-label="Rotate" data-tip="Rotate"><span data-icon="rotate"></span></button>
+      </div>
+      <div style="padding:24px;display:grid;place-items:center"><div class="ui-minibar" role="toolbar" aria-label="Selection">
+        <button class="ui-iconbtn sm" aria-label="Duplicate" data-tip="Duplicate"><span data-icon="copy"></span></button><button class="ui-iconbtn sm" aria-label="Lock" data-tip="Lock"><span data-icon="unlock"></span></button>
+        <button class="ui-iconbtn sm danger" aria-label="Delete" data-tip="Delete"><span data-icon="delete"></span></button><button class="ui-iconbtn sm" aria-label="More" data-tip="More"><span data-icon="more"></span></button></div></div>
+    </div>
+    <div class="grid g2">
+      <div><h3 class="sub">Tiles</h3>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <button class="ui-tile"><span class="ui-tile-img"><span data-icon="characters"></span></span>Teacher</button>
+          <button class="ui-tile" aria-pressed="true"><span class="ui-tile-img"><span data-icon="dog"></span></span>Rex</button>
+          <button class="ui-tile"><span class="ui-tile-img"><span data-icon="cat"></span></span>Mittens</button></div></div>
+      <div><h3 class="sub">Badges</h3><div class="state-row"><span class="ui-badge">Default</span><span class="ui-badge accent">New</span><span class="ui-badge success">Saved</span><span class="ui-badge warning">Unsaved</span><span class="ui-badge danger">Error</span><kbd class="ui-kbd">Ctrl</kbd><kbd class="ui-kbd">K</kbd></div></div>
+    </div>
+    <div><h3 class="sub">Filmstrip</h3>
+      <div class="ui-film" role="list" aria-label="Pages">
+        <button class="ui-film-item" aria-current="true" aria-label="Page 1: Reading time"><span class="ui-film-thumb"></span><span class="ui-film-num">1</span></button>
+        <button class="ui-film-item" aria-label="Page 2: Art corner"><span class="ui-film-thumb"></span><span class="ui-film-num">2</span></button>
+        <button class="ui-film-item ui-film-add" aria-label="Add page" data-tip="Add page"><span data-icon="add"></span></button></div></div>
+    <div class="ui-empty"><span data-icon="pages"></span><h3>Start with a sample or a blank page</h3><p>Open a ready-made scene to explore, or begin with an empty page.</p><div class="ui-row"><button class="ui-btn primary">Blank page</button><button class="ui-btn">Open a file…</button></div></div>
+  </div>
+</main>
+
+<script src="../src/ui/icons.js"></script>
+<script src="../src/ui/ui.js"></script>
+<script>
+  // kit-page only: render tokens and the icon gallery
+  const css = getComputedStyle(document.documentElement);
+  const colours = ['bg-app', 'surface', 'surface-2', 'surface-hover', 'border', 'border-input', 'text', 'text-muted', 'accent', 'accent-hover', 'accent-weak', 'accent-weak-text', 'danger', 'danger-weak', 'success', 'warning', 'focus'];
+  document.getElementById('chips').innerHTML = colours.map((c) => `<div class="chip"><i style="background:var(--ui-${c})"></i><span>${c}<code>${css.getPropertyValue('--ui-' + c).trim()}</code></span></div>`).join('');
+  document.getElementById('spacing').innerHTML = [1, 2, 3, 4, 5, 6, 8, 10].map((n) => `<span style="text-align:center;font-size:11px"><div style="height:${4 * n}px;width:${4 * n}px"></div>s-${n}<br>${4 * n}px</span>`).join('');
+  const names = Object.keys(window.UI_ICONS).sort();
+  document.getElementById('icon-count').textContent = names.length + ' icons';
+  document.getElementById('icons-grid').innerHTML = names.map((n) => `<div class="ico">${UI.icon(n)}<code>${n}</code></div>`).join('');
+
+  // wiring for the demos
+  UI.popover(document.getElementById('menu-btn'), document.getElementById('menu-demo'));
+  UI.popover(document.getElementById('pop-btn'), document.getElementById('pop-demo'));
+  const dlg = document.getElementById('dlg-demo');
+  document.getElementById('dlg-btn').onclick = () => dlg.showModal();
+  for (const id of ['dlg-x', 'dlg-cancel', 'dlg-ok']) document.getElementById(id).onclick = () => dlg.close();
+  document.getElementById('toast-btn').onclick = () => UI.toast('Page colour changed to suit Chalk');
+  document.getElementById('toast-ok-btn').onclick = () => UI.toast('Saved to my-book.json', { kind: 'success' });
+</script>
+</body>
+</html>

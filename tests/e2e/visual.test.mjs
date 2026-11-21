@@ -51,4 +51,11 @@ for (const [name, setup] of Object.entries(STATES)) {
     assert.ok(r.ok, `${name}: ${(r.ratio * 100).toFixed(3)}% of pixels differ (see tests/e2e/__actual__/${name}.png)`);
   });
 }
+test('visual: ui-kit page (all components, tokens and icons)', { skip }, async () => {
+  const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 1 }); const errs = [];
+  page.on('pageerror', (e) => errs.push(e.message));
+  await page.goto(url.replace('index.html', 'docs/ui-kit.html')); await page.waitForFunction(() => document.getElementById('ui-sprite')); await page.addStyleTag({ content: STILL }); await page.waitForTimeout(300);
+  const r = await compare(page, 'ui-kit', { fullPage: true }); await page.close();
+  assert.deepEqual(errs, []); assert.ok(!r.missing, 'no baseline for ui-kit (run npm run update:baselines)'); assert.ok(r.ok, `ui-kit: ${(r.ratio * 100).toFixed(3)}% of pixels differ`);
+});
 test.after(async () => { if (browser) await browser.close(); server.close(); });

@@ -10,11 +10,13 @@
     "serve": "python3 -m http.server 8765",
     "build:plugins": "python3 tools/build_plugins.py",
     "check:plugins": "python3 tools/build_plugins.py --check",
+    "check:icons": "python3 tools/build_icons.py --check",
+    "build:icons": "python3 tools/build_icons.py",
     "test": "node --test \"tests/unit/*.test.mjs\"",
     "test:e2e": "node --test \"tests/e2e/*.test.mjs\"",
     "test:visual": "node --test tests/e2e/visual.test.mjs",
     "update:baselines": "node tools/update_baselines.mjs",
-    "test:all": "npm run check:plugins && npm test && npm run test:e2e"
+    "test:all": "npm run check:plugins && npm run check:icons && npm test && npm run test:e2e"
   },
   "devDependencies": {
     "playwright-core": "^1.50.0"

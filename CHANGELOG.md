@@ -5,6 +5,12 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
+## Unreleased — interface foundations (revamp phase 1; nothing changes on screen yet)
+- New design system in `src/ui/`: **tokens** (colour, 4 px spacing, type, radii, shadows, control sizes that grow to 44 px on touch screens), **components** (buttons, icon buttons, fields, switch, checkbox, segmented control, tabs, left rail, swatches, popover and menu, tooltip, collapsible section, tile, filmstrip, badge, empty state, top bar, ribbon, mini bar, dialog, toast) and **behaviour** (`ui.js`): keyboard-operable tooltips with shortcuts, popovers and menus, tabs with arrow keys, sections, toasts.
+- **99 icons** from Lucide (ISC) as one generated file that works from disk; `docs/ui-kit.html` shows every token, icon and component with live examples. Light theme only.
+- The app now loads these files but does not use them yet: the 13 screenshot baselines are byte-identical.
+- Tests: contrast of 23 colour pairs (WCAG 4.5:1 text, 3:1 controls), icon integrity, and 11 browser tests for accessibility and keyboard behaviour. They caught two real problems before release: input borders too faint on grey (2.89:1 → 3.4:1) and tooltips vanishing when keyboard focus scrolled the page.
+
 ## 0.21.0 — StorySketch: styles, skeletons, tests, open source
 The tool is renamed **StorySketch** (it was "Crayon Poser"): crayon is now one of several styles. Existing project files open as before, and your browser autosave and remembered file are carried over.
 - **Drawing styles are plugins.** New: **Marker (felt-tip)**, **Ink pen** and **Chalk (blackboard)** next to Crayon, which looks exactly the same as before (checked byte for byte). Pick the style under *Page → Drawing style*; export uses it (or *Clean lines*). Chalk draws dark lines in chalk-white and offers a blackboard page colour. Dark pages work in every style.

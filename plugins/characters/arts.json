@@ -1,0 +1,9 @@
+{
+  "api": 1,
+  "version": "1.0.0",
+  "id": "arts",
+  "name": "The Arts",
+  "color": "#e53935",
+  "hair": "curly",
+  "order": 12
+}

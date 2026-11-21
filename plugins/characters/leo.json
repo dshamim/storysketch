@@ -1,0 +1,10 @@
+{
+  "api": 1,
+  "version": "1.0.0",
+  "id": "leo",
+  "name": "Leo",
+  "color": "#ef7d10",
+  "body": "stripes",
+  "hair": "spiky",
+  "order": 6
+}

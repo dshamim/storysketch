@@ -1,0 +1,12 @@
+{
+  "api": 1,
+  "version": "1.0.0",
+  "id": "mia",
+  "name": "Mia",
+  "color": "#14998f",
+  "hair": "curlylong",
+  "accessories": {
+    "glasses": {}
+  },
+  "order": 5
+}

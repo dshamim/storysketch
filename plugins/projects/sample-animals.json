@@ -1,0 +1,34 @@
+{
+ "api": 1,
+ "version": "1.0.0",
+ "id": "sample-animals",
+ "name": "Sample — Pets and dinosaurs (3 pages)",
+ "description": "A dog, a cat and a dinosaur next to children, using the four-legged skeleton. Marker style.",
+ "settings": {"style": "marker"},
+ "cast": ["noah", "zara", {"template": "t-dog", "id": "rex", "name": "Rex"}, {"template": "t-cat", "id": "mittens", "name": "Mittens", "color": "#8a8f98"}, {"template": "t-dino", "id": "dino", "name": "Dino"}],
+ "pages": [
+  { "name": "A walk in the park", "notes": "Rex is a four-legged character: drag his paws, tail or head. Animals have their own poses (Stand, Walk, Run, Sit, Lie down, Beg, Bark, Sniff, Happy).",
+    "items": [
+     {"type": "prop", "kind": "sun", "x": 870, "y": 115, "s": 0.85},
+     {"type": "prop", "kind": "cloud", "x": 470, "y": 105, "s": 0.85},
+     {"type": "prop", "kind": "plant", "x": 100, "y": 650, "s": 1.15},
+     {"type": "figure", "cast": "noah", "x": 240, "floor": 650, "pose": "walk", "s": 1.3},
+     {"type": "figure", "cast": "rex", "x": 578, "floor": 650, "pose": "run", "s": 1.3},
+     {"type": "figure", "cast": "zara", "x": 864, "floor": 650, "pose": "wave", "flip": true, "s": 1.3}
+    ] },
+  { "name": "Cat on the table", "notes": "Mittens lies on the table. Layering works the same for animals as for people: Rex sits in front, and anything can be moved forward or back with [ and ].",
+    "items": [
+     {"type": "prop", "kind": "table", "x": 500, "y": 589, "params": {"width": 480}, "s": 1.22},
+     {"type": "figure", "cast": "mittens", "x": 500, "floor": 443, "pose": "lie", "s": 1.22},
+     {"type": "figure", "cast": "zara", "x": 866, "floor": 650, "pose": "point", "flip": true, "s": 1.22},
+     {"type": "figure", "cast": "rex", "x": 85, "floor": 650, "pose": "beg", "expr": "panting", "s": 1.22}
+    ] },
+  { "name": "A dinosaur visits", "notes": "The Dinosaur is the same skeleton as the dog with a different build (long neck and tail, back plates).",
+    "items": [
+     {"type": "prop", "kind": "sun", "x": 870, "y": 115, "s": 0.85},
+     {"type": "figure", "cast": "dino", "x": 500, "floor": 650, "pose": "bark", "s": 1.3},
+     {"type": "figure", "cast": "noah", "x": 150, "floor": 650, "pose": "jump", "expr": "surprised", "s": 1.17},
+     {"type": "figure", "cast": "zara", "x": 870, "floor": 650, "pose": "cheer", "flip": true, "s": 1.3}
+    ] }
+ ]
+}

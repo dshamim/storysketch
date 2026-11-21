@@ -1,0 +1,15 @@
+{
+ "api": 1, "version": "1.0.0",
+ "items": [
+  {"id": "t-girl", "name": "Girl – dress & ponytail", "look": {"body": "dress", "hair": "ponytail"}},
+  {"id": "t-boy", "name": "Boy – T-shirt & short hair", "look": {"body": "tshirt", "hair": "short"}},
+  {"id": "t-curly", "name": "Curly hair & glasses", "look": {"body": "dress", "hair": "curlylong", "accessories": {"glasses": {}}}},
+  {"id": "t-hero", "name": "Superhero kid", "look": {"body": "stripes", "hair": "spiky", "accessories": {"mask": {}, "cape": {}}}},
+  {"id": "t-actor", "name": "Actor with crown", "look": {"body": "dress", "hair": "pigtails", "accessories": {"crown": {}}}},
+  {"id": "t-scarf", "name": "Headscarf & tunic", "look": {"body": "tunic", "hair": "headscarf"}},
+  {"id": "t-wheel", "name": "Wheelchair user", "look": {"body": "tshirt", "hair": "curly", "defaultPose": "sit", "accessories": {"wheelchair": {}}}},
+  {"id": "t-teacher", "name": "Grown-up – long dress", "look": {"build": "adult", "body": "longdress", "hair": "long"}},
+  {"id": "t-adultm", "name": "Grown-up – shirt", "look": {"build": "adult", "body": "tshirt", "hair": "short", "accessories": {"glasses": {}}}},
+  {"id": "t-stick", "name": "Plain stick figure", "look": {"body": "stick", "hair": "none"}}
+ ]
+}

@@ -1,0 +1,32 @@
+{
+ "api": 1,
+ "version": "1.0.0",
+ "id": "sample-airport",
+ "name": "Sample — At the airport (2 pages)",
+ "description": "Inside the terminal and out on the runway, from the airport prop packs. Ink-pen style.",
+ "settings": {"style": "ink"},
+ "cast": ["teacher", "maya", "leo"],
+ "pages": [
+  { "name": "Check-in", "notes": "The big window is see-through: the aircraft behind it is a separate prop sent to the back.",
+    "items": [
+     {"type": "prop", "kind": "aircraft", "x": 640, "y": 340, "s": 0.5},
+     {"type": "prop", "kind": "airportwindow", "x": 500, "y": 470, "s": 0.88},
+     {"type": "prop", "kind": "departures", "x": 250, "y": 175, "s": 0.7},
+     {"type": "prop", "kind": "checkin", "x": 760, "y": 690, "s": 1.0},
+     {"type": "figure", "cast": "maya", "x": 380, "floor": 690, "pose": "give", "s": 1.0},
+     {"type": "prop", "kind": "suitcase", "x": 270, "y": 690, "s": 1.0},
+     {"type": "figure", "cast": "leo", "x": 560, "floor": 690, "pose": "wave", "s": 0.85}
+    ] },
+  { "name": "Ready for take-off", "notes": "Runway, tower and aircraft are props; the windsock shows the wind.",
+    "items": [
+     {"type": "prop", "kind": "sun", "x": 850, "y": 135, "s": 1.2},
+     {"type": "prop", "kind": "cloud", "x": 250, "y": 140, "s": 1.1},
+     {"type": "prop", "kind": "cloud", "x": 560, "y": 90, "s": 0.8},
+     {"type": "prop", "kind": "ctower", "x": 160, "y": 530, "s": 0.85},
+     {"type": "prop", "kind": "runway", "x": 500, "y": 640, "s": 0.98},
+     {"type": "prop", "kind": "aircraft", "x": 580, "y": 560, "s": 0.62, "params": {"stairs": true, "door": true}},
+     {"type": "prop", "kind": "windsock", "x": 900, "y": 540, "s": 0.9},
+     {"type": "figure", "cast": "teacher", "x": 300, "floor": 715, "pose": "wave", "s": 0.75}
+    ] }
+ ]
+}

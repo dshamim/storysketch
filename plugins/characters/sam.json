@@ -1,0 +1,14 @@
+{
+  "api": 1,
+  "version": "1.0.0",
+  "id": "sam",
+  "name": "Sam",
+  "color": "#e0402f",
+  "body": "tshirt",
+  "hair": "curly",
+  "defaultPose": "sit",
+  "accessories": {
+    "wheelchair": {}
+  },
+  "order": 3
+}

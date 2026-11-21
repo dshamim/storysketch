@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StorySketch</title>
+<link rel="stylesheet" href="src/css/app.css">
+</head>
+<body>
+<svg id="defs-holder" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
+
+<header>
+  <div class="brand">✏️ StorySketch <small id="ver"></small></div>
+  <div class="pagenav">
+    <button id="prev-page" title="Previous page">◀</button>
+    <select id="page-sel"></select>
+    <button id="next-page" title="Next page">▶</button>
+    <button id="add-page" title="Add a page after this one">+ Page</button>
+    <button id="rename-page" title="Rename this page / edit its notes">✎</button>
+    <button id="del-page" title="Delete this page" class="danger">🗑</button>
+  </div>
+  <button id="preview" title="Toggle style preview (P)">✏️ Preview: off</button>
+  <div class="spacer"></div>
+  <button id="undo" title="Undo (Ctrl+Z)">↶</button>
+  <button id="redo" title="Redo (Ctrl+Shift+Z)">↷</button>
+  <button id="open-designer" title="Character designer">👤 Designer</button>
+  <button id="open-plugins" title="Installed plugins: hair, clothes, accessories, props, characters, poses">🧩 Plugins</button>
+  <button id="open-export" class="primary">⬇ Export</button>
+  <div class="proj">
+    <span id="file-name"></span>
+    <button id="save" title="Save to the current file (Ctrl+S)">Save</button>
+    <button id="saveas" title="Save a copy to a new file (Ctrl+Shift+S)">Save as…</button>
+    <button id="load" title="Open a project file (Ctrl+O)">Open…</button>
+    <button id="new">New</button>
+    <input type="file" id="load-file" accept=".json,application/json" hidden>
+  </div>
+</header>
+
+<main>
+  <aside id="left">
+    <div class="lhead">
+      <nav class="tabs">
+        <button data-tab="tab-cast" class="on">Characters</button>
+        <button data-tab="tab-props">Props</button>
+        <button data-tab="tab-page">Pages</button>
+        <button data-tab="tab-layers">Layers</button>
+      </nav>
+      <input id="lsearch" type="search" placeholder="Search characters…  ( / )" autocomplete="off">
+    </div>
+    <section class="tabpane" id="tab-cast">
+      <p class="muted small">Click to add to the page. Edit looks in the Character designer.</p>
+      <div class="grid" id="cast-grid"></div>
+      <div id="lib-section"></div>
+    </section>
+    <section class="tabpane" id="tab-layers" hidden>
+      <p class="muted small">Top of the list = front. Click to select (Ctrl/Shift-click for several) — handy for picking something buried under other things. ▣ = a group. 🔒 = locked: it can't be clicked or moved on the page; click 🔒 here to unlock.</p>
+      <div id="layers"></div>
+    </section>
+    <section class="tabpane" id="tab-props" hidden><div id="prop-list"></div></section>
+    <section class="tabpane" id="tab-page" hidden>
+      <h4>This page</h4>
+      <label class="f"><span>Page name</span><input id="page-name" type="text"></label>
+      <label class="f"><span>Notes</span><textarea id="page-notes" rows="5" placeholder="What happens, visual choice, Q&amp;A point…"></textarea></label>
+      <h4>All pages <small class="muted">(click to open)</small></h4>
+      <div id="page-list"></div>
+      <div class="row"><button id="add-page2">+ Add page</button></div>
+      <h4>Book settings</h4>
+      <label class="f"><span>Page size (all pages)</span>
+        <select id="page-size">
+          <option value="1000x750">4:3 landscape</option>
+          <option value="1000x707">A4 landscape</option>
+          <option value="1000x563">16:9</option>
+          <option value="900x900">Square</option>
+          <option value="707x1000">A4 portrait</option>
+        </select></label>
+      <label class="f"><span>Drawing style (preview and export)</span><select id="style-sel"></select></label>
+      <label class="f"><span>Paper colour (match your page or slide background)</span><input id="paper-col" type="color"></label>
+      <p class="muted small">Export sizes: 1× = 1000 px wide, 4× = 4000 px wide (print, ≈ A4 at 300 dpi).</p>
+    </section>
+  </aside>
+
+  <section id="center">
+    <div id="page-strip"></div>
+    <div id="stage-wrap"><svg id="stage" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
+      <div id="zoombar" title="Ctrl + mouse wheel (or pinch) zooms where the pointer is. Wheel or Space-drag moves around.">
+        <button id="zoom-out" title="Zoom out (Ctrl+−)">−</button><button id="zoom-pct" title="Fit the whole page (Ctrl+0)">100%</button><button id="zoom-in" title="Zoom in (Ctrl+=)">+</button><button id="zoom-sel" title="Zoom to the selection (Shift+2)">🔍 Selection</button>
+      </div></div>
+  </section>
+
+  <aside id="right">
+    <div id="inspector"></div>
+  </aside>
+</main>
+
+<dialog id="designer">
+  <div class="dhead"><b>Character designer</b><select id="d-templates"></select><button id="d-close">Done</button></div>
+  <div class="dbody">
+    <div class="dcol" id="d-cast"></div>
+    <div class="dpreview">
+      <div id="d-preview"></div>
+      <div class="row"><select id="d-pose"></select><label class="chk"><input type="checkbox" id="d-crayon"> styled</label></div>
+    </div>
+    <div class="dform" id="d-form"></div>
+  </div>
+</dialog>
+
+<dialog id="export">
+  <form id="export-form" method="dialog">
+    <h3>Export</h3>
+    <fieldset><legend>What</legend>
+      <label><input type="radio" name="what" value="page" checked> Whole page</label>
+      <label><input type="radio" name="what" value="selection"> Selection (one PNG, overlaps kept)</label>
+      <label><input type="radio" name="what" value="layers"> Every layer as its own file</label>
+    </fieldset>
+    <fieldset><legend>Look</legend>
+      <select name="look" id="ex-look"></select>
+    </fieldset>
+    <fieldset><legend>Background</legend>
+      <label><input type="radio" name="bg" value="none" checked> Transparent</label>
+      <label><input type="radio" name="bg" value="paper"> Paper colour</label>
+    </fieldset>
+    <fieldset><legend>Size</legend>
+      <label><input type="radio" name="scale" value="1"> 1×</label>
+      <label><input type="radio" name="scale" value="2" checked> 2×</label>
+      <label><input type="radio" name="scale" value="3"> 3×</label>
+      <label><input type="radio" name="scale" value="4"> 4× (print)</label>
+    </fieldset>
+    <fieldset><legend>Format</legend>
+      <label><input type="radio" name="fmt" value="png" checked> PNG</label>
+      <label><input type="radio" name="fmt" value="svg"> SVG</label>
+    </fieldset>
+    <label class="chk" id="ask-row"><input type="checkbox" name="ask" checked> Choose where to save (opens in the last export folder)</label>
+    <p class="muted small">For AI image tools: Whole page · Clean · Paper colour · 1×.</p>
+    <div class="row"><button id="do-export" class="primary">Export</button><button id="x-close" type="button">Close</button><span id="export-status"></span></div>
+  </form>
+</dialog>
+
+<dialog id="newdlg">
+  <form method="dialog" class="pad">
+    <h3>New project</h3>
+    <p class="muted">Unsaved changes in the current project will be lost.</p>
+    <div class="row" id="new-choices"></div>
+  </form>
+</dialog>
+
+<dialog id="plugins">
+  <div class="pad plugins">
+    <h3>🧩 Plugins</h3>
+    <p class="muted small" id="plug-intro"></p>
+    <div id="plug-summary"></div>
+    <div id="plug-warn"></div>
+    <details><summary>Everything loaded</summary><div id="plug-list"></div></details>
+    <div class="row"><button id="plug-rescan" class="primary">Rescan plugins folder</button><button id="plug-close">Close</button><span id="plug-status" class="muted"></span></div>
+    <p class="muted small">To add your own: copy an existing file in <code>plugins/&lt;type&gt;/</code>, change its <code>id</code> and name, then <b>Rescan</b>. Full guide: <code>plugins/README.md</code>.<br>
+    The first Rescan asks you to pick the <code>plugins</code> folder once (Chrome needs permission to read it). No-dialog alternative: <code>python3 tools/build_plugins.py</code>, then refresh.</p>
+  </div>
+</dialog>
+
+<dialog id="upgradedlg">
+  <form method="dialog" class="pad">
+    <h3>This file is from an older version</h3>
+    <p id="upgrade-msg"></p>
+    <p class="muted small">Saving writes the new format, which older versions of the tool can't open.</p>
+    <div class="row">
+      <button value="new" class="primary">Save as a new file (recommended)</button>
+      <button value="upgrade">Upgrade this file</button>
+      <button value="cancel">Cancel</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="permdlg">
+  <div class="pad">
+    <h3>Allow saving to this file again?</h3>
+    <p id="perm-msg"></p>
+    <p class="muted small">Chrome forgets this permission whenever the page is refreshed, so it asks once per session. Click <b>Allow &amp; save</b>, then choose <b>Allow</b> / <b>Edit file</b> in Chrome's prompt.</p>
+    <p id="perm-err" class="warn" hidden></p>
+    <div class="row">
+      <button type="button" data-perm="allow" class="primary">Allow &amp; save</button>
+      <button type="button" data-perm="saveas">Save as a new file…</button>
+      <button type="button" data-perm="cancel">Cancel</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="msgdlg">
+  <div class="pad">
+    <h3 id="msg-title"></h3>
+    <div id="msg-body"></div>
+    <div class="row" id="msg-buttons"></div>
+  </div>
+</dialog>
+
+<dialog id="bookinfo">
+  <form method="dialog" class="pad">
+    <h3 id="bookinfo-title">About this book</h3>
+    <div id="bookinfo-body"></div>
+    <div class="row"><button value="ok" class="primary">OK</button></div>
+  </form>
+</dialog>
+
+<div id="toast"></div>
+
+<script src="src/core/version.js"></script>
+<script src="src/core/legacy.js"></script>
+<script src="src/core/util.js"></script>
+<script src="src/core/draw.js"></script>
+<script src="src/core/files.js"></script>
+<script src="src/core/storage.js"></script>
+<script src="src/core/registry.js"></script>
+<script src="src/core/parts.js"></script>
+<script src="src/core/rigs/biped.js"></script>
+<script src="src/core/figure.js"></script>
+<script src="src/core/presets.js"></script>
+<script src="src/core/props-core.js"></script>
+<script src="src/core/store.js"></script>
+<!-- plugin index (rebuilt by "Rescan plugins" or tools/build_plugins.py); plugins load before the editor starts -->
+<script src="plugins/manifest.js"></script>
+<script src="src/app/model.js"></script>
+<script src="src/app/history.js"></script>
+<script src="src/app/stage.js"></script>
+<script src="src/app/pointer.js"></script>
+<script src="src/app/items.js"></script>
+<script src="src/app/library.js"></script>
+<script src="src/app/inspector.js"></script>
+<script src="src/app/designer.js"></script>
+<script src="src/app/export.js"></script>
+<script src="src/app/project.js"></script>
+<script src="src/app/plugins-panel.js"></script>
+<script src="src/app/main.js"></script>
+</body>
+</html>

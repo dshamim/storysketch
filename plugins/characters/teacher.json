@@ -1,0 +1,12 @@
+{
+  "api": 1,
+  "version": "1.0.0",
+  "id": "teacher",
+  "name": "Teacher",
+  "color": "#7b3fbf",
+  "build": "adult",
+  "body": "longdress",
+  "hair": "long",
+  "skirt": 0.75,
+  "order": 4
+}

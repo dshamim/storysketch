@@ -1,0 +1,10 @@
+{
+  "api": 1,
+  "version": "1.0.0",
+  "id": "ava",
+  "name": "Ava",
+  "color": "#8a5a2b",
+  "body": "tunic",
+  "hair": "headscarf",
+  "order": 9
+}

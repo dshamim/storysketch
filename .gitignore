@@ -1,0 +1,6 @@
+# exported images are regenerated from the project file
+exports/
+node_modules
+.DS_Store
+Thumbs.db
+tests/e2e/__actual__/

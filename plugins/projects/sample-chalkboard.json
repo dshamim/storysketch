@@ -1,0 +1,19 @@
+{
+ "api": 1,
+ "version": "1.0.0",
+ "id": "sample-chalkboard",
+ "name": "Sample — Chalkboard lesson (1 page)",
+ "description": "A teacher at a blackboard, drawn in chalk on a dark page: the chalk style turns dark lines chalk-white automatically.",
+ "settings": {"style": "chalk", "paper": "#2b3a35"},
+ "cast": ["teacher", "ava", "noah"],
+ "pages": [
+  { "name": "Times tables", "notes": "Chalk style + a dark page colour. Everything you draw stays editable: pick another style under Page → Drawing style (the page colour follows only if you haven't changed it).",
+    "items": [
+     {"type": "prop", "kind": "whiteboard", "x": 500, "y": 300, "s": 2.2, "params": {"title": "Times tables", "chart": "times"}},
+     {"type": "figure", "cast": "teacher", "x": 190, "floor": 680, "pose": "point"},
+     {"type": "figure", "cast": "ava", "x": 660, "floor": 690, "pose": "sitclap", "s": 0.9, "expr": "grin"},
+     {"type": "prop", "kind": "table", "x": 660, "y": 690, "params": {"width": 260}},
+     {"type": "figure", "cast": "noah", "x": 850, "floor": 690, "pose": "think", "s": 0.9, "flip": true}
+    ] }
+ ]
+}

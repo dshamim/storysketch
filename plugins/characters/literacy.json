@@ -1,0 +1,9 @@
+{
+  "api": 1,
+  "version": "1.0.0",
+  "id": "literacy",
+  "name": "Literacy",
+  "color": "#3949ab",
+  "hair": "bob",
+  "order": 10
+}

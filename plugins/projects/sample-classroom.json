@@ -1,0 +1,33 @@
+{
+ "api": 1,
+ "version": "1.0.0",
+ "id": "sample-classroom",
+ "name": "Sample — Busy classroom (2 pages)",
+ "description": "A classroom scene and an art corner. Shows posing, layering (a table in front of a child), props and the whiteboard. Crayon style.",
+ "settings": {"style": "crayon"},
+ "cast": ["teacher", "lily", "sam", "ahmed", "mia", "leo"],
+ "pages": [
+  { "name": "Reading time", "notes": "A table drawn in front of Lily hides her legs. The teacher's hand is a detached layer so it sits on top of the pointer. Select anything and drag the dots to repose it.",
+    "items": [
+     {"type": "prop", "kind": "rug", "x": 500, "y": 699, "s": 1.83},
+     {"type": "prop", "kind": "whiteboard", "x": 793, "y": 260, "s": 1.2, "params": {"title": "Reading time", "chart": "alphabet"}},
+     {"type": "prop", "kind": "bookshelf", "x": 120, "y": 626, "s": 0.9},
+     {"type": "figure", "cast": "teacher", "x": 671, "floor": 662, "pose": "point", "flip": false, "s": 1.22},
+     {"type": "figure", "cast": "lily", "x": 354, "floor": 638, "pose": "sitread", "s": 1.22},
+     {"type": "prop", "kind": "table", "x": 354, "y": 638, "params": {"width": 300}, "s": 1.22},
+     {"type": "prop", "kind": "bookopen", "x": 354, "y": 440, "s": 0.976},
+     {"type": "prop", "kind": "plant", "x": 900, "y": 650, "s": 1.22}
+    ] },
+  { "name": "Art corner", "notes": "Ahmed paints at the easel, Sam (with his wheelchair) drums, Mia sings. Colours are per character; try the Page tab → Drawing style.",
+    "items": [
+     {"type": "prop", "kind": "curtain", "x": 500, "y": 650, "s": 1.242},
+     {"type": "prop", "kind": "sun", "x": 860, "y": 105, "s": 0.85},
+     {"type": "prop", "kind": "easel", "x": 230, "y": 650, "s": 1.188},
+     {"type": "figure", "cast": "ahmed", "x": 392, "floor": 650, "pose": "paint", "flip": true, "s": 1.08},
+     {"type": "figure", "cast": "sam", "x": 630, "floor": 650, "pose": "sitdrum", "s": 1.08},
+     {"type": "prop", "kind": "drum", "x": 705, "y": 650, "s": 1.08},
+     {"type": "figure", "cast": "mia", "x": 846, "floor": 650, "pose": "sing", "expr": "talk", "s": 1.08},
+     {"type": "prop", "kind": "notes", "x": 824, "y": 358, "params": {"kind": "pair"}, "s": 1.08}
+    ] }
+ ]
+}

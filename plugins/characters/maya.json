@@ -1,0 +1,11 @@
+{
+  "api": 1,
+  "version": "1.0.0",
+  "id": "maya",
+  "name": "Maya (example)",
+  "color": "#00897b",
+  "body": "overalls",
+  "hair": "braids",
+  "accessories": { "hat": {}, "scarf": { "color": "#fbc02d" } },
+  "starter": false
+}

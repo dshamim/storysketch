@@ -1,0 +1,10 @@
+{
+  "api": 1,
+  "version": "1.0.0",
+  "id": "numeracy",
+  "name": "Numeracy",
+  "color": "#2e7d32",
+  "body": "tshirt",
+  "hair": "spiky",
+  "order": 11
+}

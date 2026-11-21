@@ -1,0 +1,8 @@
+{
+ "api": 1, "version": "1.0.0",
+ "items": [
+  {"id": "t-dog", "name": "Dog", "look": {"rig": "quadruped", "build": "dog", "color": "#a0662f", "defaultPose": "stand"}},
+  {"id": "t-cat", "name": "Cat", "look": {"rig": "quadruped", "build": "cat", "color": "#e08a2d", "defaultPose": "stand"}},
+  {"id": "t-dino", "name": "Dinosaur", "look": {"rig": "quadruped", "build": "dino", "color": "#2e9b5c", "defaultPose": "stand"}}
+ ]
+}

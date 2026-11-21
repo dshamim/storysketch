@@ -1,0 +1,17 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Plugin manifest is up to date
+        run: python3 tools/build_plugins.py --check
+      - run: npm install --no-audit --no-fund
+      - name: Unit tests
+        run: npm test
+      - name: Browser smoke tests
+        # the pixel baselines are made on the maintainer's machine; fonts differ on CI, so only the behaviour tests run here
+        run: npx playwright install --with-deps chromium && SKIP_VISUAL=1 npm run test:e2e

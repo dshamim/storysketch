@@ -87,6 +87,8 @@ function onUp() {
   if (d.kind === 'move' && d.hit) {
     const now = Date.now(); const it = itemById(d.hit);
     if (it?.group && app.lastClick?.id === d.hit && now - app.lastClick.t < 450) { app.lastClick = null; select([d.hit]); return; }
+    // double-click anything else = open its details
+    if (!it?.group && app.lastClick?.id === d.hit && now - app.lastClick.t < 450) { app.lastClick = null; showDetails(); return; }
     app.lastClick = { id: d.hit, t: now };
   }
 }

@@ -1,10 +1,10 @@
-// Inspector: the right panel for the selected item(s) and for several selected at once.
+// Details panel (right, on demand): Look, Pose and Arrange for the selected item(s); the page tips when nothing is selected.
 // (Part of the editor; plain <script> files share globals and load in the order listed in index.html.)
 // ---------- inspector ----------
 const field = (label, html) => `<label class="f"><span>${label}</span>${html}</label>`;
 const opts = (obj, v) => Object.entries(obj).map(([k, l]) => `<option value="${k}" ${String(k) === String(v) ? 'selected' : ''}>${U.esc(l)}</option>`).join('');
 // ---------- several selected: show what they have in common, change all at once ----------
-const MODE_OPTS = { auto: 'Colour (normal)', faded: 'Faded', grey: 'Grey pencil' };
+const MODE_OPTS = { auto: 'Full colour', faded: 'Faded', grey: 'Grey pencil' };
 const allSame = (vals) => vals.every((v) => JSON.stringify(v) === JSON.stringify(vals[0]));
 // one control for a value that may differ between the selected items (then it says "mixed")
 function mixedField(pr, attrs, vals) {
@@ -74,78 +74,126 @@ function onMultiInput(t) {
   // choices and tick boxes can show/hide other options, and "mixed" goes away
   if (t.tagName === 'SELECT' || t.dataset.ptype === 'toggle') renderInspector();
 }
-function renderInspector() {
-  const el = $('#inspector');
-  if (!app.sel.length) { const c = getClip(); const n = c ? c.items.filter((i) => i.type !== 'limbs').length : 0; const nl = pg().items.filter((i) => i.locked).length; el.innerHTML = (n ? `<div class="row"><button data-act="paste" class="primary">Paste ${n} copied item${n === 1 ? '' : 's'} (Ctrl+V)</button></div>` : '') + (nl ? `<div class="row"><button data-act="unlockall" title="Locked items can't be clicked on the page — this unlocks every one on this page">🔓 Unlock all on this page (${nl})</button></div>` : '') + '<p class="muted">Select something on the page.<br><br><b>Tips</b><br>• Drag orange dots = hands/feet, blue = elbows/knees, green = lean/head.<br>• <b>Shift</b>-drag a hand/foot = rotate just the forearm/shin (or switch mode in the figure panel).<br>• <b>Double-click</b> an elbow/knee = bend it the other way.<br>• <kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd> copy to another page — same size and position.<br>• Select several: <b>Ctrl/Shift-click</b>, or drag a box on empty space. <kbd>Ctrl+A</kbd> selects all.<br>• <kbd>[</kbd> <kbd>]</kbd> layer order, <kbd>P</kbd> styled view, <kbd>H</kbd> flip, <kbd>Ctrl+D</kbd> duplicate.<br>• <kbd>Ctrl+G</kbd> group the selection, <kbd>Ctrl+Shift+G</kbd> ungroup. Click a member = whole group, double-click = just that item.<br>• <kbd>Ctrl+Shift+L</kbd> lock / unlock. Locked things can\'t be clicked on the page (clicks go through to what\'s behind) — unlock them from the Layers tab.<br>• Zoom: <kbd>Ctrl</kbd>+mouse wheel or pinch, or the − + buttons at the bottom right. Wheel or <b>Space</b>-drag (or middle-drag) moves around. <kbd>Ctrl+0</kbd> fits the page.<br>• <b>Alt+click</b> steps through everything stacked under the pointer, front to back — for things buried under other things.</p>'; return; }
-  if (app.sel.length > 1) {
-    const sg = selGroup(); const all = selItems(); const lk = all.length && all.every((i) => i.locked);
-    const head = sg ? `<h3>▣ ${U.esc(groupName(sg))}</h3>` + field(`Group name <small class="muted">· ${app.sel.length} items</small>`, `<input type="text" data-gname="${sg}" value="${U.esc(groupName(sg))}">`) + `<div class="row"><button data-act="ungroup" title="Ctrl+Shift+G">Ungroup</button><button data-act="lock" title="Ctrl+Shift+L">${lk ? '🔓 Unlock group' : '🔒 Lock group'}</button><button data-act="zoomsel" title="Zoom in on the group">🔍 Zoom to</button></div>`
-      : `<p><b>${app.sel.length} items selected</b></p><div class="row"><button data-act="group" class="primary" title="Ctrl+G — then one click picks them all up">▣ Group</button>${all.some((i) => i.group) ? '<button data-act="ungroup" title="Ctrl+Shift+G">Ungroup</button>' : ''}<button data-act="lock" title="Ctrl+Shift+L">${lk ? '🔓 Unlock' : '🔒 Lock'}</button><button data-act="zoomsel">🔍 Zoom to</button></div>`;
-    el.innerHTML = `${head}${lk ? '<p class="warn">🔒 Locked — these can\'t be moved, changed or deleted until unlocked.</p>' : ''}<div class="row"><button data-act="front">To front</button><button data-act="back">To back</button><button data-act="dup">Duplicate</button><button data-act="del" class="danger">Delete</button></div><div class="row"><button data-act="copy" title="Ctrl+C">Copy</button><button data-act="cut" title="Ctrl+X">Cut</button><select data-copyto title="Copy the selection to another page (same size and position)"><option value="">Copy to page…</option>${app.P.pages.map((p, i) => i === app.page ? '' : `<option value="${i}">${i + 1}. ${U.esc(p.name)}</option>`).join('')}</select></div><div class="row"><button data-act="flipall">⇆ Flip each</button></div>${commonPanel(all)}<p class="muted">Drag any of them to move the group. Purple corner = resize the group, purple circle = rotate it (Shift snaps to 15°).<br>Export → "Selection" saves these together as one PNG (keeps overlaps right in Canva).</p>`;
-    for (const c of $$('[data-mixed]', el)) c.indeterminate = true; // a tick box whose items differ
-    return;
-  }
-  const it = itemById(app.sel[0]); if (!it) { el.innerHTML = ''; return; }
-  let h = `<h3>${it.locked ? '🔒 ' : ''}${U.esc(itemName(it))}</h3>`;
+// ---------- Details panel: Look · Pose · Arrange ----------
+// Opens on demand (ribbon "Details", double-click an item, or the mini bar). The ribbon covers the common choices; everything else lives here.
+const DTABS = { look: 'Look', pose: 'Pose', arrange: 'Arrange' };
+const ico = (n) => UI.icon(n);
+const copyToField = (many) => `<select data-copyto title="Copy ${many ? 'the selection' : 'it'} to another page (same size and position)"><option value="">Copy to page…</option>${app.P.pages.map((p, i) => i === app.page ? '' : `<option value="${i}">${i + 1}. ${U.esc(p.name)}</option>`).join('')}</select>`;
+const orderRow = () => `<div class="row"><button data-act="front">To front</button><button data-act="up">Forward</button><button data-act="down">Backward</button><button data-act="back">To back</button></div>`;
+const ALIGN_BTNS = [['left', 'align-left', 'Left'], ['hcenter', 'align-hcenter', 'Centre'], ['right', 'align-right', 'Right'], ['top', 'align-top', 'Top'], ['vmiddle', 'align-vmiddle', 'Middle'], ['bottom', 'align-bottom', 'Bottom']];
+const alignRow = (prefix, label) => `<p class="muted small">${label}</p><div class="iconrow">${ALIGN_BTNS.map(([m, ic, nm]) => `<button class="ui-iconbtn" data-act="${prefix}-${m}" data-tip="${nm}" aria-label="${label}: ${nm}">${ico(ic)}</button>`).join('')}</div>`;
+const distRow = () => `<p class="muted small">Space evenly (3 or more)</p><div class="iconrow"><button class="ui-iconbtn" data-act="dist-h" data-tip="Across" aria-label="Space evenly across">${ico('distribute-h')}</button><button class="ui-iconbtn" data-act="dist-v" data-tip="Down" aria-label="Space evenly down">${ico('distribute-v')}</button></div>`;
+
+function detailTabs(sel) {
+  if (!sel.length) return [];
+  if (sel.length > 1) return movable(sel).length ? ['look', 'arrange'] : ['arrange'];
+  const it = sel[0]; if ((ownerOf(it) || it).locked || it.type === 'limbs') return ['arrange'];
+  if (it.type === 'figure') return castById(it.cast) ? ['look', 'pose', 'arrange'] : ['arrange'];
+  return PROP_BY_ID[it.kind] ? ['look', 'arrange'] : ['look'];
+}
+function detailsTitle(sel) {
+  if (!sel.length) return 'Page';
+  if (sel.length > 1) { const sg = selGroup(); return sg ? `▣ ${groupName(sg)}` : `${sel.length} items`; }
+  return (((ownerOf(sel[0]) || sel[0]).locked ? '🔒 ' : '') + itemName(sel[0]));
+}
+function renderDetails() {
+  if ($('#right').hidden) return; // built when opened
+  const el = $('#inspector'); const sel = selItems(); const tabs = detailTabs(sel);
+  if (tabs.length && !tabs.includes(app.dtab)) app.dtab = tabs[0];
+  $('#details-title').textContent = detailsTitle(sel);
+  const bar = tabs.length > 1 ? `<div class="ui-tabs" role="tablist" aria-label="Details">${tabs.map((t) => `<button class="ui-tab" role="tab" id="dtab-${t}" data-dtab="${t}" aria-selected="${t === app.dtab}" tabindex="${t === app.dtab ? 0 : -1}">${DTABS[t]}</button>`).join('')}</div>` : '';
+  el.innerHTML = bar + `<div class="dpanel" ${tabs.length > 1 ? `role="tabpanel" aria-labelledby="dtab-${app.dtab}"` : ''}>${!sel.length ? pageDetails() : sel.length > 1 ? multiDetails(sel, app.dtab) : oneDetails(sel[0], app.dtab)}</div>`;
+  for (const c of $$('[data-mixed]', el)) c.indeterminate = true; // a tick box whose items differ
+}
+function pageDetails() {
+  const c = getClip(); const n = c ? c.items.filter((i) => i.type !== 'limbs').length : 0; const nl = pg().items.filter((i) => i.locked).length;
+  return (n ? `<div class="row"><button data-act="paste" class="primary">Paste ${n} copied item${n === 1 ? '' : 's'} (Ctrl+V)</button></div>` : '') +
+    (nl ? `<div class="row"><button data-act="unlockall" title="Locked items can't be clicked on the page — this unlocks every one on this page">🔓 Unlock all on this page (${nl})</button></div>` : '') +
+    '<p class="muted">Select something on the page to see its details here.<br><br><b>Tips</b><br>• Drag orange dots = hands/feet, blue = elbows/knees, green = lean/head.<br>• <b>Shift</b>-drag a hand/foot = turn just the lower arm/leg (or switch under Pose ▸ When dragging).<br>• <b>Double-click</b> an elbow/knee = bend it the other way.<br>• <kbd>Ctrl+C</kbd> / <kbd>Ctrl+V</kbd> copy to another page — same size and position.<br>• Select several: <b>Ctrl/Shift-click</b>, or drag a box on empty space. <kbd>Ctrl+A</kbd> selects all.<br>• <kbd>[</kbd> <kbd>]</kbd> layer order, <kbd>P</kbd> styled view, <kbd>H</kbd> flip, <kbd>Ctrl+D</kbd> duplicate.<br>• <kbd>Ctrl+G</kbd> group the selection, <kbd>Ctrl+Shift+G</kbd> ungroup. Click a member = whole group, double-click = just that item.<br>• <kbd>Ctrl+Shift+L</kbd> lock / unlock. Locked things can\'t be clicked on the page (clicks go through to what\'s behind) — unlock them from the Layers panel.<br>• Things snap to the page and to each other while you drag; hold <kbd>Alt</kbd> to move freely (View ▸ Snapping turns it off).<br>• Zoom: <kbd>Ctrl</kbd>+mouse wheel or pinch, or the − + buttons at the bottom right. Wheel or <b>Space</b>-drag (or middle-drag) moves around. <kbd>Ctrl+0</kbd> fits the page.<br>• <b>Alt+click</b> steps through everything stacked under the pointer, front to back — for things buried under other things.</p>';
+}
+
+// ---- several selected ----
+function multiDetails(all, tab) {
+  if (tab === 'look') return commonPanel(all);
+  const sg = selGroup(); const lk = all.length && all.every((i) => i.locked);
+  const head = sg ? field(`Group name <small class="muted">· ${app.sel.length} items</small>`, `<input type="text" data-gname="${sg}" value="${U.esc(groupName(sg))}">`) + `<div class="row"><button data-act="ungroup" title="Ctrl+Shift+G">Ungroup</button><button data-act="lock" title="Ctrl+Shift+L">${lk ? '🔓 Unlock group' : '🔒 Lock group'}</button><button data-act="zoomsel" title="Zoom in on the group">🔍 Zoom to</button></div>`
+    : `<div class="row"><button data-act="group" class="primary" title="Ctrl+G — then one click picks them all up">▣ Group</button>${all.some((i) => i.group) ? '<button data-act="ungroup" title="Ctrl+Shift+G">Ungroup</button>' : ''}<button data-act="lock" title="Ctrl+Shift+L">${lk ? '🔓 Unlock' : '🔒 Lock'}</button><button data-act="zoomsel">🔍 Zoom to</button></div>`;
+  return head + (lk ? '<p class="warn">🔒 Locked — these can\'t be moved, changed or deleted until unlocked.</p>' : '') +
+    `<h4>Line up</h4>${alignRow('align', 'Line up with each other')}${distRow()}${alignRow('align-page', 'Line up with the page')}` +
+    `<h4>Order</h4>${orderRow()}` +
+    `<h4>Actions</h4><div class="row"><button data-act="dup">Duplicate</button><button data-act="del" class="danger">Delete</button><button data-act="flipall">⇆ Flip each</button></div><div class="row"><button data-act="copy" title="Ctrl+C">Copy</button><button data-act="cut" title="Ctrl+X">Cut</button>${copyToField(true)}</div>` +
+    '<p class="muted">Drag any of them to move the group. Purple corner = resize the group, purple circle = rotate it (Shift snaps to 15°).<br>Export → "Selection" saves these together as one PNG.</p>';
+}
+
+// ---- one selected ----
+function oneDetails(it, tab) {
   const own0 = ownerOf(it) || it;
   if (own0.locked) {
-    h += `<p class="warn">🔒 Locked — it can't be moved, posed, changed or deleted, and clicks on the page go through it to whatever is behind.</p><div class="row"><button data-act="unlock" class="primary" title="Ctrl+Shift+L">🔓 Unlock</button><button data-act="zoomsel">🔍 Zoom to</button></div>`;
-    h += `<div class="row"><button data-act="front">To front</button><button data-act="up">Forward</button><button data-act="down">Backward</button><button data-act="back">To back</button></div>`;
-    h += `<div class="row"><button data-act="copy" title="Ctrl+C">Copy</button><select data-copyto title="Copy to another page (same size and position)"><option value="">Copy to page…</option>${app.P.pages.map((p, i) => i === app.page ? '' : `<option value="${i}">${i + 1}. ${U.esc(p.name)}</option>`).join('')}</select></div>`;
-    el.innerHTML = h; return;
+    return `<p class="warn">🔒 Locked — it can't be moved, posed, changed or deleted, and clicks on the page go through it to whatever is behind.</p><div class="row"><button data-act="unlock" class="primary" title="Ctrl+Shift+L">🔓 Unlock</button><button data-act="zoomsel">🔍 Zoom to</button></div>` +
+      orderRow() + `<div class="row"><button data-act="copy" title="Ctrl+C">Copy</button>${copyToField(false)}</div>`;
   }
-  if (it.group) h += `<p class="muted small">Part of <b>▣ ${U.esc(groupName(it.group))}</b> — you picked just this one.</p><div class="row"><button data-act="selgroup">Select the whole group</button><button data-act="leavegroup">Take out of group</button></div>`;
-  if (it.type === 'figure') {
-    const c = castById(it.cast);
-    h += field('Character', `<select data-k="cast">${app.P.cast.map((x) => `<option value="${x.id}" ${x.id === it.cast ? 'selected' : ''}>${U.esc(x.name)}</option>`).join('')}</select>`);
-    h += `<div class="row"><button data-act="design">✎ Edit this character's look</button></div>`;
-    h += field('Expression', `<select data-k="expr">${opts(FIG.expressions(c), it.expr)}</select>`);
-    if (FIG.rigOf(c).supports?.face) h += field('Eyes look', `<select data-k="look">${opts({ '-1': 'Left', 0: 'Centre', 1: 'Right' }, it.look || 0)}</select>`);
-    h += `<h4>Pose presets</h4><div class="poses">${posesFor(c).map((p) => `<button class="tile sm" data-pose="${p.id}" title="${U.esc(p.name)}">${figureThumb(c, p.id, false, p.expr)}<span>${U.esc(p.name)}</span></button>`).join('')}</div>`;
-    h += `<div class="row"><button data-act="mirror">⇋ Mirror pose</button>${FIG.rigOf(c).supports?.feet ? `<button data-act="feet">Feet: ${it.pose.feet || 'out'}</button>` : ''}${FIG.rigOf(c).supports?.hair ? `<button data-act="hairflip" title="Mirror only the hair (ponytail, parting, curls) — pose stays the same">⇆ Hair side</button>` : ''}${FIG.sidedAccessories(c).length ? `<button data-act="capeflip" title="Move ${U.esc(FIG.sidedAccessories(c).map((d) => d.name).join(' / '))} to the other side — pose stays the same">⇆ ${U.esc(FIG.sidedAccessories(c)[0].name)} side</button>` : ''}</div>`;
-    h += `<h4>Dragging hands &amp; feet</h4><div class="row seg"><button data-act="mode-reach" class="${app.handMode === 'reach' ? 'on' : ''}" title="Hand goes where you drag; elbow follows">Reach (elbow follows)</button><button data-act="mode-rotate" class="${app.handMode === 'rotate' ? 'on' : ''}" title="Only the forearm/shin turns around the elbow/knee">Rotate forearm / shin</button></div>`;
-    h += `<div class="row"><span class="muted small">Flip bend:</span>${FIG.limbs(c).map((L) => `<button data-flip="${L.id}">${U.esc(L.joint)}</button>`).join('')}</div>`;
-    h += `<h4>Layering</h4><p class="muted">Tick limbs to put them on their own layer <i>above</i> the figure — e.g. hands on top of a drum or book while the body stays behind it.</p><div class="checks">` +
-      FIG.limbs(c).map((L) => `<label><input type="checkbox" data-detach="${L.id}" ${it.detach?.[L.id] ? 'checked' : ''}> ${U.esc(L.label)}</label>`).join('') + '</div>';
-  }
-  if (it.type === 'limbs') h += `<p class="muted">Detached limbs of ${U.esc(itemName(ownerOf(it) || it))}. Move this layer above a prop to put the hands on top. Select the figure to pose.</p>`;
-  if (it.type === 'prop') {
-    const def = PROP_BY_ID[it.kind];
-    if (!def) { el.innerHTML = h + `<p class="warn">⚠ Prop plugin "${U.esc(it.kind)}" is not installed. Add it to plugins/props and rescan.</p>`; return; }
-    const P = { ...propDefaults(def).params, ...(it.params || {}) };
-    const optionField = (pr, key, v) => {
-      if (pr.type === 'toggle') return `<label class="chk tog"><input type="checkbox" data-param="${key}" data-ptype="toggle" ${v !== false && v !== 'false' ? 'checked' : ''}> ${U.esc(pr.label)}</label>`;
-      if (pr.type === 'select') return field(pr.label, `<select data-param="${key}">${opts(pr.options, v)}</select>`);
-      if (pr.type === 'range') return field(`${U.esc(pr.label)} <output>${v}</output>`, `<input type="range" min="${pr.min}" max="${pr.max}" step="${pr.step || 1}" value="${v}" data-param="${key}">`);
-      if (pr.type === 'color') return field(pr.label, `<input type="color" value="${v}" data-param="${key}">`);
-      return field(pr.label, `<input type="text" value="${U.esc(v)}" data-param="${key}">`);
-    };
-    const own = (def.params || []).filter((pr) => whenOk(pr, P));
-    if (own.length) h += `<h4>Options</h4>` + own.map((pr) => optionField(pr, pr.key, P[pr.key] ?? pr.def)).join('');
-    // slots: pick any installed add-on of the right kind (pictures, flowers, charts…)
-    for (const sl of def.slots || []) {
-      if (!whenOk(sl, P)) continue;
-      const cur = P[sl.key]; const list = CP.addonsOfKind(sl.kind);
-      const tile = (id, name, svg) => `<button class="tile sm ${String(cur) === id || (id === 'none' && EMPTY_SLOT.has(cur)) ? 'on' : ''}" data-slot="${sl.key}" data-addon="${id}" title="${U.esc(name)}">${svg}<span>${U.esc(name)}</span></button>`;
-      h += `<h4>${U.esc(sl.label || sl.key)}</h4><div class="slotpick">` + tile('none', 'None', '<svg viewBox="0 0 100 70"><rect x="4" y="4" width="92" height="62" fill="none" stroke="#ccc" stroke-dasharray="5 4"/></svg>') + list.map((ad) => tile(ad.id, ad.name || ad.id, addonThumb(ad))).join('') + '</div>';
-      if (!EMPTY_SLOT.has(cur) && !CP.addons[cur]) h += `<p class="warn">⚠ Add-on "${U.esc(cur)}" is not installed.</p>`;
-      const ad = CP.addons[cur]; if (ad && ad.params) { const vals = addonParams(ad, sl.key, P); h += ad.params.filter((pr) => whenOk(pr, vals)).map((pr) => optionField(pr, `${sl.key}.${pr.key}`, vals[pr.key])).join(''); }
-      if (!list.length) h += `<p class="muted small">No "${U.esc(sl.kind)}" add-ons installed — add some to plugins/addons.</p>`;
-    }
-    h += `<h4>Colours</h4><div class="colors">${Object.keys(def.colors).map((k) => `<label>${k}<input type="color" value="${it.colors?.[k] || def.colors[k]}" data-color="${k}"></label>`).join('')}<button data-act="resetcol">Reset</button></div>`;
-  }
-  if (it.type !== 'limbs') {
-    h += `<h4>Placement</h4>`;
-    h += field(`Size <output>${(+it.s).toFixed(2)}</output>`, `<input type="range" min="0.15" max="4" step="0.01" value="${it.s}" data-k="s">`);
-    h += field(`Rotate <output>${it.rot || 0}°</output>`, `<input type="range" min="-180" max="180" step="1" value="${it.rot || 0}" data-k="rot">`);
-    h += `<div class="row"><button data-act="flip">⇆ Flip</button><button data-act="size1">Standard size (1.00)</button></div>`;
-    h += field('Colour', `<select data-k="mode">${opts({ auto: 'Colour (normal)', faded: 'Faded', grey: 'Grey pencil' }, it.mode || 'auto')}</select>`);
-  }
-  h += `<div class="row"><button data-act="front">To front</button><button data-act="up">Forward</button><button data-act="down">Backward</button><button data-act="back">To back</button></div>`;
-  h += `<div class="row"><button data-act="dup">Duplicate</button><button data-act="lock" title="Ctrl+Shift+L — stops it being selected or moved on the page">🔒 Lock</button><button data-act="zoomsel" title="Zoom in on it">🔍 Zoom to</button><button data-act="del" class="danger">Delete</button></div>`;
-  h += `<div class="row"><button data-act="copy" title="Ctrl+C">Copy</button><button data-act="cut" title="Ctrl+X">Cut</button><select data-copyto title="Copy the selection to another page (same size and position)"><option value="">Copy to page…</option>${app.P.pages.map((p, i) => i === app.page ? '' : `<option value="${i}">${i + 1}. ${U.esc(p.name)}</option>`).join('')}</select></div>`;
-  el.innerHTML = h;
+  if (it.type === 'limbs') return `<p class="muted">Arms and legs of ${U.esc(itemName(ownerOf(it) || it))} that were put in front. Move this layer above a prop to put the hands on top. Select the character to change its pose.</p>` + orderRow();
+  if (it.type === 'figure') { if (!castById(it.cast)) return `<p class="warn">⚠ This character is missing from the book.</p>` + arrangeDetails(it); return tab === 'pose' ? poseDetails(it) : tab === 'arrange' ? arrangeDetails(it) : figureLook(it); }
+  if (!PROP_BY_ID[it.kind]) return `<p class="warn">⚠ Prop add-on "${U.esc(it.kind)}" is not installed. Add it to plugins/props and refresh add-ons.</p>`;
+  return tab === 'arrange' ? arrangeDetails(it) : propLook(it);
 }
+function figureLook(it) {
+  const c = castById(it.cast);
+  return field('Character', `<select data-k="cast">${app.P.cast.map((x) => `<option value="${x.id}" ${x.id === it.cast ? 'selected' : ''}>${U.esc(x.name)}</option>`).join('')}</select>`) +
+    `<div class="row"><button data-act="design">✎ Edit this character…</button></div>` +
+    field('Expression', `<select data-k="expr">${opts(FIG.expressions(c), it.expr)}</select>`) +
+    (FIG.rigOf(c).supports?.face ? field('Eyes look', `<select data-k="look">${opts({ '-1': 'Left', 0: 'Centre', 1: 'Right' }, it.look || 0)}</select>`) : '') +
+    field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
+}
+function poseDetails(it) {
+  const c = castById(it.cast); const rig = FIG.rigOf(c);
+  return `<h4>Poses</h4><div class="poses">${posesFor(c).map((p) => `<button class="tile sm" data-pose="${p.id}" title="${U.esc(p.name)}">${figureThumb(c, p.id, false, p.expr)}<span>${U.esc(p.name)}</span></button>`).join('')}</div>` +
+    `<div class="row"><button data-act="mirror">⇋ Mirror pose</button>${rig.supports?.feet ? `<button data-act="feet">Feet: ${it.pose.feet || 'out'}</button>` : ''}${rig.supports?.hair ? `<button data-act="hairflip" title="Mirror only the hair (ponytail, parting, curls) — the pose stays the same">⇆ Hair side</button>` : ''}${FIG.sidedAccessories(c).length ? `<button data-act="capeflip" title="Mirror only the cape or other one-sided add-ons">⇆ ${U.esc(FIG.sidedAccessories(c).map((a) => a.name || a.id).join(' / '))}</button>` : ''}</div>` +
+    `<h4>When dragging a hand or foot</h4><div class="row seg"><button data-act="mode-reach" class="${app.handMode === 'reach' ? 'on' : ''}" title="The hand goes where you drag; the elbow follows">Move whole arm</button><button data-act="mode-rotate" class="${app.handMode === 'rotate' ? 'on' : ''}" title="Only the lower arm or leg turns around the elbow or knee">Turn lower arm</button></div>` +
+    `<div class="row"><span class="muted small">Flip elbow / knee:</span>${FIG.limbs(c).map((L) => `<button data-flip="${L.id}">${U.esc(L.joint)}</button>`).join('')}</div>` +
+    `<h4>Put arms / legs in front</h4><p class="muted">Tick to put them on their own layer <i>above</i> the character — e.g. hands on top of a drum or book while the body stays behind it.</p><div class="checks">` +
+    FIG.limbs(c).map((L) => `<label><input type="checkbox" data-detach="${L.id}" ${it.detach?.[L.id] ? 'checked' : ''}> ${U.esc(L.label)}</label>`).join('') + '</div>';
+}
+function propLook(it) {
+  const def = PROP_BY_ID[it.kind]; let h = '';
+  const P = { ...propDefaults(def).params, ...(it.params || {}) };
+  const optionField = (pr, key, v) => {
+    if (pr.type === 'toggle') return `<label class="chk tog"><input type="checkbox" data-param="${key}" data-ptype="toggle" ${v !== false && v !== 'false' ? 'checked' : ''}> ${U.esc(pr.label)}</label>`;
+    if (pr.type === 'select') return field(pr.label, `<select data-param="${key}">${opts(pr.options, v)}</select>`);
+    if (pr.type === 'range') return field(`${U.esc(pr.label)} <output>${v}</output>`, `<input type="range" min="${pr.min}" max="${pr.max}" step="${pr.step || 1}" value="${v}" data-param="${key}">`);
+    if (pr.type === 'color') return field(pr.label, `<input type="color" value="${v}" data-param="${key}">`);
+    return field(pr.label, `<input type="text" value="${U.esc(v)}" data-param="${key}">`);
+  };
+  const own = (def.params || []).filter((pr) => whenOk(pr, P));
+  if (own.length) h += `<h4>Options</h4>` + own.map((pr) => optionField(pr, pr.key, P[pr.key] ?? pr.def)).join('');
+  // slots: pick any installed add-on of the right kind (pictures, flowers, charts…)
+  for (const sl of def.slots || []) {
+    if (!whenOk(sl, P)) continue;
+    const cur = P[sl.key]; const list = CP.addonsOfKind(sl.kind);
+    const tile = (id, name, svg) => `<button class="tile sm ${String(cur) === id || (id === 'none' && EMPTY_SLOT.has(cur)) ? 'on' : ''}" data-slot="${sl.key}" data-addon="${id}" title="${U.esc(name)}">${svg}<span>${U.esc(name)}</span></button>`;
+    h += `<h4>${U.esc(sl.label || sl.key)}</h4><div class="slotpick">` + tile('none', 'None', '<svg viewBox="0 0 100 70"><rect x="4" y="4" width="92" height="62" fill="none" stroke="#ccc" stroke-dasharray="5 4"/></svg>') + list.map((ad) => tile(ad.id, ad.name || ad.id, addonThumb(ad))).join('') + '</div>';
+    if (!EMPTY_SLOT.has(cur) && !CP.addons[cur]) h += `<p class="warn">⚠ Add-on "${U.esc(cur)}" is not installed.</p>`;
+    const ad = CP.addons[cur]; if (ad && ad.params) { const vals = addonParams(ad, sl.key, P); h += ad.params.filter((pr) => whenOk(pr, vals)).map((pr) => optionField(pr, `${sl.key}.${pr.key}`, vals[pr.key])).join(''); }
+    if (!list.length) h += `<p class="muted small">No "${U.esc(sl.kind)}" add-ons installed — add some to plugins/addons.</p>`;
+  }
+  h += `<h4>Colours</h4><div class="colors">${Object.keys(def.colors).map((k) => `<label>${k}<input type="color" value="${it.colors?.[k] || def.colors[k]}" data-color="${k}"></label>`).join('')}<button data-act="resetcol">Reset</button></div>`;
+  h += `<h4>Overall colour</h4>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
+  return h;
+}
+function arrangeDetails(it) {
+  let h = '';
+  if (it.group) h += `<p class="muted small">Part of <b>▣ ${U.esc(groupName(it.group))}</b> — you picked just this one.</p><div class="row"><button data-act="selgroup">Select the whole group</button><button data-act="leavegroup">Take out of group</button></div>`;
+  h += `<h4>Size and turn</h4>`;
+  h += field(`Size <output>${(+it.s).toFixed(2)}</output>`, `<input type="range" min="0.15" max="4" step="0.01" value="${it.s}" data-k="s">`);
+  h += field(`Rotate <output>${it.rot || 0}°</output>`, `<input type="range" min="-180" max="180" step="1" value="${it.rot || 0}" data-k="rot">`);
+  h += `<div class="row"><button data-act="flip">⇆ Flip</button><button data-act="size1">Standard size (1.00)</button></div>`;
+  h += `<h4>Order</h4>${orderRow()}`;
+  h += `<h4>Line up</h4>${alignRow('align-page', 'Line up with the page')}`;
+  h += `<h4>Actions</h4><div class="row"><button data-act="dup">Duplicate</button><button data-act="lock" title="Ctrl+Shift+L — stops it being selected or moved on the page">🔒 Lock</button><button data-act="zoomsel" title="Zoom in on it">🔍 Zoom to</button><button data-act="del" class="danger">Delete</button></div>`;
+  h += `<div class="row"><button data-act="copy" title="Ctrl+C">Copy</button><button data-act="cut" title="Ctrl+X">Cut</button>${copyToField(false)}</div>`;
+  return h;
+}
+function renderInspector() { renderRibbon(); renderDetails(); positionMiniBar(); }
 function onInspectorInput(e) {
   const t = e.target;
   if (t.dataset.copyto !== undefined) { if (t.value !== '') copyToPage(+t.value); t.value = ''; return; }
@@ -171,6 +219,8 @@ function onInspectorInput(e) {
 }
 function onInspectorClick(e) {
   const b = e.target.closest('button'); if (!b) return; const it = itemById(app.sel[0]);
+  if (b.dataset.dtab) { app.dtab = b.dataset.dtab; renderDetails(); $(`#dtab-${app.dtab}`)?.focus(); return; }
+  if (b.dataset.act && arrangeAction(b.dataset.act)) return;
   if (b.dataset.mpose || b.dataset.mslot || b.dataset.act === 'mresetcol') {
     const ed = movable(selItems());
     if (b.dataset.mpose) { for (const f of ed) if (f.type === 'figure' && castById(f.cast)) { const fc = castById(f.cast); const pr = poseOf(fc, b.dataset.mpose); f.pose = FIG.fromPreset(fc, pr); f.expr = pr.expr || 'happy'; } }

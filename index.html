@@ -28,6 +28,7 @@
 </header>
 
 <div class="ui-ribbon" id="ribbon" role="toolbar" aria-label="Page settings">
+  <div class="rb-group" id="ribbon-page">
   <label class="rb"><span>Style</span><span class="ui-select"><select id="style-sel"></select><span data-icon="chevron-down"></span></span></label>
   <label class="rb"><span>Page colour</span><input type="color" id="paper-col"></label>
   <label class="rb"><span>Page size</span><span class="ui-select"><select id="page-size">
@@ -39,6 +40,10 @@
   </select><span data-icon="chevron-down"></span></span></label>
   <span class="ui-divider-v"></span>
   <label class="ui-switch" data-tip="Show the page in the chosen drawing style" data-kbd="P"><input type="checkbox" role="switch" id="preview-sw"><span class="ui-switch-track"></span><span>Styled view</span></label>
+  </div>
+  <div class="rb-group" id="ribbon-sel" hidden></div>
+  <div class="grow"></div>
+  <button class="ui-btn ghost sm" id="details-toggle" aria-pressed="false" aria-controls="right" data-tip="Show or hide the details panel"><span data-icon="panel-right-open"></span>Details</button>
 </div>
 
 <main id="workspace">
@@ -75,7 +80,8 @@
       <p id="empty-hint" class="empty-hint" hidden>Add a character or a prop from the left to begin.</p></div>
   </section>
 
-  <aside id="right">
+  <aside id="right" aria-label="Details" hidden>
+    <div class="details-head"><h2 id="details-title">Page</h2><button class="ui-iconbtn sm" id="details-close" data-tip="Hide the details panel" aria-label="Hide the details panel"><span data-icon="close"></span></button></div>
     <div id="inspector"></div>
   </aside>
 </main>
@@ -134,6 +140,7 @@
   <button role="menuitem" data-act="zoomsel"><span data-icon="fit"></span><span class="grow">Zoom to the selection</span><kbd class="ui-kbd">Shift+2</kbd></button>
   <hr>
   <button role="menuitemcheckbox" id="menu-library" aria-checked="true" data-act="library"><span data-icon="check" class="tick"></span><span class="grow">Library panel</span></button>
+  <button role="menuitemcheckbox" id="menu-details" aria-checked="false" data-act="details"><span data-icon="check" class="tick"></span><span class="grow">Details panel</span></button>
 </div>
 <div class="ui-popover ui-menu" role="menu" id="menu-help" aria-label="Help" hidden>
   <button role="menuitem" data-act="about"><span data-icon="info"></span><span class="grow">About StorySketch</span></button>
@@ -281,6 +288,8 @@
 <script src="src/app/pointer.js"></script>
 <script src="src/app/items.js"></script>
 <script src="src/app/library.js"></script>
+<script src="src/app/arrange.js"></script>
+<script src="src/app/ribbon.js"></script>
 <script src="src/app/inspector.js"></script>
 <script src="src/app/designer.js"></script>
 <script src="src/app/export.js"></script>

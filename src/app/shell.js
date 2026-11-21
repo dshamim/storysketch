@@ -4,6 +4,7 @@
 // ---------- shell ----------
 const pops = {};
 const FLY_KEY = 'storysketch/flyout';
+const DET_KEY = 'storysketch/details';
 
 // ---- menu actions: one table, so every menu item and shortcut means the same thing ----
 const doUndo = () => restore((flushCommit(), STORE.undo()));
@@ -15,10 +16,13 @@ const ACTIONS = {
   undo: doUndo, redo: doRedo, cut: () => copySel(true), copy: () => copySel(false), paste: () => pasteInto(), duplicate: () => duplicateSel(), delete: () => deleteSel(),
   selectall: selectAll, group: () => groupSel(), ungroup: () => ungroupSel(), lock: () => toggleLockSel(),
   preview: () => setPreview(!app.preview), zoomin: () => zoomTo(app.view.z * 1.25), zoomout: () => zoomTo(app.view.z / 1.25), zoomfit: () => zoomFit(), zoomsel: () => zoomSel(),
-  library: () => (flyoutOpen() ? hideFlyout() : showFlyout()),
+  library: () => (flyoutOpen() ? hideFlyout() : showFlyout()), details: () => (detailsOpen() ? hideDetails() : showDetails()),
   about: () => showAbout(),
   'page-rename': () => openNotes(true), 'page-dup': () => duplicatePage(), 'page-earlier': () => movePage(app.page, -1), 'page-later': () => movePage(app.page, 1), 'page-del': () => deletePage(),
 };
+
+for (const a of ARRANGE_ACTS) ACTIONS[a] = () => arrangeAction(a);
+Object.assign(ACTIONS, { 'z-front': () => moveZ(app.sel, 'front'), 'z-up': () => moveZ(app.sel, 'up'), 'z-down': () => moveZ(app.sel, 'down'), 'z-back': () => moveZ(app.sel, 'back') });
 
 function initShell() {
   // menus (File, Edit, View, Help, page options) and the export popover
@@ -57,6 +61,15 @@ function initShell() {
   $('#fly-close').onclick = hideFlyout; $('#fly-open').onclick = showFlyout;
   try { if (localStorage.getItem(FLY_KEY) === 'closed') hideFlyout(); } catch (e) { /* ignore */ }
   setTab(app.tab);
+  // details panel (right)
+  $('#details-toggle').onclick = () => (detailsOpen() ? hideDetails() : showDetails());
+  $('#details-close').onclick = hideDetails;
+  $('#inspector').addEventListener('keydown', (e) => {
+    const t = e.target.closest('[role=tab]'); if (!t || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(e.key)) return;
+    const tabs = $$('#inspector [role=tab]'); const i = tabs.indexOf(t); e.preventDefault();
+    const n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : tabs.length - 1; tabs[(n + tabs.length) % tabs.length].click();
+  });
+  try { if (localStorage.getItem(DET_KEY) === 'open') showDetails(); else hideDetails(); } catch (e) { hideDetails(); }
 
   // filmstrip + notes drawer
   $('#film').addEventListener('click', (e) => {
@@ -84,12 +97,17 @@ function syncEditMenu() {
   for (const a of ['cut', 'copy', 'duplicate', 'delete', 'lock']) setItemEnabled(a, n > 0);
   setItemEnabled('group', n > 1); setItemEnabled('ungroup', selItems().some((i) => i.group)); setItemEnabled('paste', !!getClip());
 }
-function syncViewMenu() { $('#menu-preview').setAttribute('aria-checked', String(!!app.preview)); $('#menu-library').setAttribute('aria-checked', String(flyoutOpen())); }
+function syncViewMenu() { $('#menu-details')?.setAttribute('aria-checked', String(detailsOpen()));  $('#menu-preview').setAttribute('aria-checked', String(!!app.preview)); $('#menu-library').setAttribute('aria-checked', String(flyoutOpen())); }
 
 // ---- flyout ----
 const flyoutOpen = () => !$('#left').hidden;
 function showFlyout() { $('#left').hidden = false; $('#fly-open').hidden = true; $('#workspace').classList.remove('fly-closed'); try { localStorage.setItem(FLY_KEY, 'open'); } catch (e) { /* ignore */ } requestAnimationFrame(renderOverlay); }
 function hideFlyout() { $('#left').hidden = true; $('#fly-open').hidden = false; $('#workspace').classList.add('fly-closed'); try { localStorage.setItem(FLY_KEY, 'closed'); } catch (e) { /* ignore */ } requestAnimationFrame(renderOverlay); }
+
+// ---- details panel ----
+const detailsOpen = () => !$('#right').hidden;
+function showDetails() { $('#right').hidden = false; $('#workspace').classList.remove('details-closed'); $('#details-toggle').setAttribute('aria-pressed', 'true'); try { localStorage.setItem(DET_KEY, 'open'); } catch (e) { /* ignore */ } renderDetails(); requestAnimationFrame(renderOverlay); }
+function hideDetails() { $('#right').hidden = true; $('#workspace').classList.add('details-closed'); $('#details-toggle').setAttribute('aria-pressed', 'false'); try { localStorage.setItem(DET_KEY, 'closed'); } catch (e) { /* ignore */ } requestAnimationFrame(renderOverlay); }
 
 // ---- filmstrip ----
 // A page's thumbnail is drawn in clean lines with its own id prefix (so gradient / clip ids never clash with the canvas).

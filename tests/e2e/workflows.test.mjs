@@ -60,6 +60,7 @@ test('copy, paste, duplicate and delete', { skip }, async () => {
 test('pose: a preset pose button changes the figure; mirror flips it; detaching an arm adds a front-limbs layer', { skip }, async () => {
   const { page } = await fresh(`app.P = STORE.fresh('blank'); addFigure(CP.characters[0].id); renderAll();`);
   const arm = () => page.evaluate(() => JSON.stringify(pg().items[0].pose.armR));
+  await page.click('#details-toggle'); await page.click('#dtab-pose');
   const before = await arm(); await page.click('.poses [data-pose="wave"]'); const waved = await arm(); assert.notEqual(before, waved);
   await page.click('[data-act="mirror"]'); assert.equal(await page.evaluate(() => pg().items[0].pose.armL.length), 2);
   await page.check('[data-detach="armL"]'); assert.ok((await items(page)).some((i) => i.type === 'limbs'), 'a limbs layer was added');

@@ -61,6 +61,7 @@ test('selecting a figure shows its rig handles; dragging a hand handle really po
   const after = await page.evaluate(() => JSON.stringify(pg().items[0].pose.armR));
   assert.notEqual(before, after, 'dragging the hand should change the arm pose'); assert.deepEqual(errs, []);
   // the inspector lists the rig's limbs for bend-flipping and layering
+  await page.click('#details-toggle'); await page.click('#dtab-pose');
   assert.equal(await page.locator('[data-flip]').count(), 4); assert.equal(await page.locator('[data-detach]').count(), 4);
   await page.close();
 });
@@ -69,6 +70,7 @@ test('a dog: add from template, 13 handles, its own poses and limbs, designer hi
   page.on('pageerror', (e) => errs.push(e.message)); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   await page.evaluate(() => { app.P = STORE.fresh('blank'); newFromTemplate('t-dog'); const c = app.P.cast.at(-1); addFigure(c.id); renderStage(); });
   assert.equal(await page.locator('#overlay [data-h]:not([data-h="scale"]):not([data-h="rot"])').count(), 13);
+  await page.click('#details-toggle'); await page.click('#dtab-pose');
   assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('.poses .tile')].map((b) => b.dataset.pose)), ['stand', 'walk', 'run', 'sit', 'lie', 'beg', 'bark', 'sniff', 'wag']);
   assert.equal(await page.locator('[data-detach]').count(), 4); assert.equal(await page.locator('[data-act="feet"]').count(), 0);
   // drag a paw

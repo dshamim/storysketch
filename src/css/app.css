@@ -105,8 +105,9 @@ form.pad { padding: 18px 20px; max-width: 520px; }
 #paper-col { width: 36px; height: 32px; padding: 2px; border: 1px solid var(--ui-border-input); border-radius: var(--ui-r-sm); background: var(--ui-surface); cursor: pointer; }
 
 /* workspace: rail | flyout | canvas | details */
-#workspace { flex: 1; min-height: 0; display: grid; grid-template-columns: auto 300px minmax(0, 1fr) 310px; position: relative; }
-#workspace.fly-closed { grid-template-columns: auto 0 minmax(0, 1fr) 310px; }
+#workspace { --fly: 300px; --det: 330px; flex: 1; min-height: 0; display: grid; grid-template-columns: auto var(--fly) minmax(0, 1fr) var(--det); position: relative; }
+#workspace.fly-closed { --fly: 0px; }
+#workspace.details-closed { --det: 0px; }
 .railwrap { grid-column: 1; display: flex; flex-direction: column; width: 72px; background: var(--ui-surface); border-right: 1px solid var(--ui-border); overflow-y: auto; }
 .railwrap .ui-rail { width: 100%; border-right: 0; }
 .railwrap .rail-extra { padding-top: 0; }
@@ -159,3 +160,12 @@ form.pad { padding: 18px 20px; max-width: 520px; }
 .start-thumb.blank .ui-i { width: 40px; height: 40px; }
 .start-card b { padding: var(--ui-s-1) var(--ui-s-1) 0; }
 .start-card small { padding: 0 var(--ui-s-1) var(--ui-s-1); color: var(--ui-text-muted); font-size: var(--ui-fs-sm); line-height: 1.35; }
+
+/* details panel */
+.details-head { display: flex; align-items: center; justify-content: space-between; gap: var(--ui-s-2); margin-bottom: var(--ui-s-2); }
+.details-head h2 { margin: 0; font-size: var(--ui-fs-lg); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#inspector .ui-tabs { margin-bottom: var(--ui-s-3); }
+#inspector .dpanel > h4:first-child { margin-top: 4px; }
+#inspector :where(select, input[type=text], input[type=search]) { height: 36px; border-radius: var(--ui-r-sm); border: 1px solid var(--ui-border-input); padding: 0 var(--ui-s-2); }
+.iconrow { display: flex; gap: 2px; margin: 0 0 var(--ui-s-2); }
+.rb-group { display: flex; align-items: center; gap: var(--ui-s-1); }

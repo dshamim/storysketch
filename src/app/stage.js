@@ -41,12 +41,13 @@ function onWheel(e) {
 function renderStage() {
   const { pageW: W, pageH: H, paper } = app.P.settings; const svg = $('#stage');
   applyView();
+  const hint = $('#empty-hint'); if (hint) hint.hidden = pg().items.length > 0;
   const items = pg().items.filter((it) => !it.hidden && !(ownerOf(it) || {}).hidden).map((it, i) => itemSVG(it, app.preview ? curStyle() : null, 's' + i + '_')).join('');
   const M = 20000; // shade everything off the page, however far you zoom or pan
   svg.innerHTML = `<rect x="0" y="0" width="${W}" height="${H}" fill="${paper}" class="page"/>` +
     `<g id="items">${items}</g>` +
-    `<path d="M${-M} ${-M}H${W + M}V${H + M}H${-M}Z M0 0V${H}H${W}V0Z" fill-rule="evenodd" fill="#e9e6e1" fill-opacity="0.78" pointer-events="none"/>` +
-    `<rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="#c9c4bc" stroke-width="2" pointer-events="none"/>` +
+    `<path d="M${-M} ${-M}H${W + M}V${H + M}H${-M}Z M0 0V${H}H${W}V0Z" fill-rule="evenodd" fill="#eceef2" fill-opacity="0.8" pointer-events="none"/>` +
+    `<rect x="0" y="0" width="${W}" height="${H}" fill="none" stroke="#c5cbd4" stroke-width="2" pointer-events="none"/>` +
     `<g id="overlay"></g><rect id="marquee" fill="rgba(37,99,235,0.08)" stroke="#2563eb" stroke-dasharray="5 4" visibility="hidden" pointer-events="none"/>`;
   renderOverlay();
 }

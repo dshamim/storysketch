@@ -71,6 +71,7 @@ const UI = (() => {
   // UI.popover(trigger, panel, { placement }) wires aria-expanded, outside click, Esc (focus goes back to the trigger) and positioning.
   // A panel with role="menu" also gets arrow-key navigation and closes when an item is chosen.
   let openPop = null;
+  const MENU_ITEM = '[role=menuitem], [role=menuitemcheckbox], [role=menuitemradio]';
   function popover(trigger, panel, opts = {}) {
     const isMenu = panel.getAttribute('role') === 'menu';
     const api = {
@@ -79,7 +80,7 @@ const UI = (() => {
         if (openPop && openPop !== api) openPop.close(false);
         panel.hidden = false; trigger.setAttribute('aria-expanded', 'true'); trigger.setAttribute('aria-haspopup', isMenu ? 'menu' : 'dialog'); openPop = api; hideTip(true);
         place(panel, trigger, opts.placement || 'bottom-start');
-        const first = isMenu ? $('[role=menuitem]:not([disabled])', panel) : $('input, select, button, [tabindex]', panel);
+        const first = isMenu ? $(MENU_ITEM.replace(/\]/g, ']:not([disabled])'), panel) : $('input, select, button, [tabindex]', panel);
         if (first && (isMenu || viaKeyboard || opts.focus)) first.focus();
         emit(panel, 'ui-open', {});
       },
@@ -94,13 +95,13 @@ const UI = (() => {
     trigger.addEventListener('keydown', (e) => { if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && isMenu) { e.preventDefault(); api.open(true); } });
     panel.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); api.close(); return; }
-      if (e.key === 'Tab') { api.close(false); return; }
+      if (e.key === 'Tab' && isMenu) { api.close(false); return; }
       if (!isMenu) return;
-      const items = $$('[role=menuitem]:not([disabled])', panel); const i = items.indexOf(document.activeElement);
+      const items = $$(MENU_ITEM.replace(/\]/g, ']:not([disabled])'), panel); const i = items.indexOf(document.activeElement);
       const go = (n) => { e.preventDefault(); items[(n + items.length) % items.length].focus(); };
       if (e.key === 'ArrowDown') go(i + 1); else if (e.key === 'ArrowUp') go(i - 1); else if (e.key === 'Home') go(0); else if (e.key === 'End') go(items.length - 1);
     });
-    if (isMenu) panel.addEventListener('click', (e) => { if (e.target.closest('[role=menuitem]')) api.close(); });
+    if (isMenu) panel.addEventListener('click', (e) => { if (e.target.closest(MENU_ITEM)) api.close(); });
     document.addEventListener('pointerdown', (e) => { if (!panel.hidden && !panel.contains(e.target) && !trigger.contains(e.target)) api.close(false); }, true);
     window.addEventListener('resize', () => { if (!panel.hidden) place(panel, trigger, opts.placement || 'bottom-start'); });
     return api;

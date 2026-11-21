@@ -1,6 +1,6 @@
 # StorySketch — UI revamp plan
 
-**Status:** in progress. Phase 0 (safety net + `app.js` split) and Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) are done; next is Phase 2 (shell). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
+**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) are done; next is Phase 3 (ribbon, mini bar, Details panel). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
 Goal: an interface that is as simple as **Canva's**: clear logical groups, graphical icons, controls shown only when relevant, a first-class **text tool**
 and a small set of **shape / arrow / pencil** tools.
 
@@ -286,3 +286,13 @@ Each phase ships working software with the test suite green; no big-bang rewrite
 - Text outlines: [opentype.js](https://github.com/nodebox/opentype.js) · [text-to-svg](https://github.com/naari3/text-to-svg)
 - Touch / tablet / phone: [Canva mobile app navigation](https://www.canva.com/help/navigate-canva-mobile-app/) · [Canva Apps layout guidelines](https://www.canva.dev/docs/apps/design-guidelines/layout/) · [Miro mobile & tablet troubleshooting](https://help.miro.com/hc/articles/360021113559) · [Miro tablet app](https://help.miro.com/hc/articles/360017731633) · [WCAG 2.1 target size](https://www.w3.org/WAI/WCAG21/Understanding/target-size.html) · [WCAG 2.2 target size (enhanced)](https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced) · [Touch-target guidance (Siteimprove)](https://www.siteimprove.com/blog/motor-impairments-and-mobile-ui-the-touch-target-problem)
 - Canva floating bar / Position: [Add elements](https://www.canva.com/help/add-elements/)
+
+## 12. Phase 2 notes (what was built, and what is deliberately temporary)
+Built: top bar with File / Edit / View / Help menus, save status, undo/redo and an Export panel; left rail (Characters, Props, Layers, Add-ons) with a foldable flyout; bottom page strip with thumbnails, page menu, notes drawer and zoom controls; start screen (first run and File ▸ New). Every control in §4.10 has a home; `tests/e2e/shell.test.mjs` checks each one is reachable.
+
+Temporary, to be removed in later phases:
+- **The page-settings strip** under the top bar (Style, Page colour, Page size, Styled view) is the "nothing selected" ribbon (§4.2) shown all the time. **Phase 3** makes it contextual and adds the selection controls; the Details panel then replaces the old right-hand panel (still the old inspector for now, so the right side looks older than the rest).
+- **Add-ons** and **New character** still open the old dialogs; **Phase 5** turns them into panels. Shapes and Text are not in the rail yet (phases 4 and 4b); a rail button that does nothing is worse than none.
+- Rail order is Characters · Props · Layers · Add-ons for now; confirm once Shapes and Text exist.
+
+Not done from §4 yet: drag-to-reorder pages (the page menu has Move earlier / later), recent projects on the start screen, and a first-run tour. (The empty-page hint is shown until the page has something on it.)

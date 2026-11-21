@@ -48,15 +48,19 @@ function addFromLibrary(id) {
   if (!castById(id)) app.P.cast.push(STORE.normalizeCast(U.clone(src)));
   renderLibrary(); addFigure(id); toast(`${src.name} added to this book`);
 }
+const TAB_INFO = { 'tab-cast': ['Characters', 'Search characters…'], 'tab-props': ['Props', 'Search props…'], 'tab-layers': ['Layers', 'Search layers…'] };
 function setTab(tab) {
+  if (!TAB_INFO[tab]) tab = 'tab-cast';
   app.tab = tab;
-  $$('#left [data-tab]').forEach((x) => x.classList.toggle('on', x.dataset.tab === tab)); $$('#left .tabpane').forEach((p) => p.hidden = p.id !== tab);
-  const ph = { 'tab-cast': 'Search characters…', 'tab-props': 'Search props…', 'tab-page': 'Search pages…', 'tab-layers': 'Search layers…' }[tab];
-  const box = $('#lsearch'); box.placeholder = ph + '  ( / )'; box.value = app.filters[tab] || '';
+  $$('#rail [data-tab]').forEach((x) => { const on = x.dataset.tab === tab; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; });
+  $$('#left .tabpane').forEach((p) => p.hidden = p.id !== tab);
+  const [title, ph] = TAB_INFO[tab];
+  $('#fly-title').textContent = title;
+  const box = $('#lsearch'); box.placeholder = ph; box.value = app.filters[tab] || '';
 }
 function onSearch() {
   app.filters[app.tab] = $('#lsearch').value;
-  if (app.tab === 'tab-cast' || app.tab === 'tab-props') renderLibrary(); else if (app.tab === 'tab-page') renderPageList(); else renderLayers();
+  if (app.tab === 'tab-cast' || app.tab === 'tab-props') renderLibrary(); else renderLayers();
 }
 // style pickers: project setting (Page tab) + export "Look" (Clean + every style)
 function renderStyleControls() {
@@ -74,29 +78,15 @@ function setStyle(id) {
   if (s.paper.toLowerCase() === base(was).toLowerCase() && base(now).toLowerCase() !== s.paper.toLowerCase()) { s.paper = base(now); $('#paper-col').value = s.paper; toast(`Page colour changed to suit ${now.name || id}`); }
   syncStyleControls(); renderStage(); renderLibrary(); commit(false);
 }
+// the page-level controls (ribbon) and the name/notes drawer follow the current page
 function renderPageTab() {
-  const p = pg(); const s = app.P.settings;
+  const p = pg(); const st = app.P.settings;
   $('#page-name').value = p.name; $('#page-notes').value = p.notes || '';
-  $('#page-size').value = `${s.pageW}x${s.pageH}`; $('#paper-col').value = s.paper; syncStyleControls();
-  $('#page-strip').innerHTML = `<b>Page ${app.page + 1} · ${U.esc(p.name)}</b> <span>${U.esc(p.notes || '')}</span>`;
-}
-function renderPageList() {
-  const html = app.P.pages.map((p, i) => {
-    if (!matches('tab-page', String(i + 1), p.name, p.notes)) return '';
-    const n = p.items.filter((it) => it.type !== 'limbs').length; const last = app.P.pages.length - 1;
-    return `<div class="pg ${i === app.page ? 'sel' : ''}" data-goto="${i}"><span class="pn">${i + 1}</span><span class="pt" title="${U.esc(p.notes || '')}">${U.esc(p.name || 'Untitled')}<small>${n} item${n === 1 ? '' : 's'}</small></span>
-      <button data-pmove="-1" data-pi="${i}" title="Move earlier" ${i === 0 ? 'disabled' : ''}>▲</button><button data-pmove="1" data-pi="${i}" title="Move later" ${i === last ? 'disabled' : ''}>▼</button>
-      <button data-pdup="${i}" title="Duplicate page">copy</button><button data-pdel="${i}" title="Delete page" class="danger">🗑</button></div>`;
-  }).join('');
-  $('#page-list').innerHTML = html || noMatch('tab-page');
-}
-function showPagesTab(focusName) {
-  setTab('tab-page');
-  if (focusName) { const el = $('#page-name'); el.focus(); el.select(); }
+  $('#page-size').value = `${st.pageW}x${st.pageH}`; $('#paper-col').value = st.paper; syncStyleControls();
 }
 function addPage(after = app.page) {
   const p = { id: 'p' + U.uid(), name: `Page ${app.P.pages.length + 1}`, notes: '', items: [] };
-  app.P.pages.splice(after + 1, 0, p); goPage(after + 1); commit(); showPagesTab(true); toast('Page added — type a name');
+  app.P.pages.splice(after + 1, 0, p); goPage(after + 1); commit(); toast('Page added');
 }
 async function deletePage(i = app.page) {
   const p = app.P.pages[i]; const n = p.items.filter((it) => it.type !== 'limbs').length;
@@ -117,10 +107,6 @@ function movePage(i, d) {
   if (app.page === i) app.page = j; else if (app.page === j) app.page = i;
   renderAll(); commit();
 }
-function renderPageSelect() {
-  $('#page-sel').innerHTML = app.P.pages.map((p, i) => `<option value="${i}" ${i === app.page ? 'selected' : ''}>${i + 1}. ${U.esc(p.name)}</option>`).join('');
-}
-
 // ---------- layers ----------
 function renderLayers() {
   const items = pg().items; const sg = selGroup();

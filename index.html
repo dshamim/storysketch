@@ -8,91 +8,186 @@
 <link rel="stylesheet" href="src/ui/components.css">
 <link rel="stylesheet" href="src/css/app.css">
 </head>
-<body>
+<body class="ui">
 <svg id="defs-holder" width="0" height="0" style="position:absolute" aria-hidden="true"></svg>
 
-<header>
-  <div class="brand">✏️ StorySketch <small id="ver"></small></div>
-  <div class="pagenav">
-    <button id="prev-page" title="Previous page">◀</button>
-    <select id="page-sel"></select>
-    <button id="next-page" title="Next page">▶</button>
-    <button id="add-page" title="Add a page after this one">+ Page</button>
-    <button id="rename-page" title="Rename this page / edit its notes">✎</button>
-    <button id="del-page" title="Delete this page" class="danger">🗑</button>
-  </div>
-  <button id="preview" title="Toggle style preview (P)">✏️ Preview: off</button>
-  <div class="spacer"></div>
-  <button id="undo" title="Undo (Ctrl+Z)">↶</button>
-  <button id="redo" title="Redo (Ctrl+Shift+Z)">↷</button>
-  <button id="open-designer" title="Character designer">👤 Designer</button>
-  <button id="open-plugins" title="Installed plugins: hair, clothes, accessories, props, characters, poses">🧩 Plugins</button>
-  <button id="open-export" class="primary">⬇ Export</button>
-  <div class="proj">
-    <span id="file-name"></span>
-    <button id="save" title="Save to the current file (Ctrl+S)">Save</button>
-    <button id="saveas" title="Save a copy to a new file (Ctrl+Shift+S)">Save as…</button>
-    <button id="load" title="Open a project file (Ctrl+O)">Open…</button>
-    <button id="new">New</button>
-    <input type="file" id="load-file" accept=".json,application/json" hidden>
-  </div>
+<header class="ui-topbar" id="topbar">
+  <span class="ui-brand"><span data-icon="pencil"></span>StorySketch</span>
+  <nav class="menubar" aria-label="Menus">
+    <button class="ui-btn ghost sm" id="btn-file">File</button>
+    <button class="ui-btn ghost sm" id="btn-edit">Edit</button>
+    <button class="ui-btn ghost sm" id="btn-view">View</button>
+  </nav>
+  <div class="grow"></div>
+  <span class="ui-status" id="project-status" tabindex="0"><span id="file-name">Untitled</span><span id="save-state" class="ui-badge"></span></span>
+  <button class="ui-iconbtn" id="undo" data-tip="Undo" data-kbd="Ctrl+Z" aria-label="Undo"><span data-icon="undo"></span></button>
+  <button class="ui-iconbtn" id="redo" data-tip="Redo" data-kbd="Ctrl+Shift+Z" aria-label="Redo"><span data-icon="redo"></span></button>
+  <button class="ui-btn primary" id="open-export"><span data-icon="export"></span>Export</button>
+  <button class="ui-iconbtn" id="btn-help" data-tip="Help" aria-label="Help"><span data-icon="help"></span></button>
+  <input type="file" id="load-file" accept=".json,application/json" hidden>
 </header>
 
-<main>
-  <aside id="left">
+<div class="ui-ribbon" id="ribbon" role="toolbar" aria-label="Page settings">
+  <label class="rb"><span>Style</span><span class="ui-select"><select id="style-sel"></select><span data-icon="chevron-down"></span></span></label>
+  <label class="rb"><span>Page colour</span><input type="color" id="paper-col"></label>
+  <label class="rb"><span>Page size</span><span class="ui-select"><select id="page-size">
+    <option value="1000x750">4:3 landscape</option>
+    <option value="1000x707">A4 landscape</option>
+    <option value="1000x563">16:9</option>
+    <option value="900x900">Square</option>
+    <option value="707x1000">A4 portrait</option>
+  </select><span data-icon="chevron-down"></span></span></label>
+  <span class="ui-divider-v"></span>
+  <label class="ui-switch" data-tip="Show the page in the chosen drawing style" data-kbd="P"><input type="checkbox" role="switch" id="preview-sw"><span class="ui-switch-track"></span><span>Styled view</span></label>
+</div>
+
+<main id="workspace">
+  <div class="railwrap">
+    <nav class="ui-rail" id="rail" role="tablist" aria-orientation="vertical" aria-label="Library" data-ui-ready="1">
+      <button class="ui-rail-btn" role="tab" id="rail-cast" data-tab="tab-cast" aria-selected="true"><span data-icon="characters"></span>Characters</button>
+      <button class="ui-rail-btn" role="tab" id="rail-props" data-tab="tab-props" aria-selected="false"><span data-icon="props"></span>Props</button>
+      <button class="ui-rail-btn" role="tab" id="rail-layers" data-tab="tab-layers" aria-selected="false"><span data-icon="layers"></span>Layers</button>
+    </nav>
+    <div class="ui-rail rail-extra"><button class="ui-rail-btn" id="open-plugins" data-tip="Hair, clothes, props and other things you can add"><span data-icon="addons"></span>Add-ons<span class="ui-badge warning rail-badge" id="plug-badge" hidden></span></button></div>
+  </div>
+
+  <aside id="left" aria-label="Library">
     <div class="lhead">
-      <nav class="tabs">
-        <button data-tab="tab-cast" class="on">Characters</button>
-        <button data-tab="tab-props">Props</button>
-        <button data-tab="tab-page">Pages</button>
-        <button data-tab="tab-layers">Layers</button>
-      </nav>
-      <input id="lsearch" type="search" placeholder="Search characters…  ( / )" autocomplete="off">
+      <div class="fly-title"><h2 id="fly-title">Characters</h2><button class="ui-iconbtn sm" id="fly-close" data-tip="Hide this panel" aria-label="Hide this panel"><span data-icon="panel-left-close"></span></button></div>
+      <input id="lsearch" class="ui-input" type="search" placeholder="Search characters…" autocomplete="off" aria-label="Search" data-kbd="/">
     </div>
-    <section class="tabpane" id="tab-cast">
-      <p class="muted small">Click to add to the page. Edit looks in the Character designer.</p>
+    <section class="tabpane" id="tab-cast" role="tabpanel" aria-labelledby="rail-cast">
+      <div class="row"><button class="ui-btn sm" id="open-designer"><span data-icon="add"></span>New character</button></div>
+      <p class="muted small">Click a character to add it to the page.</p>
       <div class="grid" id="cast-grid"></div>
       <div id="lib-section"></div>
     </section>
-    <section class="tabpane" id="tab-layers" hidden>
+    <section class="tabpane" id="tab-layers" role="tabpanel" aria-labelledby="rail-layers" hidden>
       <p class="muted small">Top of the list = front. Click to select (Ctrl/Shift-click for several) — handy for picking something buried under other things. ▣ = a group. 🔒 = locked: it can't be clicked or moved on the page; click 🔒 here to unlock.</p>
       <div id="layers"></div>
     </section>
-    <section class="tabpane" id="tab-props" hidden><div id="prop-list"></div></section>
-    <section class="tabpane" id="tab-page" hidden>
-      <h4>This page</h4>
-      <label class="f"><span>Page name</span><input id="page-name" type="text"></label>
-      <label class="f"><span>Notes</span><textarea id="page-notes" rows="5" placeholder="What happens, visual choice, Q&amp;A point…"></textarea></label>
-      <h4>All pages <small class="muted">(click to open)</small></h4>
-      <div id="page-list"></div>
-      <div class="row"><button id="add-page2">+ Add page</button></div>
-      <h4>Book settings</h4>
-      <label class="f"><span>Page size (all pages)</span>
-        <select id="page-size">
-          <option value="1000x750">4:3 landscape</option>
-          <option value="1000x707">A4 landscape</option>
-          <option value="1000x563">16:9</option>
-          <option value="900x900">Square</option>
-          <option value="707x1000">A4 portrait</option>
-        </select></label>
-      <label class="f"><span>Drawing style (preview and export)</span><select id="style-sel"></select></label>
-      <label class="f"><span>Paper colour (match your page or slide background)</span><input id="paper-col" type="color"></label>
-      <p class="muted small">Export sizes: 1× = 1000 px wide, 4× = 4000 px wide (print, ≈ A4 at 300 dpi).</p>
-    </section>
+    <section class="tabpane" id="tab-props" role="tabpanel" aria-labelledby="rail-props" hidden><div id="prop-list"></div></section>
   </aside>
+  <button class="ui-iconbtn flyout-open" id="fly-open" data-tip="Show the library panel" aria-label="Show the library panel" hidden><span data-icon="panel-left-open"></span></button>
 
   <section id="center">
-    <div id="page-strip"></div>
     <div id="stage-wrap"><svg id="stage" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
-      <div id="zoombar" title="Ctrl + mouse wheel (or pinch) zooms where the pointer is. Wheel or Space-drag moves around.">
-        <button id="zoom-out" title="Zoom out (Ctrl+−)">−</button><button id="zoom-pct" title="Fit the whole page (Ctrl+0)">100%</button><button id="zoom-in" title="Zoom in (Ctrl+=)">+</button><button id="zoom-sel" title="Zoom to the selection (Shift+2)">🔍 Selection</button>
-      </div></div>
+      <p id="empty-hint" class="empty-hint" hidden>Add a character or a prop from the left to begin.</p></div>
   </section>
 
   <aside id="right">
     <div id="inspector"></div>
   </aside>
 </main>
+
+<footer id="filmbar">
+  <div id="notes-drawer" hidden>
+    <div class="ui-field"><label for="page-name">Page name</label><input class="ui-input" id="page-name" type="text"></div>
+    <div class="ui-field notes"><label for="page-notes">Notes (what happens, visual choice, Q&amp;A point…)</label><textarea class="ui-input" id="page-notes" rows="3"></textarea></div>
+  </div>
+  <div class="filmrow">
+    <div id="film" class="ui-film" role="group" aria-label="Pages"></div>
+    <div class="film-tools">
+      <button class="ui-iconbtn" id="page-menu-btn" data-tip="Page options" aria-label="Page options"><span data-icon="more"></span></button>
+      <button class="ui-btn ghost sm" id="toggle-notes" aria-expanded="false" aria-controls="notes-drawer">Notes</button>
+      <span class="ui-divider-v"></span>
+      <button class="ui-iconbtn" id="zoom-out" data-tip="Zoom out" data-kbd="Ctrl+−" aria-label="Zoom out"><span data-icon="zoom-out"></span></button>
+      <button class="ui-btn ghost sm zoom-pct" id="zoom-pct" data-tip="Fit the whole page" data-kbd="Ctrl+0">100%</button>
+      <button class="ui-iconbtn" id="zoom-in" data-tip="Zoom in" data-kbd="Ctrl+=" aria-label="Zoom in"><span data-icon="zoom-in"></span></button>
+      <button class="ui-iconbtn" id="zoom-sel" data-tip="Zoom to the selection" data-kbd="Shift+2" aria-label="Zoom to the selection"><span data-icon="fit"></span></button>
+    </div>
+  </div>
+</footer>
+
+<!-- menus -->
+<div class="ui-popover ui-menu" role="menu" id="menu-file" aria-label="File" hidden>
+  <button role="menuitem" data-act="new"><span data-icon="new"></span><span class="grow">New…</span></button>
+  <button role="menuitem" data-act="open"><span data-icon="open"></span><span class="grow">Open…</span><kbd class="ui-kbd">Ctrl+O</kbd></button>
+  <hr>
+  <button role="menuitem" id="save" data-act="save"><span data-icon="save"></span><span class="grow">Save</span><kbd class="ui-kbd">Ctrl+S</kbd></button>
+  <button role="menuitem" id="saveas" data-act="saveas"><span data-icon="save"></span><span class="grow">Save as…</span><kbd class="ui-kbd">Ctrl+Shift+S</kbd></button>
+  <hr>
+  <button role="menuitem" data-act="export"><span data-icon="export"></span><span class="grow">Export…</span></button>
+  <button role="menuitem" data-act="addons"><span data-icon="addons"></span><span class="grow">Add-ons…</span></button>
+</div>
+<div class="ui-popover ui-menu" role="menu" id="menu-edit" aria-label="Edit" hidden>
+  <button role="menuitem" data-act="undo"><span data-icon="undo"></span><span class="grow">Undo</span><kbd class="ui-kbd">Ctrl+Z</kbd></button>
+  <button role="menuitem" data-act="redo"><span data-icon="redo"></span><span class="grow">Redo</span><kbd class="ui-kbd">Ctrl+Shift+Z</kbd></button>
+  <hr>
+  <button role="menuitem" data-act="cut"><span data-icon="cut"></span><span class="grow">Cut</span><kbd class="ui-kbd">Ctrl+X</kbd></button>
+  <button role="menuitem" data-act="copy"><span data-icon="copy"></span><span class="grow">Copy</span><kbd class="ui-kbd">Ctrl+C</kbd></button>
+  <button role="menuitem" data-act="paste"><span data-icon="paste"></span><span class="grow">Paste</span><kbd class="ui-kbd">Ctrl+V</kbd></button>
+  <button role="menuitem" data-act="duplicate"><span data-icon="copy"></span><span class="grow">Duplicate</span><kbd class="ui-kbd">Ctrl+D</kbd></button>
+  <button role="menuitem" data-act="delete" class="danger"><span data-icon="delete"></span><span class="grow">Delete</span><kbd class="ui-kbd">Del</kbd></button>
+  <hr>
+  <button role="menuitem" data-act="selectall"><span data-icon="select"></span><span class="grow">Select all</span><kbd class="ui-kbd">Ctrl+A</kbd></button>
+  <button role="menuitem" data-act="group"><span data-icon="group"></span><span class="grow">Group</span><kbd class="ui-kbd">Ctrl+G</kbd></button>
+  <button role="menuitem" data-act="ungroup"><span data-icon="ungroup"></span><span class="grow">Ungroup</span><kbd class="ui-kbd">Ctrl+Shift+G</kbd></button>
+  <button role="menuitem" data-act="lock"><span data-icon="lock"></span><span class="grow">Lock / unlock</span><kbd class="ui-kbd">Ctrl+Shift+L</kbd></button>
+</div>
+<div class="ui-popover ui-menu" role="menu" id="menu-view" aria-label="View" hidden>
+  <button role="menuitemcheckbox" id="menu-preview" aria-checked="false" data-act="preview"><span data-icon="check" class="tick"></span><span class="grow">Styled view</span><kbd class="ui-kbd">P</kbd></button>
+  <hr>
+  <button role="menuitem" data-act="zoomin"><span data-icon="zoom-in"></span><span class="grow">Zoom in</span><kbd class="ui-kbd">Ctrl+=</kbd></button>
+  <button role="menuitem" data-act="zoomout"><span data-icon="zoom-out"></span><span class="grow">Zoom out</span><kbd class="ui-kbd">Ctrl+−</kbd></button>
+  <button role="menuitem" data-act="zoomfit"><span data-icon="fit"></span><span class="grow">Fit the whole page</span><kbd class="ui-kbd">Ctrl+0</kbd></button>
+  <button role="menuitem" data-act="zoomsel"><span data-icon="fit"></span><span class="grow">Zoom to the selection</span><kbd class="ui-kbd">Shift+2</kbd></button>
+  <hr>
+  <button role="menuitemcheckbox" id="menu-library" aria-checked="true" data-act="library"><span data-icon="check" class="tick"></span><span class="grow">Library panel</span></button>
+</div>
+<div class="ui-popover ui-menu" role="menu" id="menu-help" aria-label="Help" hidden>
+  <button role="menuitem" data-act="about"><span data-icon="info"></span><span class="grow">About StorySketch</span></button>
+</div>
+<div class="ui-popover ui-menu" role="menu" id="menu-page" aria-label="Page options" hidden>
+  <button role="menuitem" data-act="page-rename"><span data-icon="pencil"></span><span class="grow">Rename / edit notes…</span></button>
+  <button role="menuitem" data-act="page-dup"><span data-icon="copy"></span><span class="grow">Duplicate page</span></button>
+  <button role="menuitem" data-act="page-earlier"><span data-icon="chevron-left"></span><span class="grow">Move earlier</span></button>
+  <button role="menuitem" data-act="page-later"><span data-icon="chevron-right"></span><span class="grow">Move later</span></button>
+  <hr>
+  <button role="menuitem" id="del-page" data-act="page-del" class="danger"><span data-icon="delete"></span><span class="grow">Delete page</span></button>
+</div>
+
+<!-- export -->
+<div class="ui-popover" id="export" role="dialog" aria-label="Export" hidden>
+  <form id="export-form" class="export-form">
+    <h2>Export</h2>
+    <fieldset><legend>What</legend>
+      <label><input type="radio" name="what" value="page" checked> Whole page</label>
+      <label><input type="radio" name="what" value="selection"> Selection (one PNG, overlaps kept)</label>
+      <label><input type="radio" name="what" value="layers"> Every layer as its own file</label>
+    </fieldset>
+    <fieldset><legend>Look</legend>
+      <span class="ui-select"><select name="look" id="ex-look"></select><span data-icon="chevron-down"></span></span>
+    </fieldset>
+    <fieldset><legend>Background</legend>
+      <label><input type="radio" name="bg" value="none" checked> Transparent</label>
+      <label><input type="radio" name="bg" value="paper"> Page colour</label>
+    </fieldset>
+    <fieldset><legend>Size</legend>
+      <label><input type="radio" name="scale" value="1"> 1×</label>
+      <label><input type="radio" name="scale" value="2" checked> 2×</label>
+      <label><input type="radio" name="scale" value="3"> 3×</label>
+      <label><input type="radio" name="scale" value="4"> 4× (print)</label>
+    </fieldset>
+    <fieldset><legend>Format</legend>
+      <label><input type="radio" name="fmt" value="png" checked> PNG</label>
+      <label><input type="radio" name="fmt" value="svg"> SVG</label>
+    </fieldset>
+    <label class="ui-check" id="ask-row"><input type="checkbox" name="ask" checked><span class="ui-check-box"><span data-icon="check"></span></span><span>Choose where to save</span></label>
+    <p class="ui-muted small">For AI image tools: Whole page · Clean lines · Page colour · 1×.</p>
+    <div class="ui-row"><button class="ui-btn primary" id="do-export">Export</button><button class="ui-btn" id="x-close" type="button">Close</button><span id="export-status" class="ui-muted" role="status"></span></div>
+  </form>
+</div>
+
+<!-- start screen: first run and File > New -->
+<div id="start" class="start" role="region" aria-labelledby="start-h" hidden>
+  <div class="start-in">
+    <h1 id="start-h">Start a project</h1>
+    <p class="ui-muted" id="start-note">Pick a blank page, or open a sample to see how it is made. Samples are yours to change.</p>
+    <div class="start-cards" id="start-cards"></div>
+    <div class="ui-row"><button class="ui-btn" id="start-open"><span data-icon="open"></span>Open a file…</button><button class="ui-btn ghost" id="start-close">Close</button></div>
+  </div>
+</div>
 
 <dialog id="designer">
   <div class="dhead"><b>Character designer</b><select id="d-templates"></select><button id="d-close">Done</button></div>
@@ -106,48 +201,9 @@
   </div>
 </dialog>
 
-<dialog id="export">
-  <form id="export-form" method="dialog">
-    <h3>Export</h3>
-    <fieldset><legend>What</legend>
-      <label><input type="radio" name="what" value="page" checked> Whole page</label>
-      <label><input type="radio" name="what" value="selection"> Selection (one PNG, overlaps kept)</label>
-      <label><input type="radio" name="what" value="layers"> Every layer as its own file</label>
-    </fieldset>
-    <fieldset><legend>Look</legend>
-      <select name="look" id="ex-look"></select>
-    </fieldset>
-    <fieldset><legend>Background</legend>
-      <label><input type="radio" name="bg" value="none" checked> Transparent</label>
-      <label><input type="radio" name="bg" value="paper"> Paper colour</label>
-    </fieldset>
-    <fieldset><legend>Size</legend>
-      <label><input type="radio" name="scale" value="1"> 1×</label>
-      <label><input type="radio" name="scale" value="2" checked> 2×</label>
-      <label><input type="radio" name="scale" value="3"> 3×</label>
-      <label><input type="radio" name="scale" value="4"> 4× (print)</label>
-    </fieldset>
-    <fieldset><legend>Format</legend>
-      <label><input type="radio" name="fmt" value="png" checked> PNG</label>
-      <label><input type="radio" name="fmt" value="svg"> SVG</label>
-    </fieldset>
-    <label class="chk" id="ask-row"><input type="checkbox" name="ask" checked> Choose where to save (opens in the last export folder)</label>
-    <p class="muted small">For AI image tools: Whole page · Clean · Paper colour · 1×.</p>
-    <div class="row"><button id="do-export" class="primary">Export</button><button id="x-close" type="button">Close</button><span id="export-status"></span></div>
-  </form>
-</dialog>
-
-<dialog id="newdlg">
-  <form method="dialog" class="pad">
-    <h3>New project</h3>
-    <p class="muted">Unsaved changes in the current project will be lost.</p>
-    <div class="row" id="new-choices"></div>
-  </form>
-</dialog>
-
 <dialog id="plugins">
   <div class="pad plugins">
-    <h3>🧩 Plugins</h3>
+    <h3>Add-ons</h3>
     <p class="muted small" id="plug-intro"></p>
     <div id="plug-summary"></div>
     <div id="plug-warn"></div>
@@ -201,8 +257,6 @@
   </form>
 </dialog>
 
-<div id="toast"></div>
-
 <script src="src/ui/icons.js"></script>
 <script src="src/ui/ui.js"></script>
 <script src="src/core/version.js"></script>
@@ -231,6 +285,7 @@
 <script src="src/app/export.js"></script>
 <script src="src/app/project.js"></script>
 <script src="src/app/plugins-panel.js"></script>
+<script src="src/app/shell.js"></script>
 <script src="src/app/main.js"></script>
 </body>
 </html>

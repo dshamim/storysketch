@@ -5,6 +5,19 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
+## Unreleased — new shell (revamp phase 2)
+The first visible part of the interface revamp: the outer frame of the app is rebuilt with the new design system. Nothing about how drawings, poses or files work has changed.
+- **Top bar**: **File** (New…, Open…, Save, Save as…, Export…, Add-ons…), **Edit** (undo/redo, cut/copy/paste, duplicate, delete, select all, group, ungroup, lock — greyed out when they don't apply), **View** (styled view, zoom, library panel), project name with a **Saved ✓ / Unsaved ●** badge, Undo and Redo icons, **Export** and **Help** (About, with the version).
+- **Export** is now a small panel under the Export button instead of a window; Esc closes it.
+- **Left rail** with **Characters · Props · Layers** and **Add-ons** (it shows a warning count when an add-on has a problem). Choosing a tab opens its panel; choosing the open tab again, or the arrow button, folds the panel away to give the page more room (remembered). `/` opens the panel and jumps to search.
+- **Page strip** along the bottom: a thumbnail of every page (it follows your edits), click to open, **+** to add. **⋯** has rename / notes, duplicate, move earlier/later and delete. **Notes** opens a drawer for the page name and notes. Page Up / Page Down change page. Zoom controls moved to the bottom right.
+- **Start screen** on first run and from **File ▸ New**: a blank page or one of the four samples, each with a preview. Starting a new project when there are unsaved changes asks first.
+- **Page settings** (drawing style, page colour, page size, Styled view) are in a strip under the top bar. In the next phase this strip becomes the contextual ribbon for whatever is selected.
+- Keyboard: arrow keys, Home/End, Space and Enter now work inside menus, the rail and the page strip without also moving the selected item or panning the page (Space used to be swallowed, so a focused button could not be pressed with it).
+- Fixes found on the way: the popover helper never closed a menu after a checkbox item (View ▸ Styled view), and a form popover closed when you pressed Tab.
+- Wording: *Plugins → Add-ons*, *Paper colour → Page colour*, *Preview → Styled view*.
+- Tests: new `shell.test.mjs` (start screen, menus, rail, page strip, notes, export panel, keyboard walk-through, and a checklist that every old control is still reachable), the page / new-project / dialog tests now drive the new controls, and 19 screenshot baselines were regenerated.
+
 ## Unreleased — interface foundations (revamp phase 1; nothing changes on screen yet)
 - New design system in `src/ui/`: **tokens** (colour, 4 px spacing, type, radii, shadows, control sizes that grow to 44 px on touch screens), **components** (buttons, icon buttons, fields, switch, checkbox, segmented control, tabs, left rail, swatches, popover and menu, tooltip, collapsible section, tile, filmstrip, badge, empty state, top bar, ribbon, mini bar, dialog, toast) and **behaviour** (`ui.js`): keyboard-operable tooltips with shortcuts, popovers and menus, tabs with arrow keys, sections, toasts.
 - **99 icons** from Lucide (ISC) as one generated file that works from disk; `docs/ui-kit.html` shows every token, icon and component with live examples. Light theme only.

@@ -17,7 +17,7 @@ const skip = browser ? false : 'no Chromium available';
 async function fresh(setup = `app.P = STORE.fresh('blank'); renderAll();`) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, acceptDownloads: true }); const errs = [];
   page.on('pageerror', (e) => errs.push(e.message)); page.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
-  await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P);
+  await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   await page.evaluate(() => localStorage.clear()); await page.evaluate(setup);
   return { page, errs };
 }
@@ -65,13 +65,13 @@ test('pose: a preset pose button changes the figure; mirror flips it; detaching 
   await page.check('[data-detach="armL"]'); assert.ok((await items(page)).some((i) => i.type === 'limbs'), 'a limbs layer was added');
   await page.close();
 });
-test('pages: add, rename via the page selector, switch and delete', { skip }, async () => {
+test('pages: add, switch with the filmstrip and delete from the page menu', { skip }, async () => {
   const { page } = await fresh();
   await page.click('#add-page'); assert.equal(await page.evaluate(() => app.P.pages.length), 2);
   assert.equal(await page.evaluate(() => app.page), 1);
-  await page.click('#prev-page'); assert.equal(await page.evaluate(() => app.page), 0);
-  await page.click('#next-page'); assert.equal(await page.evaluate(() => app.page), 1);
-  await page.click('#del-page'); await page.click('#msgdlg [data-v="ok"]'); await page.waitForTimeout(200); assert.equal(await page.evaluate(() => app.P.pages.length), 1, 'page deleted after confirming');
+  await page.click('#film [data-page="0"]'); assert.equal(await page.evaluate(() => app.page), 0);
+  await page.click('#film [data-page="1"]'); assert.equal(await page.evaluate(() => app.page), 1);
+  await page.click('#page-menu-btn'); await page.click('#del-page'); await page.click('#msgdlg [data-v="ok"]'); await page.waitForTimeout(200); assert.equal(await page.evaluate(() => app.P.pages.length), 1, 'page deleted after confirming');
   await page.close();
 });
 test('style: the preview toggle (P) switches between clean and styled drawing', { skip }, async () => {
@@ -79,12 +79,12 @@ test('style: the preview toggle (P) switches between clean and styled drawing', 
   const svg = () => page.evaluate(() => document.querySelector('#items').innerHTML);
   const clean = await svg(); await page.keyboard.press('p'); const styled = await svg();
   assert.notEqual(clean, styled); assert.match(styled, /filter="url\(#crayon-grain\)"/);
-  await page.click('[data-tab="tab-page"]'); await page.selectOption('#style-sel', 'marker'); assert.match(await svg(), /marker-edge/);
+  await page.selectOption('#style-sel', 'marker'); assert.match(await svg(), /marker-edge/);
   await page.close();
 });
 test('export: PNG and SVG download with the expected names and content', { skip }, async () => {
   const { page } = await fresh(`restore(STORE.fresh('project:sample-classroom')); app.page = 0; renderAll();`);
-  await page.click('#open-export'); await page.uncheck('input[name="ask"]'); await page.check('input[name="scale"][value="1"]');
+  await page.click('#open-export'); await page.uncheck('input[name="ask"]', { force: true }); await page.check('input[name="scale"][value="1"]');
   let [dl] = await Promise.all([page.waitForEvent('download'), page.click('#do-export')]);
   assert.match(dl.suggestedFilename(), /^p01-reading-time-crayon\.png$/);
   const buf = fs.readFileSync(await dl.path()); assert.equal(buf.subarray(1, 4).toString(), 'PNG');
@@ -108,9 +108,9 @@ test('zoom: + / − / Ctrl+0 change and reset the zoom', { skip }, async () => {
   await page.click('#zoom-in'); const a = await z(); await page.click('#zoom-out'); await page.click('#zoom-out'); const b = await z(); assert.ok(a > b);
   await page.keyboard.press('Control+0'); assert.ok(Math.abs((await z()) - (await page.evaluate(() => app.view.fit ?? app.view.z))) < 5 || true); await page.close();
 });
-test('dialogs open and close: designer, plugins, export, new', { skip }, async () => {
+test('dialogs open and close: designer and add-ons', { skip }, async () => {
   const { page } = await fresh();
-  for (const [btn, dlg] of [['#open-designer', '#designer'], ['#open-plugins', '#plugins'], ['#open-export', '#export'], ['#new', '#newdlg']]) {
+  for (const [btn, dlg] of [['#open-designer', '#designer'], ['#open-plugins', '#plugins']]) {
     await page.click(btn); assert.equal(await page.evaluate((d) => document.querySelector(d).open, dlg), true, dlg); await page.keyboard.press('Escape');
     assert.equal(await page.evaluate((d) => document.querySelector(d).open, dlg), false, dlg + ' closed');
   }

@@ -19,7 +19,7 @@ const skip = !browser ? 'no Chromium available' : !baselinesApply() ? `baselines
 async function open(setup) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
   const errs = []; page.on('pageerror', (e) => errs.push(e.message));
-  await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.addStyleTag({ content: STILL });
+  await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs await page.addStyleTag({ content: STILL });
   // item ids seed the hand-drawn wobble, so they must be the same on every run
   await page.evaluate(() => { localStorage.clear(); let n = 0; U.uid = () => 'u' + (++n).toString(36); });
   await page.evaluate(setup); await page.waitForTimeout(350);
@@ -32,14 +32,18 @@ const STATES = {
   'classroom-several-selected': `${classroom} select(pg().items.filter((i) => ['table', 'bookopen'].includes(i.kind) || i.cast === 'lily').map((i) => i.id));`,
   'classroom-nothing-selected': `${classroom} select([]);`,
   'tab-props': `${classroom} select([]); document.querySelector('[data-tab="tab-props"]').click();`,
-  'tab-pages': `${classroom} select([]); document.querySelector('[data-tab="tab-page"]').click();`,
+  'page-notes-open': `${classroom} select([]); document.querySelector('#toggle-notes').click();`,
   'tab-layers': `${classroom} select([pg().items[3].id]); document.querySelector('[data-tab="tab-layers"]').click();`,
   'chalk-styled': `restore(STORE.fresh('project:sample-chalkboard')); app.page = 0; setPreview(true); renderAll(); select([]);`,
   'animals-dog-selected': `restore(STORE.fresh('project:sample-animals')); app.page = 0; setPreview(true); renderAll(); select([pg().items.find((i) => i.cast === 'rex').id]);`,
   'dialog-designer': `${classroom} select([]); document.querySelector('#open-designer').click();`,
-  'dialog-export': `${classroom} select([]); document.querySelector('#open-export').click();`,
+  'popover-export': `${classroom} select([]); document.querySelector('#open-export').click();`,
+  'menu-file': `${classroom} select([]); document.querySelector('#btn-file').click();`,
+  'menu-edit-selection': `${classroom} select([pg().items[3].id]); document.querySelector('#btn-edit').click();`,
+  'flyout-collapsed': `${classroom} select([]); document.querySelector('#rail-cast').click();`,
+  'page-menu': `${classroom} select([]); document.querySelector('#page-menu-btn').click();`,
   'dialog-plugins': `${classroom} select([]); document.querySelector('#open-plugins').click();`,
-  'dialog-new': `${classroom} select([]); document.querySelector('#new').click();`,
+  'start-screen': `${classroom} select([]); showStart(true);`,
 };
 for (const [name, setup] of Object.entries(STATES)) {
   test(`visual: ${name}`, { skip }, async () => {

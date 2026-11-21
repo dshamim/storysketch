@@ -91,11 +91,10 @@ const WAITS_ON_USER = new Set(['ask', 'upgrade', 'picker']); // no watchdog whil
 const SAVE_SLOW_MS = 4000;
 let saveRun = null;
 function setSaveButtons(state) {
-  const b = $('#save'), a = $('#saveas'); clearTimeout(b._t);
-  b.disabled = a.disabled = state === 'busy';
-  b.textContent = state === 'busy' ? 'Saving…' : state === 'done' ? 'Saved ✓' : 'Save';
-  b.classList.toggle('saved', state === 'done');
-  if (state === 'done') b._t = setTimeout(() => setSaveButtons('idle'), 2200);
+  const st = $('#save-state');
+  for (const id of ['#save', '#saveas']) $(id).disabled = state === 'busy';
+  if (state === 'busy') { st.hidden = false; st.textContent = 'Saving…'; st.className = 'ui-badge accent'; return; }
+  setDirty(app.dirty); // back to "Saved ✓" / "Unsaved ●"
 }
 // Chrome stopped answering about the remembered file (happens after a refresh on some setups): pick it again once.
 function askRepick() {

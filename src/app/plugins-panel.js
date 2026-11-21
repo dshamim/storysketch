@@ -3,8 +3,8 @@
 // ---------- plugins panel ----------
 const TYPE_LABEL = { hair: 'Hair styles', clothes: 'Clothes', accessory: 'Accessories', prop: 'Props', pose: 'Poses', template: 'Templates', character: 'Characters' };
 function updatePluginBadge() {
-  const n = CP.warnings.length; const b = $('#open-plugins');
-  b.textContent = n ? `🧩 Plugins ⚠ ${n}` : '🧩 Plugins'; b.classList.toggle('warnb', !!n);
+  const n = CP.warnings.length; const b = $('#plug-badge');
+  b.hidden = !n; b.textContent = n; $('#open-plugins').setAttribute('aria-label', n ? `Add-ons, ${n} problem${n === 1 ? '' : 's'}` : 'Add-ons');
 }
 function openPlugins() {
   const counts = {}; for (const r of CP.loaded) counts[r.type] = (counts[r.type] || 0) + 1;

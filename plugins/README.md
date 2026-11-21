@@ -24,7 +24,7 @@ plugins/
 
 1. **Copy** a similar file in the right folder (for example `hair/braids.js` or `characters/maya.json`).
 2. **Change** its `id` (unique, lowercase, no spaces) and `name`, then edit the drawing or the values.
-3. **Rescan**: in the tool click **🧩 Plugins → Rescan plugins folder** (the first time, pick this
+3. **Rescan**: in the tool click **Add-ons → Rescan plugins folder** (left rail) (the first time, pick this
    `plugins` folder; Chrome remembers it). The tool rebuilds `manifest.js` and reloads.
    No-dialog alternative: `python3 tools/build_plugins.py`, then refresh the page.
 
@@ -32,7 +32,7 @@ Why the rescan? A page opened from your disk isn't allowed to list a folder, so 
 index in `manifest.js`. You need a rescan when you **add, remove or rename** a file, or **edit a
 `.json` file** (JSON is copied into the index). Edits to an existing **`.js`** file only need a refresh.
 
-Problems (a typo, a missing field, the wrong version) show in **🧩 Plugins** with the file name.
+Problems (a typo, a missing field, the wrong version) show in **Add-ons** (left rail) with the file name.
 The rest of the plugins still load.
 
 ## Versions — `api` and `version`
@@ -48,7 +48,7 @@ CP.register({ api: 1, version: '1.0.0', type: 'hair', id: 'braids', … })
 
 - `api` is the plugin interface version (currently **1**). It changes only for **breaking**
   changes. The tool loads only plugins whose `api` it supports. Older, newer or missing `api` means
-  **not loaded** and listed in 🧩 Plugins with the reason. Nothing is converted automatically.
+  **not loaded** and listed in Add-ons with the reason. Nothing is converted automatically.
 - `version` is your own version of the plugin (free text, shown in the Plugins list).
 - Same `id` as an existing plugin = **replaces it** (files load in folder/alphabetical order). Use a
   new id unless you mean to override a built-in.

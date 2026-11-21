@@ -92,7 +92,7 @@ function pasteInto(pageIdx = app.page, { quiet = false } = {}) {
   page.items.push(...fresh); tidyGroups(page);
   try { localStorage.setItem(CLIP_KEY, JSON.stringify(clip)); } catch (e) { /* ignore */ }
   const owners = fresh.filter((i) => i.type !== 'limbs').map((i) => i.id);
-  if (pageIdx === app.page) { app.sel = owners; renderAll(); } else renderPageList();
+  if (pageIdx === app.page) { app.sel = owners; renderAll(); } else renderFilmstrip();
   commit();
   if (!quiet) toast(pageIdx === app.page ? `Pasted ${owners.length} item${owners.length === 1 ? '' : 's'}` : `Copied ${owners.length} item${owners.length === 1 ? '' : 's'} to page ${pageIdx + 1}`);
 }

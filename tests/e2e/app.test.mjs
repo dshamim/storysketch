@@ -19,7 +19,7 @@ const skip = browser ? false : 'no Chromium available (install playwright-core a
 test('page loads with no console errors and no plugin problems', { skip }, async () => {
   const page = await browser.newPage(); const errs = [];
   page.on('pageerror', (e) => errs.push(e.message)); page.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
-  await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P);
+  await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   assert.deepEqual(errs, []);
   assert.deepEqual(await page.evaluate(() => [...CP.warnings]), []);
   assert.equal(await page.evaluate(() => document.title), 'StorySketch');
@@ -27,7 +27,7 @@ test('page loads with no console errors and no plugin problems', { skip }, async
 });
 test('every style renders a scene and exports SVG', { skip }, async () => {
   const page = await browser.newPage(); const errs = [];
-  page.on('pageerror', (e) => errs.push(e.message)); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P);
+  page.on('pageerror', (e) => errs.push(e.message)); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   const out = await page.evaluate(() => {
     app.P = STORE.fresh('blank'); addProp('table'); addFigure(CP.characters[0].id); select([]);
     const res = {};
@@ -44,14 +44,14 @@ test('every style renders a scene and exports SVG', { skip }, async () => {
   await page.close();
 });
 test('the style picker and export Look list show every style', { skip }, async () => {
-  const page = await browser.newPage(); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P);
+  const page = await browser.newPage(); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   const opts = await page.evaluate(() => [[...document.querySelectorAll('#style-sel option')].map((o) => o.value), [...document.querySelectorAll('#ex-look option')].map((o) => o.value)]);
   assert.deepEqual(opts[0], ['crayon', 'marker', 'ink', 'chalk']); assert.ok(opts[1].includes('clean') && opts[1].length === 5);
   await page.close();
 });
 test('selecting a figure shows its rig handles; dragging a hand handle really poses it', { skip }, async () => {
   const page = await browser.newPage({ viewport: { width: 1500, height: 950 } }); const errs = [];
-  page.on('pageerror', (e) => errs.push(e.message)); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P);
+  page.on('pageerror', (e) => errs.push(e.message)); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   await page.evaluate(() => { app.P = STORE.fresh('blank'); addFigure(CP.characters[0].id); renderStage(); });
   assert.equal(await page.locator('#overlay [data-h^="ik:"], #overlay [data-h^="up:"], #overlay [data-h="torso"], #overlay [data-h="head"]').count(), 10);
   const before = await page.evaluate(() => JSON.stringify(pg().items[0].pose.armR));
@@ -66,7 +66,7 @@ test('selecting a figure shows its rig handles; dragging a hand handle really po
 });
 test('a dog: add from template, 13 handles, its own poses and limbs, designer hides hair/clothes, switching skeleton resets poses', { skip }, async () => {
   const page = await browser.newPage({ viewport: { width: 1500, height: 950 } }); const errs = [];
-  page.on('pageerror', (e) => errs.push(e.message)); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P);
+  page.on('pageerror', (e) => errs.push(e.message)); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   await page.evaluate(() => { app.P = STORE.fresh('blank'); newFromTemplate('t-dog'); const c = app.P.cast.at(-1); addFigure(c.id); renderStage(); });
   assert.equal(await page.locator('#overlay [data-h]:not([data-h="scale"]):not([data-h="rot"])').count(), 13);
   assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('.poses .tile')].map((b) => b.dataset.pose)), ['stand', 'walk', 'run', 'sit', 'lie', 'beg', 'bark', 'sniff', 'wag']);
@@ -85,16 +85,16 @@ test('a dog: add from template, 13 handles, its own poses and limbs, designer hi
   assert.deepEqual(errs, []); await page.close();
 });
 test('New project offers a blank page and every sample project', { skip }, async () => {
-  const page = await browser.newPage(); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P);
-  await page.click('#new');
-  assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('#new-choices button')].map((b) => b.value)), ['blank', 'project:sample-airport', 'project:sample-animals', 'project:sample-chalkboard', 'project:sample-classroom', 'cancel']);
-  await page.click('#new-choices button[value="project:sample-animals"]');
+  const page = await browser.newPage(); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
+  await page.click('#btn-file'); await page.click('[data-act="new"]');
+  assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('#start-cards [data-start]')].map((b) => b.dataset.start)), ['blank', 'project:sample-airport', 'project:sample-animals', 'project:sample-chalkboard', 'project:sample-classroom']);
+  await page.click('#start-cards [data-start="project:sample-animals"]');
   await page.waitForFunction(() => app.P.pages.length === 3 && app.P.settings.style === 'marker'); await page.close();
 });
 test('every sample page keeps all its items inside the page and renders in every style without errors', { skip }, async () => {
   const page = await browser.newPage(); const errs = [];
   page.on('pageerror', (e) => errs.push(e.message)); page.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
-  await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P);
+  await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   const bad = await page.evaluate(() => {
     const out = [];
     for (const sp of CP.projects) {

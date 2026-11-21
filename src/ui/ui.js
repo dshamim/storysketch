@@ -107,6 +107,41 @@ const UI = (() => {
     return api;
   }
 
+  // ---------- popovers for buttons that are rebuilt (the ribbon) ----------
+  // UI.showPopover(trigger, panel) opens a (static) panel next to a button that may be replaced later; clicking the same panel's button again closes it.
+  // Same behaviour as popover(): outside click, Esc (focus returns to the trigger if it still exists), arrow keys in menus, a menu closes when an item is chosen.
+  let dyn = null;
+  function closePopover(returnFocus = true) {
+    if (!dyn) return; const { trigger, panel } = dyn; dyn = null; panel.hidden = true;
+    trigger.setAttribute('aria-expanded', 'false'); if (returnFocus && document.contains(trigger)) trigger.focus(); emit(panel, 'ui-close', {});
+  }
+  function showPopover(trigger, panel, opts = {}) {
+    if (dyn && dyn.panel === panel) { closePopover(); return; }
+    closePopover(false); if (openPop) openPop.close(false);
+    const isMenu = panel.getAttribute('role') === 'menu';
+    if (!panel.dataset.uiDyn) {
+      panel.dataset.uiDyn = '1';
+      panel.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); closePopover(); return; }
+        if (!isMenu) return;
+        if (e.key === 'Tab') { closePopover(false); return; }
+        const items = $$(MENU_ITEM.replace(/\]/g, ']:not([disabled])'), panel); const i = items.indexOf(document.activeElement);
+        const go = (n) => { e.preventDefault(); items[(n + items.length) % items.length].focus(); };
+        if (e.key === 'ArrowDown') go(i + 1); else if (e.key === 'ArrowUp') go(i - 1); else if (e.key === 'Home') go(0); else if (e.key === 'End') go(items.length - 1);
+      });
+      if (isMenu) panel.addEventListener('click', (e) => { if (e.target.closest(MENU_ITEM)) closePopover(); });
+    }
+    panel.hidden = false; trigger.setAttribute('aria-expanded', 'true'); trigger.setAttribute('aria-haspopup', isMenu ? 'menu' : 'dialog'); hideTip(true);
+    dyn = { trigger, panel }; place(panel, trigger, opts.placement || 'bottom-start');
+    const first = isMenu ? $(MENU_ITEM.replace(/\]/g, ']:not([disabled])'), panel) : $('input, select, button, [tabindex]', panel);
+    if (first && (isMenu || opts.focus)) first.focus();
+    emit(panel, 'ui-open', {});
+  }
+  function initDynamicPopovers() {
+    document.addEventListener('pointerdown', (e) => { if (dyn && !dyn.panel.contains(e.target) && !dyn.trigger.contains(e.target)) closePopover(false); }, true);
+    window.addEventListener('resize', () => { if (dyn) place(dyn.panel, dyn.trigger, 'bottom-start'); });
+  }
+
   // ---------- tabs (also the left rail) and segmented controls ----------
   // Roving tabindex: one tab stop, arrow keys move between items, Home/End jump. Emits "ui-change" with { id }.
   function roving(root, itemSel, { selAttr, vertical, onSelect }) {
@@ -171,8 +206,8 @@ const UI = (() => {
     for (const el of $$('.ui-range', root)) if (!el.dataset.uiReady) { el.dataset.uiReady = '1'; range(el); }
   }
   let inited = false;
-  function init() { if (inited) return; inited = true; injectSprite(); initTooltips(); enhance(); }
+  function init() { if (inited) return; inited = true; injectSprite(); initTooltips(); initDynamicPopovers(); enhance(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 
-  return { icon, injectSprite, fillIcons, enhance, popover, tabs, segmented, swatches, section, range, toast, place, hideTip, esc, init };
+  return { icon, injectSprite, fillIcons, enhance, popover, showPopover, closePopover, tabs, segmented, swatches, section, range, toast, place, hideTip, esc, init };
 })();

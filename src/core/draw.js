@@ -118,6 +118,21 @@ const GLYPH = (() => {
     ')': [0.2, [[1, [[0, 0], [0.17, 0.3], [0.17, 0.75], [0, 1.08]]]]],
     '"': [0.2, [[0, [[0.04, 0], [0.04, 0.2]]], [0, [[0.16, 0], [0.16, 0.2]]]]],
   };
+  Object.assign(L, {
+    ';': [0.12, [[0, [[0.05, 0.5], [0.05, 0.56]]], [0, [[0.09, 0.92], [0.03, 1.13]]]]],
+    '_': [0.5, [[0, [[0, 1.1], [0.5, 1.1]]]]],
+    '<': [0.45, [[0, [[0.45, 0.3], [0, 0.62], [0.45, 0.94]]]]],
+    '>': [0.45, [[0, [[0, 0.3], [0.45, 0.62], [0, 0.94]]]]],
+    '[': [0.2, [[0, [[0.2, 0], [0.02, 0], [0.02, 1.08], [0.2, 1.08]]]]],
+    ']': [0.2, [[0, [[0, 0], [0.18, 0], [0.18, 1.08], [0, 1.08]]]]],
+    '|': [0.08, [[0, [[0.04, 0], [0.04, 1.2]]]]],
+    '\\': [0.4, [[0, [[0, 0], [0.4, 1]]]]],
+    '~': [0.55, [[1, [[0, 0.62], [0.14, 0.5], [0.3, 0.6], [0.43, 0.5], [0.55, 0.58]]]]],
+    '#': [0.6, [[0, [[0.22, 0.05], [0.14, 0.95]]], [0, [[0.5, 0.05], [0.42, 0.95]]], [0, [[0.05, 0.35], [0.6, 0.35]]], [0, [[0.02, 0.68], [0.57, 0.68]]]]],
+    '%': [0.7, [[0, [[0.62, 0.02], [0.06, 0.98]]], [1, [[0.1, 0.02], [0.2, 0], [0.28, 0.1], [0.2, 0.22], [0.1, 0.18], [0.1, 0.02]]], [1, [[0.5, 0.78], [0.6, 0.74], [0.68, 0.84], [0.6, 0.98], [0.5, 0.94], [0.5, 0.78]]]]],
+    '&': [0.62, [[1, [[0.62, 1], [0.24, 0.54], [0.1, 0.3], [0.26, 0.02], [0.48, 0.16], [0.4, 0.42], [0.1, 0.74], [0.14, 0.94], [0.4, 1], [0.6, 0.74]]]]],
+    '$': [0.5, [[1, [[0.46, 0.2], [0.3, 0.06], [0.07, 0.16], [0.1, 0.34], [0.28, 0.46], [0.46, 0.62], [0.44, 0.86], [0.22, 0.96], [0.02, 0.84]]], [0, [[0.25, -0.05], [0.25, 1.05]]]]],
+  });
   L['’'] = L["'"]; L['‘'] = L["'"]; L['“'] = L['"']; L['”'] = L['"'];
   const supported = (ch) => ch === ' ' || !!G[ch] || !!L[ch];
   const adv = 0.72, GAP = 0.16;
@@ -125,15 +140,18 @@ const GLYPH = (() => {
   const wordy = (chars) => chars.some((ch) => L[ch] && ch !== ' ');
   const LX = [0.42, [[0, [[0, 0.46], [0.42, 1]]], [0, [[0.42, 0.46], [0, 1]]]]]; // small letter x inside words (on its own, x is the times sign)
   const letter = (ch, wd) => L[ch] || (wd && ch === 'x' ? LX : null);
-  const advOf = (ch, h, wd) => { const g = letter(ch, wd); return (ch === ' ' ? (wd ? 0.42 : adv) : g ? g[0] + GAP : adv) * h; };
-  const width = (str, h) => { const chars = [...String(str)].filter(supported); const wd = wordy(chars); return chars.reduce((a, ch) => a + advOf(ch, h, wd), 0); };
+  const advOf = (ch, h, wd, sp = 0) => { const g = letter(ch, wd); return ((ch === ' ' ? (wd ? 0.42 : adv) : g ? g[0] + GAP : adv) + sp) * h; };
+  const width = (str, h, sp = 0) => { const chars = [...String(str)].filter(supported); const wd = wordy(chars); return chars.reduce((a, ch) => a + advOf(ch, h, wd, sp), 0); };
+  // how far each UTF-16 code unit of str moves the pen (0 for characters that can't be drawn), so a caret can be placed between any two letters
+  const wordyOf = (str) => wordy([...String(str)].filter(supported));
+  const advances = (str, h, sp = 0, wdIn) => { const s = String(str); const wd = wdIn ?? wordy([...s].filter(supported)); return s.split('').map((ch) => (supported(ch) ? advOf(ch, h, wd, sp) : 0)); };
   function draw(pen, str, x, y, h, o = {}) {
-    const chars = [...String(str)].filter(supported); const wd = wordy(chars);
-    const total = chars.reduce((a, ch) => a + advOf(ch, h, wd), 0);
+    const chars = [...String(str)].filter(supported); const wd = o.wordy ?? wordy(chars);
+    const sp = o.spacing || 0; const total = chars.reduce((a, ch) => a + advOf(ch, h, wd, sp), 0);
     let cx = o.align === 'left' ? x : o.align === 'right' ? x - total : x - total / 2;
     const wx = h * 0.6; let k = 0;
     for (const ch of chars) {
-      const a = advOf(ch, h, wd);
+      const a = advOf(ch, h, wd, sp);
       const stroke = o.strokes ? o.strokes[k % o.strokes.length] : (o.stroke ?? 'ink');
       const style = { stroke, w: o.w ?? Math.max(3, h * 0.09) };
       const lg = letter(ch, wd);
@@ -143,7 +161,7 @@ const GLYPH = (() => {
       cx += a;
     }
   }
-  return { draw, width, supported };
+  return { draw, width, advances, wordyOf, supported };
 })();
 
 // ---------- renderers ----------

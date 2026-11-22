@@ -3,7 +3,7 @@
 // ---------- misc ----------
 function toast(msg) { UI.toast(msg, { ms: 2600 }); }
 function setPreview(on) { app.preview = on; $('#preview-sw').checked = on; $('#menu-preview').setAttribute('aria-checked', String(on)); renderStage(); }
-function goPage(i) { app.page = U.clamp(i, 0, app.P.pages.length - 1); app.sel = []; renderAll(); }
+function goPage(i) { endEdit(); app.page = U.clamp(i, 0, app.P.pages.length - 1); app.sel = []; renderAll(); }
 function renderAll() { renderFilmstrip(); renderPageTab(); renderLibrary(); renderStage(); renderLayers(); renderInspector(); }
 
 function onKey(e) {
@@ -38,7 +38,9 @@ function onKey(e) {
   else if (k === ']') moveZ(app.sel, e.shiftKey ? 'front' : 'up');
   else if (k === 'p' || k === 'P') setPreview(!app.preview);
   else if (k === 'h' || k === 'H') { for (const it of movable(app.sel.map(itemById))) it.flip = !it.flip; renderStage(); commit(); }
-  else if (k === 'Escape') select([]);
+  else if (k === 'Escape') { if (app.tool) setTool(null); else select([]); }
+  else if ((k === 't' || k === 'T') && !ctrl) setTool(app.tool === 'text' ? null : 'text')
+  else if (k === 'Enter' && app.sel.length === 1 && isText(itemById(app.sel[0]))) { e.preventDefault(); startEdit(app.sel[0]); }
   else if (k === '/') { e.preventDefault(); showFlyout(); $('#lsearch').focus(); }
   else if (k === 'PageUp') { e.preventDefault(); goPage(app.page - 1); }
   else if (k === 'PageDown') { e.preventDefault(); goPage(app.page + 1); }
@@ -48,7 +50,7 @@ function onKey(e) {
 function init() {
   let firstRun = true; try { firstRun = !localStorage.getItem('storysketch/project'); } catch (e) { /* ignore */ }
   app.P = STORE.load(); STORE.snapshot(app.P);
-  initShell();
+  initShell(); initText();
   $('#defs-holder').innerHTML = `<defs>${RENDER.defs()}</defs>`;
   renderStyleControls();
   const stage = $('#stage');

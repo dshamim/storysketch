@@ -89,6 +89,7 @@ function detailTabs(sel) {
   if (sel.length > 1) return movable(sel).length ? ['look', 'arrange'] : ['arrange'];
   const it = sel[0]; if ((ownerOf(it) || it).locked || it.type === 'limbs') return ['arrange'];
   if (it.type === 'figure') return castById(it.cast) ? ['look', 'pose', 'arrange'] : ['arrange'];
+  if (it.type === 'text') return ['look', 'arrange'];
   return PROP_BY_ID[it.kind] ? ['look', 'arrange'] : ['look'];
 }
 function detailsTitle(sel) {
@@ -132,10 +133,25 @@ function oneDetails(it, tab) {
     return `<p class="warn">🔒 Locked — it can't be moved, posed, changed or deleted, and clicks on the page go through it to whatever is behind.</p><div class="row"><button data-act="unlock" class="primary" title="Ctrl+Shift+L">🔓 Unlock</button><button data-act="zoomsel">🔍 Zoom to</button></div>` +
       orderRow() + `<div class="row"><button data-act="copy" title="Ctrl+C">Copy</button>${copyToField(false)}</div>`;
   }
+  if (it.type === 'text') return tab === 'arrange' ? arrangeDetails(it) : textLook(it);
   if (it.type === 'limbs') return `<p class="muted">Arms and legs of ${U.esc(itemName(ownerOf(it) || it))} that were put in front. Move this layer above a prop to put the hands on top. Select the character to change its pose.</p>` + orderRow();
   if (it.type === 'figure') { if (!castById(it.cast)) return `<p class="warn">⚠ This character is missing from the book.</p>` + arrangeDetails(it); return tab === 'pose' ? poseDetails(it) : tab === 'arrange' ? arrangeDetails(it) : figureLook(it); }
   if (!PROP_BY_ID[it.kind]) return `<p class="warn">⚠ Prop add-on "${U.esc(it.kind)}" is not installed. Add it to plugins/props and refresh add-ons.</p>`;
   return tab === 'arrange' ? arrangeDetails(it) : propLook(it);
+}
+function textLook(it) {
+  const t = TXT.norm(it); const seg = (k, v, icon, label) => `<button class="ui-iconbtn" data-text-set="${k}=${v}" aria-pressed="${t[k] === v}" data-tip="${label}" aria-label="${label}">${ico(icon)}</button>`;
+  return field('Text', `<textarea rows="3" data-text="text">${U.esc(t.text)}</textarea>`) +
+    field('Colour', `<span class="cf"><input type="color" data-text="color" value="${t.color}"><span class="sw">${SWATCHES.map((c) => `<button style="background:${c}" data-text-color="${c}" title="${c}" aria-label="${c}"></button>`).join('')}</span></span>`) +
+    field(`Size <output>${t.size}</output>`, `<input type="range" min="12" max="200" step="1" data-text="size" value="${Math.min(200, t.size)}">`) +
+    `<div class="checks"><label><input type="checkbox" data-text="weight" ${t.weight === 'bold' ? 'checked' : ''}> Bold</label><label><input type="checkbox" data-text="underline" ${t.underline ? 'checked' : ''}> Underline</label></div>` +
+    `<p class="muted small">Align</p><div class="iconrow">${seg('align', 'left', 'text-left', 'Align left')}${seg('align', 'center', 'text-center', 'Centre')}${seg('align', 'right', 'text-right', 'Align right')}</div>` +
+    field(`Line spacing <output>${t.lineHeight}</output>`, `<input type="range" min="1" max="3" step="0.05" data-text="lineHeight" value="${t.lineHeight}">`) +
+    field(`Letter spacing <output>${t.letterSpacing}</output>`, `<input type="range" min="-0.1" max="1" step="0.02" data-text="letterSpacing" value="${t.letterSpacing}">`) +
+    field('Letter colours', `<select data-text="colors">${opts({ one: 'All one colour', lines: 'Each line different', rainbow: 'Rainbow' }, t.colors)}</select>`) +
+    `<label class="chk tog"><input type="checkbox" data-text="w" data-auto ${t.w ? '' : 'checked'}> Fit the box to the text</label>` +
+    (t.w ? field(`Box width <output>${t.w}</output>`, `<input type="range" min="60" max="1000" step="1" data-text="w" value="${Math.min(1000, t.w)}">`) : '<p class="muted small">Drag the side handles on the page to make a box that wraps.</p>') +
+    `<h4>Overall colour</h4>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
 }
 function figureLook(it) {
   const c = castById(it.cast);
@@ -184,7 +200,7 @@ function arrangeDetails(it) {
   let h = '';
   if (it.group) h += `<p class="muted small">Part of <b>▣ ${U.esc(groupName(it.group))}</b> — you picked just this one.</p><div class="row"><button data-act="selgroup">Select the whole group</button><button data-act="leavegroup">Take out of group</button></div>`;
   h += `<h4>Size and turn</h4>`;
-  h += field(`Size <output>${(+it.s).toFixed(2)}</output>`, `<input type="range" min="0.15" max="4" step="0.01" value="${it.s}" data-k="s">`);
+  h += field(`${it.type === 'text' ? 'Scale' : 'Size'} <output>${(+it.s).toFixed(2)}</output>`, `<input type="range" min="0.15" max="4" step="0.01" value="${it.s}" data-k="s">`);
   h += field(`Rotate <output>${it.rot || 0}°</output>`, `<input type="range" min="-180" max="180" step="1" value="${it.rot || 0}" data-k="rot">`);
   h += `<div class="row"><button data-act="flip">⇆ Flip</button><button data-act="size1">Standard size (1.00)</button></div>`;
   h += `<h4>Order</h4>${orderRow()}`;
@@ -196,6 +212,7 @@ function arrangeDetails(it) {
 function renderInspector() { renderRibbon(); renderDetails(); positionMiniBar(); }
 function onInspectorInput(e) {
   const t = e.target;
+  if (t.dataset.text !== undefined) return onTextInput(t);
   if (t.dataset.copyto !== undefined) { if (t.value !== '') copyToPage(+t.value); t.value = ''; return; }
   if (t.dataset.mk || t.dataset.mparam || t.dataset.mcolor) return onMultiInput(t);
   if (t.dataset.gname) { const page = pg(); page.groups = page.groups || {}; page.groups[t.dataset.gname] = { name: t.value }; renderLayers(); commit(false); return; }
@@ -222,6 +239,7 @@ function onInspectorClick(e) {
   const b = e.target.closest('button'); if (!b) return; const it = itemById(app.sel[0]);
   if (b.dataset.dtab) { app.dtab = b.dataset.dtab; renderDetails(); $(`#dtab-${app.dtab}`)?.focus(); return; }
   if (b.dataset.act && arrangeAction(b.dataset.act)) return;
+  if (onTextClick(b)) return;
   if (b.dataset.mpose || b.dataset.mslot || b.dataset.act === 'mresetcol') {
     const ed = movable(selItems());
     if (b.dataset.mpose) { for (const f of ed) if (f.type === 'figure' && castById(f.cast)) { const fc = castById(f.cast); const pr = poseOf(fc, b.dataset.mpose); f.pose = FIG.fromPreset(fc, pr); f.expr = pr.expr || 'happy'; } }

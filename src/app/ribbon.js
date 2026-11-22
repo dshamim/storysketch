@@ -10,6 +10,14 @@ const rbSelect = (attrs, label, optionsHtml) => `<label class="rb"><span class="
 const rbSep = '<span class="ui-divider-v"></span>';
 const rbRotate = (it) => `<label class="rb rot" data-tip="Turn (degrees)">${UI.icon('rotate')}<input class="ui-input num" type="number" data-rot min="-180" max="180" step="1" value="${it.rot || 0}" aria-label="Turn, in degrees"><span>°</span></label>`;
 
+function textRibbon(it) {
+  const t = TXT.norm(it); const tog = (k, icon, label, on) => `<button class="ui-iconbtn" data-text-toggle="${k}" aria-pressed="${on}" data-tip="${label}" aria-label="${label}">${UI.icon(icon)}</button>`;
+  const al = (v, icon, label) => `<button class="ui-iconbtn" data-text-set="align=${v}" aria-pressed="${t.align === v}" data-tip="${label}" aria-label="${label}">${UI.icon(icon)}</button>`;
+  return `<span class="rb-size"><button class="ui-iconbtn sm" data-text-step="size:-4" data-tip="Smaller" aria-label="Smaller">${UI.icon('remove')}</button><input class="ui-input num" type="number" data-text="size" min="8" max="400" step="1" value="${t.size}" aria-label="Font size"><button class="ui-iconbtn sm" data-text-step="size:4" data-tip="Bigger" aria-label="Bigger">${UI.icon('add')}</button></span>` + rbSep +
+    tog('weight', 'bold', 'Bold', t.weight === 'bold') + tog('underline', 'underline', 'Underline', !!t.underline) +
+    `<label class="rb" data-tip="Text colour"><input type="color" class="rb-color" data-text="color" value="${t.color}" aria-label="Text colour"></label>` + rbSep +
+    al('left', 'text-left', 'Align left') + al('center', 'text-center', 'Centre') + al('right', 'text-right', 'Align right') + rbMenuBtn('pop-spacing', 'text', 'Spacing');
+}
 function ribbonFor(sel) {
   const position = rbMenuBtn('menu-position', 'forward', 'Position');
   if (sel.length > 1) {
@@ -23,6 +31,7 @@ function ribbonFor(sel) {
   const it = sel[0]; const own = ownerOf(it) || it;
   if (own.locked) return '<span class="ui-badge warning">Locked</span>' + rbBtn('unlock', 'unlock', 'Unlock', 'Ctrl+Shift+L') + rbSep + position;
   if (it.type === 'limbs') return `<span class="ui-muted">Front arms and legs of ${U.esc(itemName(ownerOf(it) || it))}</span>` + rbSep + position;
+  if (it.type === 'text') return textRibbon(it) + rbSep + position + rbRotate(it);
   const mode = rbSelect('data-k="mode"', 'Colour', opts(MODE_OPTS, it.mode || 'auto'));
   if (it.type === 'figure') {
     const c = castById(it.cast); if (!c) return '<span class="ui-muted">Missing character</span>' + rbSep + position;
@@ -49,6 +58,10 @@ function openRibbonMenu(btn) {
     const it = itemById(app.sel[0]); const c = it && castById(it.cast); if (!c) return;
     $('#pose-grid').innerHTML = posesFor(c).map((p) => `<button class="tile sm" data-pose="${p.id}" title="${U.esc(p.name)}">${figureThumb(c, p.id, false, p.expr)}<span>${U.esc(p.name)}</span></button>`).join('');
     UI.showPopover(btn, $('#pop-pose'), { placement: 'bottom-start', focus: true });
+  } else if (m === 'pop-spacing') {
+    const it = itemById(app.sel[0]); if (!isText(it)) return; const t = TXT.norm(it);
+    for (const [id, k] of [['#sp-line', 'lineHeight'], ['#sp-letter', 'letterSpacing']]) { const r = $(id); r.value = t[k]; r.closest('.ui-field').querySelector('output').textContent = t[k]; }
+    UI.showPopover(btn, $('#pop-spacing'), { placement: 'bottom-start' });
   } else if (m === 'menu-distribute') {
     setItemEnabledIn('#menu-distribute', arrangeUnits().length > 2); UI.showPopover(btn, $('#menu-distribute'));
   } else UI.showPopover(btn, $('#' + m));
@@ -66,7 +79,7 @@ function miniBarHTML(key) {
 function positionMiniBar() {
   const bar = $('#minibar'); if (!bar) return;
   const sel = selItems();
-  if (!sel.length || (app.drag && app.drag.moved) || !$('#start').hidden) { bar.hidden = true; return; }
+  if (!sel.length || app.edit || (app.drag && app.drag.moved) || !$('#start').hidden) { bar.hidden = true; return; }
   const key = sel.length === 1 && (ownerOf(sel[0]) || sel[0]).locked ? 'locked' : sel.length === 1 && sel[0].type === 'limbs' ? 'limbs' : 'normal';
   if (bar.dataset.key !== key) { bar.innerHTML = key === 'limbs' ? '' : miniBarHTML(key); bar.dataset.key = key; }
   if (key === 'limbs') { bar.hidden = true; return; }
@@ -90,6 +103,7 @@ function initRibbon() {
     }
     onInspectorInput(e); if (detailsOpen()) renderDetails();
   });
+  $('#pop-spacing').addEventListener('input', (e) => { onTextInput(e.target); if (detailsOpen()) renderDetails(); });
   $('#pop-pose').addEventListener('click', (e) => { if (e.target.closest('[data-pose]')) { onInspectorClick(e); UI.closePopover(false); } });
   $('#menu-distribute').addEventListener('ui-open', () => setItemEnabledIn('#menu-distribute', arrangeUnits().length > 2));
   const bar = $('#minibar');

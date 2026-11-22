@@ -150,7 +150,7 @@ const REACHABLE = [
   ['New project', ['#btn-file'], '[data-act="new"]'], ['Open…', ['#btn-file'], '[data-act="open"]'], ['Save', ['#btn-file'], '#save'], ['Save as…', ['#btn-file'], '#saveas'],
   ['Export', [], '#open-export'], ['Undo', [], '#undo'], ['Redo', [], '#redo'], ['Add-ons (plugins)', [], '#open-plugins'], ['Character designer', [], '#open-designer'],
   ['Styled view (preview)', [], '#preview-sw'], ['Drawing style', [], '#style-sel'], ['Page colour', [], '#paper-col'], ['Page size', [], '#page-size'],
-  ['Characters', [], '#rail-cast'], ['Props', [], '#rail-props'], ['Layers', [], '#rail-layers'], ['Search', [], '#lsearch'],
+  ['Characters', [], '#rail-cast'], ['Props', [], '#rail-props'], ['Text', [], '#rail-text'], ['Layers', [], '#rail-layers'], ['Search', [], '#lsearch'],
   ['Go to a page', [], '#film [data-page]'], ['Add page', [], '#add-page'], ['Rename page / notes', ['#page-menu-btn'], '[data-act="page-rename"]'], ['Delete page', ['#page-menu-btn'], '#del-page'],
   ['Duplicate page', ['#page-menu-btn'], '[data-act="page-dup"]'], ['Zoom in', [], '#zoom-in'], ['Zoom out', [], '#zoom-out'], ['Fit page', [], '#zoom-pct'], ['Zoom to selection', [], '#zoom-sel'],
   ['Version / About', ['#btn-help'], '[data-act="about"]'], ['Group', ['#btn-edit'], '#menu-edit [data-act="group"]'], ['Lock', ['#btn-edit'], '#menu-edit [data-act="lock"]'], ['Cut/Copy/Paste', ['#btn-edit'], '#menu-edit [data-act="paste"]'],

@@ -1,6 +1,6 @@
 # StorySketch — UI revamp plan
 
-**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) and Phase 3 (ribbon, mini bar, Details panel, arrange, snapping) are done; next is Phase 4 (text tool). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
+**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) and Phase 3 (ribbon, mini bar, Details panel, arrange, snapping) and Phase 4 (text tool) are done; next is Phase 4b (shapes and arrows). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
 Goal: an interface that is as simple as **Canva's**: clear logical groups, graphical icons, controls shown only when relevant, a first-class **text tool**
 and a small set of **shape / arrow / pencil** tools.
 
@@ -307,3 +307,14 @@ Decisions and limits:
 - **Snapping** applies to moving only (not resize or turn) and uses the outline box of the selection (a rotated item's box is its outer rectangle). Guides show edges and centres, not equal-spacing hints.
 - **Details content** is still the old form controls with new tabs and wording; it is restyled with the rest of the dialogs in phase 5.
 - Still to do from §4.5: "Character type" as one visual picker (phase 5).
+
+## 14. Phase 4 notes (text)
+Built: `src/core/text.js` (TXT: layout, caret maths, drawing), `src/app/texttool.js` (tool, presets, in-place editing, properties), text sections in the ribbon and Details, width handles, hit box, undo grouping.
+
+Decisions and limits:
+- **Engine T1 only** (the single-stroke handwriting alphabet). `font` is `"hand"`; T2 (bundled OFL fonts, outlines) is still phase 8 and plugs in behind the same property. Accented letters were left out because the tool is English only.
+- **Origin at the centre.** A text item's x, y is the centre of its box, so it turns and scales about its middle. While you type or resize, the **top edge and the left / centre / right anchor stay fixed on the page** (`pinAnchor`).
+- **Typing goes into a hidden text field** and the caret / selection are drawn from the layout. This keeps the caret exactly between the drawn letters and works with keyboards and phone keyboards; it means browser spell-check, right-click menus and IME composition underlines do not show on the page. Revisit when tablets are tested (phase 6).
+- **One undo step per edit**: history snapshots are paused while a text is being edited and taken when editing ends; a new text that stays empty leaves no trace.
+- Clicking a ribbon or Details control while typing ends the edit (the formatting applies to the whole text; there is no per-letter formatting).
+- Not done: drag a style from the Text panel onto the page (click adds it), text inside speech bubbles (the bubble props still use their own text option), a highlight / opacity option, a Font picker.

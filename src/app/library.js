@@ -30,7 +30,7 @@ function renderLibrary() {
   for (const pack of propPacks()) {
     let inner = '', n = 0;
     for (const cat of propCats(pack)) {
-      const list = PROPS.filter((d) => d.pack === pack && d.cat === cat && matches('tab-props', d.name, d.id, d.cat, d.pack)); if (!list.length) continue;
+      const list = PROPS.filter((d) => d.pack === pack && d.cat === cat && d.id !== 'numbers' && matches('tab-props', d.name, d.id, d.cat, d.pack)); if (!list.length) continue;
       n += list.length;
       inner += `<h4>${U.esc(cat)}</h4><div class="grid">` + list.map((d) => {
         const fake = { id: 'thumb-' + d.id, kind: d.id, ...propDefaults(d) };
@@ -48,7 +48,7 @@ function addFromLibrary(id) {
   if (!castById(id)) app.P.cast.push(STORE.normalizeCast(U.clone(src)));
   renderLibrary(); addFigure(id); toast(`${src.name} added to this book`);
 }
-const TAB_INFO = { 'tab-cast': ['Characters', 'Search characters…'], 'tab-props': ['Props', 'Search props…'], 'tab-layers': ['Layers', 'Search layers…'] };
+const TAB_INFO = { 'tab-cast': ['Characters', 'Search characters…'], 'tab-props': ['Props', 'Search props…'], 'tab-text': ['Text', ''], 'tab-layers': ['Layers', 'Search layers…'] };
 function setTab(tab) {
   if (!TAB_INFO[tab]) tab = 'tab-cast';
   app.tab = tab;
@@ -56,7 +56,7 @@ function setTab(tab) {
   $$('#left .tabpane').forEach((p) => p.hidden = p.id !== tab);
   const [title, ph] = TAB_INFO[tab];
   $('#fly-title').textContent = title;
-  const box = $('#lsearch'); box.placeholder = ph; box.value = app.filters[tab] || '';
+  const box = $('#lsearch'); box.placeholder = ph; box.value = app.filters[tab] || ''; box.hidden = tab === 'tab-text';
 }
 function onSearch() {
   app.filters[app.tab] = $('#lsearch').value;

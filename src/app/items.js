@@ -1,7 +1,7 @@
 // Selection and item operations: add, delete, duplicate, group, lock, layer order, clipboard.
 // (Part of the editor; plain <script> files share globals and load in the order listed in index.html.)
 // ---------- selection & item ops ----------
-function select(ids) { app.sel = ids; renderOverlay(); renderInspector(); renderLayers(); }
+function select(ids) { if (app.edit && !(ids.length === 1 && ids[0] === app.edit.id)) endEdit(); app.sel = ids; renderOverlay(); renderInspector(); renderLayers(); }
 function addItem(it) {
   const items = pg().items; it.id = it.id || U.uid(); items.push(it); select([it.id]); renderStage(); commit();
 }

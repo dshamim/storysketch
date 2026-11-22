@@ -51,6 +51,7 @@
     <nav class="ui-rail" id="rail" role="tablist" aria-orientation="vertical" aria-label="Library" data-ui-ready="1">
       <button class="ui-rail-btn" role="tab" id="rail-cast" data-tab="tab-cast" aria-selected="true"><span data-icon="characters"></span>Characters</button>
       <button class="ui-rail-btn" role="tab" id="rail-props" data-tab="tab-props" aria-selected="false"><span data-icon="props"></span>Props</button>
+      <button class="ui-rail-btn" role="tab" id="rail-text" data-tab="tab-text" aria-selected="false"><span data-icon="text"></span>Text</button>
       <button class="ui-rail-btn" role="tab" id="rail-layers" data-tab="tab-layers" aria-selected="false"><span data-icon="layers"></span>Layers</button>
     </nav>
     <div class="ui-rail rail-extra"><button class="ui-rail-btn" id="open-plugins" data-tip="Hair, clothes, props and other things you can add"><span data-icon="addons"></span>Add-ons<span class="ui-badge warning rail-badge" id="plug-badge" hidden></span></button></div>
@@ -67,6 +68,12 @@
       <div class="grid" id="cast-grid"></div>
       <div id="lib-section"></div>
     </section>
+    <section class="tabpane" id="tab-text" role="tabpanel" aria-labelledby="rail-text" hidden>
+      <div class="row"><button class="ui-btn sm" id="add-textbox" aria-pressed="false" data-kbd="T"><span data-icon="text"></span>Add a text box</button></div>
+      <p class="muted small">Click on the page to type, or drag to draw a box that wraps. Click a style below to add it to the page. Double-click text on the page to edit it.</p>
+      <h4>Styles</h4>
+      <div class="grid" id="text-presets"></div>
+    </section>
     <section class="tabpane" id="tab-layers" role="tabpanel" aria-labelledby="rail-layers" hidden>
       <p class="muted small">Top of the list = front. Click to select (Ctrl/Shift-click for several) — handy for picking something buried under other things. ▣ = a group. 🔒 = locked: it can't be clicked or moved on the page; click 🔒 here to unlock.</p>
       <div id="layers"></div>
@@ -78,6 +85,7 @@
   <section id="center">
     <div id="stage-wrap"><svg id="stage" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
       <p id="empty-hint" class="empty-hint" hidden>Add a character or a prop from the left to begin.</p>
+      <textarea id="text-input" wrap="off" aria-label="Text" autocomplete="off" autocapitalize="sentences" spellcheck="false" tabindex="-1"></textarea>
       <div class="ui-minibar" id="minibar" role="toolbar" aria-label="Selection" hidden></div></div>
   </section>
 
@@ -193,6 +201,10 @@
   <button role="menuitem" data-act="ungroup"><span data-icon="ungroup"></span><span class="grow">Ungroup</span><kbd class="ui-kbd">Ctrl+Shift+G</kbd></button>
   <button role="menuitem" data-act="zoomsel"><span data-icon="fit"></span><span class="grow">Zoom to it</span><kbd class="ui-kbd">Shift+2</kbd></button>
   <button role="menuitem" data-act="details"><span data-icon="panel-right-open"></span><span class="grow">Details…</span></button>
+</div>
+<div class="ui-popover" id="pop-spacing" role="dialog" aria-label="Spacing" hidden>
+  <div class="ui-field"><label for="sp-line">Line spacing <output></output></label><input id="sp-line" type="range" min="1" max="3" step="0.05" data-text="lineHeight"></div>
+  <div class="ui-field"><label for="sp-letter">Letter spacing <output></output></label><input id="sp-letter" type="range" min="-0.1" max="1" step="0.02" data-text="letterSpacing"></div>
 </div>
 <div class="ui-popover pose-pop" id="pop-pose" role="dialog" aria-label="Choose a pose" hidden><div class="poses" id="pose-grid"></div></div>
 
@@ -332,6 +344,7 @@
 <script src="src/app/items.js"></script>
 <script src="src/app/library.js"></script>
 <script src="src/app/arrange.js"></script>
+<script src="src/app/texttool.js"></script>
 <script src="src/app/ribbon.js"></script>
 <script src="src/app/inspector.js"></script>
 <script src="src/app/designer.js"></script>

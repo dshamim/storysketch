@@ -43,7 +43,7 @@ function renderStage() {
   const { pageW: W, pageH: H, paper } = app.P.settings; const svg = $('#stage');
   applyView();
   const hint = $('#empty-hint'); if (hint) hint.hidden = pg().items.length > 0;
-  const items = pg().items.filter((it) => !it.hidden && !(ownerOf(it) || {}).hidden).map((it, i) => itemSVG(it, app.preview ? curStyle() : null, 's' + i + '_')).join('');
+  const items = pg().items.filter((it) => !it.hidden && !(ownerOf(it) || {}).hidden).map((it, i) => itemSVG(it, app.preview ? curStyle() : null, 's' + i + '_', true)).join('');
   const M = 20000; // shade everything off the page, however far you zoom or pan
   svg.innerHTML = `<rect x="0" y="0" width="${W}" height="${H}" fill="${paper}" class="page"/>` +
     `<g id="items">${items}</g>` +
@@ -59,8 +59,11 @@ function renderOverlay() {
     const it = itemById(id); if (!it || it.hidden) continue;
     const b = localBBox(it); const k = 1 / (z * it.s);
     s += `<g transform="${xform(it)}"><rect x="${b.x0}" y="${b.y0}" width="${b.w}" height="${b.h}" fill="none" stroke="${it.locked ? '#9a948c' : '#2563eb'}" stroke-dasharray="${6 * k} ${4 * k}" stroke-width="${1.4 * k}"/>`;
-    if (app.sel.length === 1 && !it.locked) {
+    const editing = isText(it) && app.edit && app.edit.id === it.id;
+    if (editing) s += textEditOverlay(it, k);
+    if (app.sel.length === 1 && !it.locked && !editing) {
       const hs = 11 * k;
+      if (isText(it)) { const my = (b.y0 + b.y1) / 2, tw = 9 * k, th = 22 * k; for (const [h, x] of [['tw-l', b.x0], ['tw-r', b.x1]]) s += `<rect data-h="${h}" x="${x - tw / 2}" y="${my - th / 2}" width="${tw}" height="${th}" rx="${3 * k}" fill="#fff" stroke="#2563eb" stroke-width="${1.5 * k}" class="h-width"/>`; }
       s += `<rect data-h="scale" x="${b.x1 - hs / 2}" y="${b.y1 - hs / 2}" width="${hs}" height="${hs}" fill="#fff" stroke="#2563eb" stroke-width="${1.6 * k}" class="h-scale"/>`;
       const cx = (b.x0 + b.x1) / 2, ty = b.y0 - 34 * k;
       s += `<line x1="${cx}" y1="${b.y0}" x2="${cx}" y2="${ty}" stroke="#2563eb" stroke-width="${1.2 * k}"/><circle data-h="rot" cx="${cx}" cy="${ty}" r="${7 * k}" fill="#fff" stroke="#2563eb" stroke-width="${1.6 * k}" class="h-rot"/>`;

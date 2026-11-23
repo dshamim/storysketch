@@ -94,9 +94,9 @@ if (sheetDir) {
     const rows = Math.ceil(list.length / cols); let body = '';
     list.forEach((it, i) => {
       const cx = (i % cols) * cell + cell / 2, cy = Math.floor(i / cols) * cell; const w = it.bb.x1 - it.bb.x0, h = it.bb.y1 - it.bb.y0; const k = Math.min(1, (cell - 60) / Math.max(w, h, 1));
-      const tx = cx - ((it.bb.x0 + it.bb.x1) / 2) * k, ty = cy + cell - 56 - it.bb.y1 * k; const ctx = { mode: 'colour', paper: '#ffffff', seed: 'sheet:' + it.id, idp: 's' + i + '_', n: 0, style: st === 'clean' ? undefined : st };
+      const tx = cx - ((it.bb.x0 + it.bb.x1) / 2) * k, ty = cy + cell - 56 - it.bb.y1 * k; const ctx = { mode: 'colour', paper: st === 'chalk' ? '#2b3a33' : '#ffffff', seed: 'sheet:' + it.id, idp: 's' + i + '_', n: 0, style: st === 'clean' ? undefined : st };
       const inner = st === 'clean' ? RENDER.clean(it.prims, ctx) : RENDER.render(it.prims, ctx);
-      body += `<g transform="translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${k.toFixed(3)})">${inner}</g><text x="${cx}" y="${cy + cell - 26}" font-family="sans-serif" font-size="13" text-anchor="middle" fill="#555">${it.id}</text><text x="${cx}" y="${cy + cell - 10}" font-family="sans-serif" font-size="11" text-anchor="middle" fill="#888">${it.note || ''}</text>`;
+      body += `<g transform="translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${k.toFixed(3)})">${inner}</g><text x="${cx}" y="${cy + cell - 26}" font-family="sans-serif" font-size="13" text-anchor="middle" fill="${st === 'chalk' ? '#cfd8dc' : '#555'}">${it.id}</text><text x="${cx}" y="${cy + cell - 10}" font-family="sans-serif" font-size="11" text-anchor="middle" fill="${st === 'chalk' ? '#aab' : '#888'}">${it.note || ''}</text>`;
     });
     fs.writeFileSync(path.join(sheetDir, `props-${st}.svg`), `<svg xmlns="http://www.w3.org/2000/svg" width="${cell * cols}" height="${cell * rows}" viewBox="0 0 ${cell * cols} ${cell * rows}"><defs>${RENDER.defs()}</defs><rect width="100%" height="100%" fill="${st === 'chalk' ? '#2b3a33' : '#fff'}"/>${body}</svg>`);
   }

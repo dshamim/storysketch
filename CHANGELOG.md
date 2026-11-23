@@ -10,6 +10,7 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - **Scale:** every seat is 80 high (a child or adult in the Sit pose fits on any of them), counters and the dining table 128, the bed mattress 80.
 - **New sample project "A day at home"** (5 pages: living room, kitchen, bedroom, bathroom, outside), built only from the scenery pieces and the Home props, with people sitting on the furniture.
 - `tools/check_props.mjs --sheet` now draws every value of every option, labelled, so one sheet shows all the states of a prop.
+- Small things (teddy, kettle, plates and cup) are drawn at their natural size, so they come out right at scale 1; the sample project uses scale 1 for every Home prop except the house on the last page (85 percent, to leave room for the garden). The toy box lid is a short propped panel.
 - Tests: every sample project is checked for unknown props, characters, poses, option values and pictures (this found an invalid value in the classroom sample, drawn the same as before).
 
 ## Unreleased — first props of the new kits

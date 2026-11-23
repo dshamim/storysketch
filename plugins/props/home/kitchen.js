@@ -5,6 +5,8 @@
   const o = { stroke: 'line', w: 4.5 }, d = { stroke: 'line', w: 3 }, f = { stroke: 'line', w: 2.2 };
   const white = { fill: 'paper', hatch: 'body', hg: 8, halpha: 0.55, ha: 90 };
   const wood = { fill: 'paper', hatch: 'wood', hg: 7, halpha: 0.3, ha: 90 };
+  // draw a small thing at a smaller size than it was designed on: shapes shrink, line widths and hatching stay the same (so the line weights still match the rest)
+  const small = (p, k, fn) => { const q = new Pen(p.c); fn(q); const m = (c) => c.map(([x, y]) => [x * k, y * k]); for (const s of q.o) { s.pts = m(s.pts); if (s.hole) s.hole = m(s.hole); if (s.more) s.more = s.more.map(m); p.o.push(s); } };
   const steam = (p, x, y, col) => { for (const dx of [-12, 2, 16]) p.curve([[x + dx, y], [x + dx - 8, y - 16], [x + dx + 6, y - 30], [x + dx - 4, y - 46]], { stroke: col, w: 2.5 }); };
 
   CP.register({ api: 1, version: '1.0.0', pack: PACK, items: [
@@ -62,18 +64,18 @@
     { type: 'prop', id: 'home-kettle', name: 'Kettle', cat: 'Kitchen', tags: ['tea', 'boil', 'teapot', 'kitchen'],
       colors: { line: '#6f6f6f', body: '#e53935', steam: '#90a4ae' },
       params: [{ key: 'steam', label: 'Steaming', type: 'toggle', def: false }],
-      draw(p, P) {
+      draw(p, P) { small(p, 0.8, (p) => {
         p.poly([[-30, 0], [-34, -34], [-20, -58], [20, -58], [34, -34], [30, 0]], { ...o, fill: 'paper', hatch: 'body', hg: 5, halpha: 0.5, ha: 90, smooth: true });
         p.poly([[30, -26], [54, -48], [58, -44], [34, -14]], { ...d, fill: 'paper' }); p.curve([[-32, -40], [-54, -44], [-52, -14], [-32, -12]], { stroke: 'line', w: 4.5 });
         p.circ(0, -64, 6, { ...d, fill: 'paper' }); if (P.steam) steam(p, 56, -50, 'steam');
-      } },
+      }); } },
     { type: 'prop', id: 'home-plates', name: 'Plates and cup', cat: 'Kitchen', tags: ['dishes', 'crockery', 'tableware', 'dinner', 'cup', 'mug'],
       colors: { line: '#6f6f6f', rim: '#1e88e5', cup: '#fbc02d' },
       params: [{ key: 'count', label: 'Plates', type: 'range', min: 1, max: 4, step: 1, def: 3 }],
-      draw(p, P) {
+      draw(p, P) { small(p, 0.8, (p) => {
         const n = Math.round(P.count);
         for (let i = 0; i < n; i++) { const y = -8 - i * 9; p.ell(-26, y, 48, 10, { ...o, w: 3.5, fill: 'paper' }); p.ell(-26, y, 32, 6, { stroke: 'rim', w: 2.2 }); }
         p.poly([[40, -2], [44, -40], [76, -40], [80, -2]], { ...d, stroke: 'line', fill: 'paper', hatch: 'cup', hg: 5, halpha: 0.5, ha: 90, smooth: false }); p.ell(60, -40, 18, 5, { ...f, fill: 'paper' }); p.curve([[80, -32], [96, -30], [94, -10], [78, -10]], { stroke: 'line', w: 3 });
-      } },
+      }); } },
   ] });
 })();

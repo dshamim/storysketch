@@ -113,9 +113,8 @@
     {
      "type": "prop",
      "kind": "home-tv",
-     "x": 900,
+     "x": 886,
      "y": 700,
-     "s": 0.9,
      "params": {
       "on": true
      }
@@ -189,8 +188,7 @@
      "type": "prop",
      "kind": "home-kettle",
      "x": 190,
-     "y": 552,
-     "s": 0.8,
+     "y": 562,
      "params": {
       "steam": true
      }
@@ -220,8 +218,7 @@
      "y": 572,
      "params": {
       "count": 2
-     },
-     "s": 0.8
+     }
     },
     {
      "type": "figure",
@@ -281,9 +278,8 @@
     {
      "type": "prop",
      "kind": "home-bunkbed",
-     "x": 152,
-     "y": 700,
-     "s": 0.92
+     "x": 164,
+     "y": 700
     },
     {
      "type": "prop",
@@ -303,16 +299,14 @@
     {
      "type": "prop",
      "kind": "home-toybox",
-     "x": 385,
-     "y": 700,
-     "s": 0.9
+     "x": 400,
+     "y": 700
     },
     {
      "type": "prop",
      "kind": "home-teddy",
      "x": 700,
-     "y": 612,
-     "s": 0.7
+     "y": 624
     },
     {
      "type": "figure",
@@ -326,8 +320,7 @@
      "type": "prop",
      "kind": "home-slippers",
      "x": 505,
-     "y": 702,
-     "s": 0.9
+     "y": 702
     }
    ]
   },
@@ -375,7 +368,6 @@
      "kind": "home-bath",
      "x": 260,
      "y": 700,
-     "s": 1.1,
      "params": {
       "water": true,
       "bubbles": true
@@ -405,7 +397,7 @@
   },
   {
    "name": "Outside",
-   "notes": "The house door is 340 high, so an adult fits through it. Open the door, switch the lights on, change the sky to sunset or night in Details, and the whole scene follows.",
+   "notes": "The house door is 340 high, so an adult fits through it. Open the door, switch the lights on, change the sky to sunset or night in Details, and the whole scene follows. (The house is drawn a little smaller on this page, at 85 percent, so there is room for the garden.)",
    "items": [
     {
      "type": "prop",
@@ -487,8 +479,7 @@
      "type": "prop",
      "kind": "home-bicycle",
      "x": 590,
-     "y": 735,
-     "s": 0.9
+     "y": 735
     },
     {
      "type": "figure",

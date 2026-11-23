@@ -5,6 +5,8 @@
   const o = { stroke: 'line', w: 4.5 }, d = { stroke: 'line', w: 3 }, f = { stroke: 'line', w: 2.2 };
   const cloth = { fill: 'paper', hatch: 'fabric', hg: 6, halpha: 0.45, ha: -40 };
   const wood = { fill: 'paper', hatch: 'line', hg: 7, halpha: 0.3, ha: 90 };
+  // draw a small thing at a smaller size than it was designed on: shapes shrink, line widths and hatching stay the same (so the line weights still match the rest)
+  const small = (p, k, fn) => { const q = new Pen(p.c); fn(q); const m = (c) => c.map(([x, y]) => [x * k, y * k]); for (const s of q.o) { s.pts = m(s.pts); if (s.hole) s.hole = m(s.hole); if (s.more) s.more = s.more.map(m); p.o.push(s); } };
   const blanket = (p, x0, x1, top, bot) => p.poly([[x0, top], [x1, top], [x1 + 6, bot], [x1 - 40, bot - 8], [x1 - 80, bot], [x0 + 40, bot - 8], [x0, bot]], { stroke: 'accent', w: 3.5, fill: 'paper', hatch: 'accent', hg: 6, halpha: 0.5, ha: 60 });
 
   CP.register({ api: 1, version: '1.0.0', pack: PACK, items: [
@@ -52,16 +54,16 @@
       colors: { line: '#8a5a33', paint: '#e53935', block: '#1e88e5', ball: '#43a047', soft: '#fbc02d' },
       params: [{ key: 'open', label: 'Lid open', type: 'toggle', def: true }],
       draw(p, P) {
-        if (P.open) { p.rect(-26, -108, 22, 24, { stroke: 'block', w: 3, fill: 'paper', hatch: 'block', hg: 4, halpha: 0.5 }); p.circ(30, -102, 16, { stroke: 'ball', w: 3, fill: 'paper', hatch: 'ball', hg: 4, halpha: 0.5 }); p.rect(-4, -112, 20, 20, { stroke: 'soft', w: 3, fill: 'paper', hatch: 'soft', hg: 4, halpha: 0.5 }); }
+        if (P.open) p.poly([[-68, -84], [68, -84], [60, -134], [-60, -134]], { ...d, fill: 'paper', hatch: 'line', hg: 8, halpha: 0.25, ha: 90, smooth: false }); // the lid, propped open behind (a short, leaning panel, so it does not look like a cabinet door)
+        if (P.open) { p.rect(-30, -112, 22, 26, { stroke: 'block', w: 3, fill: 'paper', hatch: 'block', hg: 4, halpha: 0.5 }); p.circ(30, -104, 16, { stroke: 'ball', w: 3, fill: 'paper', hatch: 'ball', hg: 4, halpha: 0.5 }); p.rect(-4, -118, 20, 20, { stroke: 'soft', w: 3, fill: 'paper', hatch: 'soft', hg: 4, halpha: 0.5 }); }
         p.rect(-70, -80, 140, 80, { ...o, ...wood }); p.line([[-70, -56], [70, -56]], d);
         for (const x of [-46, 0, 46]) p.circ(x, -34, 7, { stroke: 'paint', w: 2.5, fill: 'paper', hatch: 'paint', hg: 4, halpha: 0.5 });
-        if (P.open) p.poly([[-72, -80], [72, -80], [66, -168], [-66, -168]], { ...d, fill: 'paper', hatch: 'line', hg: 8, halpha: 0.25, ha: 90, smooth: false }); // lid propped up behind
-        else p.rect(-74, -92, 148, 14, { ...o, ...wood });
+        if (!P.open) p.rect(-74, -92, 148, 14, { ...o, ...wood });
       } },
     { type: 'prop', id: 'home-teddy', name: 'Teddy bear', cat: 'Toys', tags: ['bear', 'soft toy', 'cuddly', 'toy', 'plush'],
       colors: { line: '#a1693a', fur: '#c68642', bow: '#e53935' },
       params: [{ key: 'bow', label: 'Bow', type: 'toggle', def: true }],
-      draw(p, P) {
+      draw(p, P) { small(p, 0.72, (p) => {
         const fur = { fill: 'paper', hatch: 'fur', hg: 5, halpha: 0.5, ha: 50 };
         p.ell(-26, -14, 20, 13, { ...o, ...fur }); p.ell(26, -14, 20, 13, { ...o, ...fur });
         p.ell(0, -48, 34, 38, { ...o, ...fur }); p.ell(0, -42, 18, 22, { ...d, fill: 'paper' });
@@ -70,6 +72,6 @@
         p.circ(-11, -97, 3, { stroke: 'line', w: 3, fill: 'line' }); p.circ(11, -97, 3, { stroke: 'line', w: 3, fill: 'line' });
         p.ell(0, -84, 11, 8, { ...d, fill: 'paper' }); p.poly([[-4, -88], [4, -88], [0, -83]], { ...f, fill: 'line' }); p.curve([[-6, -78], [0, -75], [6, -78]], f);
         if (P.bow) { p.poly([[0, -60], [-18, -70], [-18, -50]], { stroke: 'bow', w: 3, fill: 'paper', hatch: 'bow', hg: 3, halpha: 0.6 }); p.poly([[0, -60], [18, -70], [18, -50]], { stroke: 'bow', w: 3, fill: 'paper', hatch: 'bow', hg: 3, halpha: 0.6 }); }
-      } },
+      }); } },
   ] });
 })();

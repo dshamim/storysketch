@@ -110,12 +110,14 @@ test('zoom: + / − / Ctrl+0 change and reset the zoom', { skip }, async () => {
   await page.click('#zoom-in'); const a = await z(); await page.click('#zoom-out'); await page.click('#zoom-out'); const b = await z(); assert.ok(a > b);
   await page.keyboard.press('Control+0'); assert.ok(Math.abs((await z()) - (await page.evaluate(() => app.view.fit ?? app.view.z))) < 5 || true); await page.close();
 });
-test('dialogs open and close: designer and add-ons', { skip }, async () => {
+test('Add-ons is a panel in the rail (not a dialog): the counts, no problems, a list, Refresh; nothing blocks the page; the Help menu opens it too', { skip }, async () => {
   const { page } = await fresh();
-  for (const [btn, dlg] of [['#open-designer', '#designer'], ['#open-plugins', '#plugins']]) {
-    await page.click(btn); assert.equal(await page.evaluate((d) => document.querySelector(d).open, dlg), true, dlg); await page.keyboard.press('Escape');
-    assert.equal(await page.evaluate((d) => document.querySelector(d).open, dlg), false, dlg + ' closed');
-  }
+  await page.click('#rail-addons'); assert.equal(await page.evaluate(() => app.tab), 'tab-addons'); assert.equal(await page.locator('#tab-addons').isVisible(), true);
+  assert.equal(await page.locator('#plug-summary .chip').count(), 7, 'one chip per kind of add-on'); assert.ok(await page.locator('#plug-list .plug-row').count() > 50, 'everything loaded is listed');
+  assert.match(await page.locator('#plug-warn').innerText(), /No problems/); assert.equal(await page.locator('#plug-rescan').isVisible(), true); assert.equal(await page.locator('#lsearch').isVisible(), false, 'no search box here');
+  assert.equal(await page.evaluate(() => !!document.querySelector('dialog:modal')), false, 'nothing blocks the page');
+  await page.click('#rail-cast'); assert.equal(await page.locator('#tab-addons').isVisible(), false);
+  await page.evaluate(() => ACTIONS.addons()); assert.equal(await page.evaluate(() => app.tab), 'tab-addons');
   await page.close();
 });
 test.after(async () => { if (browser) await browser.close(); server.close(); });

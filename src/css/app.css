@@ -63,9 +63,6 @@ dialog::backdrop { background: rgba(40,35,30,.35); }
 
 /* sticky left header with search */
 .nomatch { color: var(--muted); font-size: 12px; padding: 8px 2px; }
-.plugins { width: min(720px, 92vw); max-height: 86vh; overflow-y: auto; }
-.plugins table { width: 100%; border-collapse: collapse; font-size: 12px; } .plugins td, .plugins th { text-align: left; padding: 3px 6px; border-bottom: 1px solid var(--line); }
-.plugins code { background: #f3f0ea; padding: 0 4px; border-radius: 4px; }
 .chip { background: #f3f0ea; border-radius: 999px; padding: 3px 10px; font-size: 12px; }
 .slotpick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; } .slotpick .tile svg { height: 40px; } .slotpick .tile.on { background: #efeaff; border-color: #b9a8fb; }
 label.tog { margin: 6px 0; font-weight: 500; }
@@ -110,7 +107,6 @@ form.pad { padding: 18px 20px; max-width: 520px; }
 #workspace.details-closed { --det: 0px; }
 .railwrap { grid-column: 1; display: flex; flex-direction: column; width: 72px; background: var(--ui-surface); border-right: 1px solid var(--ui-border); overflow-y: auto; }
 .railwrap .ui-rail { width: 100%; border-right: 0; }
-.railwrap .rail-extra { padding-top: 0; }
 .ui-rail-btn { position: relative; }
 .rail-badge { position: absolute; top: 4px; right: 6px; min-height: 18px; }
 #left { grid-column: 2; background: var(--ui-surface); border-right: 1px solid var(--ui-border); overflow-y: auto; padding: 0 var(--ui-s-3) var(--ui-s-3); }
@@ -199,3 +195,11 @@ form.pad { padding: 18px 20px; max-width: 520px; }
 #stage .h-nw, #stage .h-se { cursor: nwse-resize; } #stage .h-ne, #stage .h-sw { cursor: nesw-resize; }
 .shape-tile svg { height: 56px; }
 .shape-tile[aria-pressed="true"] { background: var(--ui-accent-weak); border-color: var(--ui-accent); color: var(--ui-accent-weak-text); }
+
+/* Add-ons panel (left flyout) */
+#tab-addons code { background: #f3f0ea; padding: 0 4px; border-radius: 4px; word-break: break-all; }
+.plug-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.plug-row { display: flex; flex-direction: column; padding: 5px 2px; border-bottom: 1px solid var(--ui-border); }
+.plug-name { font-size: 13px; } .plug-meta { font-size: 11px; color: var(--muted); }
+.plug-how { margin-top: var(--ui-s-3); } .plug-how summary { cursor: pointer; font-size: 12px; }
+#plug-status:empty { display: none; }

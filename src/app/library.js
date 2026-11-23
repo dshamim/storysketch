@@ -48,7 +48,7 @@ function addFromLibrary(id) {
   if (!castById(id)) app.P.cast.push(STORE.normalizeCast(U.clone(src)));
   renderLibrary(); addFigure(id); toast(`${src.name} added to this book`);
 }
-const TAB_INFO = { 'tab-cast': ['Characters', 'Search characters…'], 'tab-props': ['Props', 'Search props…'], 'tab-shapes': ['Shapes', ''], 'tab-text': ['Text', ''], 'tab-layers': ['Layers', 'Search layers…'] };
+const TAB_INFO = { 'tab-cast': ['Characters', 'Search characters…'], 'tab-props': ['Props', 'Search props…'], 'tab-shapes': ['Shapes', ''], 'tab-text': ['Text', ''], 'tab-layers': ['Layers', 'Search layers…'], 'tab-addons': ['Add-ons', ''] };
 function setTab(tab) {
   if (!TAB_INFO[tab]) tab = 'tab-cast';
   app.tab = tab;
@@ -56,7 +56,8 @@ function setTab(tab) {
   $$('#left .tabpane').forEach((p) => p.hidden = p.id !== tab);
   const [title, ph] = TAB_INFO[tab];
   $('#fly-title').textContent = title;
-  const box = $('#lsearch'); box.placeholder = ph; box.value = app.filters[tab] || ''; box.hidden = tab === 'tab-text' || tab === 'tab-shapes';
+  const box = $('#lsearch'); box.placeholder = ph; box.value = app.filters[tab] || ''; box.hidden = tab === 'tab-text' || tab === 'tab-shapes' || tab === 'tab-addons';
+  if (tab === 'tab-addons') renderPlugins();
 }
 function onSearch() {
   app.filters[app.tab] = $('#lsearch').value;

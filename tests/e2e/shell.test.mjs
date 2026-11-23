@@ -148,7 +148,7 @@ test('export popover: opens from the button, Tab stays inside, Escape closes and
 // §4.10 of the plan: every control the old header and panels had is still there. [what, steps to reveal it, selector that must be visible and enabled]
 const REACHABLE = [
   ['New project', ['#btn-file'], '[data-act="new"]'], ['Open…', ['#btn-file'], '[data-act="open"]'], ['Save', ['#btn-file'], '#save'], ['Save as…', ['#btn-file'], '#saveas'],
-  ['Export', [], '#open-export'], ['Undo', [], '#undo'], ['Redo', [], '#redo'], ['Add-ons (plugins)', [], '#open-plugins'], ['Character designer', [], '#open-designer'],
+  ['Export', [], '#open-export'], ['Undo', [], '#undo'], ['Redo', [], '#redo'], ['Add-ons (plugins)', [], '#rail-addons'], ['Character designer', [], '#open-designer'],
   ['Styled view (preview)', [], '#preview-sw'], ['Drawing style', [], '#style-sel'], ['Page colour', [], '#paper-col'], ['Page size', [], '#page-size'],
   ['Characters', [], '#rail-cast'], ['Props', [], '#rail-props'], ['Shapes', [], '#rail-shapes'], ['Text', [], '#rail-text'], ['Layers', [], '#rail-layers'], ['Search', [], '#lsearch'],
   ['Go to a page', [], '#film [data-page]'], ['Add page', [], '#add-page'], ['Rename page / notes', ['#page-menu-btn'], '[data-act="page-rename"]'], ['Delete page', ['#page-menu-btn'], '#del-page'],

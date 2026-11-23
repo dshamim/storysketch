@@ -88,7 +88,7 @@ function init() {
   $('#prop-list').addEventListener('toggle', (e) => { const d = e.target; if (d.matches?.('details.pack')) rememberPack(d.dataset.pack, d.open); }, true);
   $('#lsearch').addEventListener('input', onSearch);
   $('#lsearch').addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); if (e.target.value) { e.target.value = ''; onSearch(); } else e.target.blur(); } });
-  $('#plug-close').onclick = () => $('#plugins').close(); $('#plug-rescan').onclick = rescanPlugins;
+  $('#plug-rescan').onclick = rescanPlugins;
   updatePluginBadge();
   $('#open-designer').onclick = () => openDesigner(app.sel.length === 1 && itemById(app.sel[0])?.type === 'figure' ? itemById(app.sel[0]).cast : null);
   $('#designer').addEventListener('input', onDesignerInput);

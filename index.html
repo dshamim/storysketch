@@ -54,8 +54,8 @@
       <button class="ui-rail-btn" role="tab" id="rail-shapes" data-tab="tab-shapes" aria-selected="false"><span data-icon="shapes"></span>Shapes</button>
       <button class="ui-rail-btn" role="tab" id="rail-text" data-tab="tab-text" aria-selected="false"><span data-icon="text"></span>Text</button>
       <button class="ui-rail-btn" role="tab" id="rail-layers" data-tab="tab-layers" aria-selected="false"><span data-icon="layers"></span>Layers</button>
+      <button class="ui-rail-btn" role="tab" id="rail-addons" data-tab="tab-addons" aria-selected="false" data-tip="Hair, clothes, props and other things you can add"><span data-icon="addons"></span>Add-ons<span class="ui-badge warning rail-badge" id="plug-badge" hidden></span></button>
     </nav>
-    <div class="ui-rail rail-extra"><button class="ui-rail-btn" id="open-plugins" data-tip="Hair, clothes, props and other things you can add"><span data-icon="addons"></span>Add-ons<span class="ui-badge warning rail-badge" id="plug-badge" hidden></span></button></div>
   </div>
 
   <aside id="left" aria-label="Library">
@@ -87,6 +87,19 @@
       <div id="layers"></div>
     </section>
     <section class="tabpane" id="tab-props" role="tabpanel" aria-labelledby="rail-props" hidden><div id="prop-list"></div></section>
+    <section class="tabpane" id="tab-addons" role="tabpanel" aria-labelledby="rail-addons" hidden>
+      <p class="muted small" id="plug-intro"></p>
+      <div id="plug-summary"></div>
+      <div id="plug-warn"></div>
+      <div class="row"><button class="ui-btn sm" id="plug-rescan"><span data-icon="refresh"></span>Refresh add-ons</button></div>
+      <p class="muted small" id="plug-status" role="status"></p>
+      <h4>Everything loaded</h4>
+      <div id="plug-list"></div>
+      <details class="plug-how"><summary>Add your own</summary>
+        <p class="muted small">Copy an existing file in <code>plugins/&lt;type&gt;/</code>, change its <code>id</code> and name, then <b>Refresh add-ons</b>. Full guide: <code>plugins/README.md</code>.</p>
+        <p class="muted small">The first refresh asks you to pick the <code>plugins</code> folder once (Chrome needs permission to read it). Without that: run <code>python3 tools/build_plugins.py</code>, then reload the page.</p>
+      </details>
+    </section>
   </aside>
   <button class="ui-iconbtn flyout-open" id="fly-open" data-tip="Show the library panel" aria-label="Show the library panel" hidden><span data-icon="panel-left-open"></span></button>
 
@@ -267,19 +280,6 @@
       <div class="row"><select id="d-pose"></select><label class="chk"><input type="checkbox" id="d-crayon"> styled</label></div>
     </div>
     <div class="dform" id="d-form"></div>
-  </div>
-</dialog>
-
-<dialog id="plugins">
-  <div class="pad plugins">
-    <h3>Add-ons</h3>
-    <p class="muted small" id="plug-intro"></p>
-    <div id="plug-summary"></div>
-    <div id="plug-warn"></div>
-    <details><summary>Everything loaded</summary><div id="plug-list"></div></details>
-    <div class="row"><button id="plug-rescan" class="primary">Refresh add-ons</button><button id="plug-close">Close</button><span id="plug-status" class="muted"></span></div>
-    <p class="muted small">To add your own: copy an existing file in <code>plugins/&lt;type&gt;/</code>, change its <code>id</code> and name, then <b>Refresh add-ons</b>. Full guide: <code>plugins/README.md</code>.<br>
-    The first refresh asks you to pick the <code>plugins</code> folder once (Chrome needs permission to read it). No-dialog alternative: <code>python3 tools/build_plugins.py</code>, then refresh.</p>
   </div>
 </dialog>
 

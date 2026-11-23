@@ -55,7 +55,7 @@ const STATES = {
   'menu-edit-selection': `${classroom} select([pg().items[3].id]); document.querySelector('#btn-edit').click();`,
   'flyout-collapsed': `${classroom} select([]); document.querySelector('#rail-cast').click();`,
   'page-menu': `${classroom} select([]); document.querySelector('#page-menu-btn').click();`,
-  'dialog-plugins': `${classroom} select([]); document.querySelector('#open-plugins').click();`,
+  'tab-addons': `${classroom} select([]); document.querySelector('#rail-addons').click();`,
   'start-screen': `${classroom} select([]); showStart(true);`,
 };
 for (const [name, setup] of Object.entries(STATES)) {

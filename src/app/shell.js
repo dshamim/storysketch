@@ -60,7 +60,6 @@ function initShell() {
   $('#rail').addEventListener('click', (e) => { const b = e.target.closest('[data-tab]'); wasOpen = !!b && b.dataset.tab === app.tab && flyoutOpen(); }, true); // before the tabs helper changes the tab
   $('#rail').addEventListener('ui-change', (e) => setTab(e.detail.el.dataset.tab));
   $('#rail').addEventListener('click', (e) => { if (e.target.closest('[data-tab]')) (wasOpen ? hideFlyout() : showFlyout()); });
-  $('#open-plugins').onclick = openPlugins;
   $('#fly-close').onclick = hideFlyout; $('#fly-open').onclick = showFlyout;
   try { if (localStorage.getItem(FLY_KEY) === 'closed') hideFlyout(); } catch (e) { /* ignore */ }
   setTab(app.tab);

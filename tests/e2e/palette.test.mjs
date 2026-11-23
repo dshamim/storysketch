@@ -161,4 +161,12 @@ test('Ctrl+K does not open the search behind a confirmation', { skip }, async ()
   await page.keyboard.press('Control+k'); assert.equal(await shown(page, '#palette'), false, 'not behind a modal dialog'); await page.keyboard.press('Escape'); assert.deepEqual(errs, []); await context.close();
 });
 
+test('a prop\'s tags (synonyms) are found by the Props search and by Ctrl+K', { skip }, async () => {
+  const { page, errs, context } = await open(CLASSROOM);
+  await page.evaluate(() => { CP.register({ api: 1, version: '1.0.0', type: 'prop', id: 'test-sofa', name: 'Sofa', pack: 'Test props', cat: 'Furniture', tags: ['couch', 'settee'], colors: { line: '#6f6f6f' }, draw(p) { p.rect(-60, -50, 120, 50, { stroke: 'line', w: 4.5, fill: 'paper' }); } }); setTab('tab-props'); });
+  await page.fill('#lsearch', 'couch'); await page.waitForTimeout(150); assert.equal(await page.locator('#tab-props [data-prop="test-sofa"], #tab-props .tile:has-text("Sofa")').count() >= 1, true, 'the library finds it by a tag');
+  await page.fill('#lsearch', ''); await search(page, 'settee'); assert.match(await page.locator('#pal-list [role=option]').first().innerText(), /Sofa/, 'Ctrl+K finds it by a tag'); await page.keyboard.press('Escape');
+  assert.deepEqual(errs, []); await context.close();
+});
+
 test.after(async () => { if (browser) await browser.close(); server.close(); });

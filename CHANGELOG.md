@@ -5,6 +5,12 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
+## Unreleased — props plan and style guide
+- **Props style guide for agents and contributors** (`docs/PROP-STYLE-GUIDE.md`): scale (child 250, adult 320 at scale 1; door 340; storybook scale for buildings, bus, playground), origin, point of view, line widths, colour slots, hatching, detail budget, states, ids with prefixes, tags, content and licence, a worked example and a checklist. `AGENTS.md` points agents to it.
+- **Plan for the first three kits** (`docs/PROPS-PLAN.md`): shared scenery pieces, Home, School (building and bus) and Park, about 70 props; generic, no local kit.
+- **`tools/check_props.mjs`** (`npm run check:props`, also in `test:all`): checks a prop against the guide (fields, id prefix, tags, every param value and an empty slot draw finite and identical twice in every style, size, floor line, line widths, shape and point limits, undeclared colour names, forbidden names) and writes contact sheets per style (`--sheet DIR`). The new kits are checked strictly, the airport and classroom props only for the basics. It is a lint, not a security sandbox.
+- **Props can have `tags`** (synonyms such as couch for sofa) that the Props search and Ctrl+K match.
+
 ## Unreleased — fonts (revamp phase 8)
 - **Five real fonts for text**, next to the hand-drawn letters: **Patrick Hand** (neat handwriting), **Comic Neue** (friendly), **Nunito** (rounded), **Crimson Pro** (book serif) and **Caveat Brush** (marker). Pick one from the new **Font** menu in the text ribbon (each option is a drawing of its own name), from **Details ▸ Font**, or with Ctrl+K (*Font: Nunito*, when a text is picked). Bold is a real Bold where the font has one (Comic Neue, Nunito, Crimson Pro), and a thickened outline for the other two.
 - **Nothing to install, ever.** The letters are stored as outlines inside StorySketch and drawn as ordinary shapes, so every drawing style (crayon, marker, ink, chalk) finishes them, a page looks the same on every computer, and exported SVG and PNG never need the font. All five are free OFL fonts; the licence of each is kept next to it (`plugins/fonts/*-OFL.txt`, `THIRD-PARTY-NOTICES.md`).

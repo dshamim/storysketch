@@ -78,7 +78,7 @@ function paletteCommands() {
   add('Characters', 'new-character', 'New character', () => newCharacter(), { words: 'create designer' });
   for (const c of app.P.cast) add('Characters', 'cast:' + c.id, 'Add character: ' + c.name, () => addFigure(c.id), { words: 'person animal figure' });
   for (const c of CP.characters.filter((x) => !castById(x.id))) add('Characters', 'lib:' + c.id, 'Add character: ' + c.name, () => addFromLibrary(c.id), { words: 'library person animal figure' });
-  for (const p of PROPS) add('Props', 'prop:' + p.id, 'Add prop: ' + (p.name || p.id), () => addProp(p.id), { words: (p.pack || '') + ' picture object' });
+  for (const p of PROPS) add('Props', 'prop:' + p.id, 'Add prop: ' + (p.name || p.id), () => addProp(p.id), { words: (p.pack || '') + ' picture object ' + (p.tags || []).join(' ') });
   for (const k of Object.keys(SHP.KINDS)) add('Shapes', 'shape:' + k, 'Add a ' + SHP.KINDS[k].name.toLowerCase(), () => addShape(k), { words: 'shape drop' });
   for (const k of Object.keys(SHP.LINES)) add('Shapes', 'shape:' + k, 'Add a ' + SHP.LINES[k].name.toLowerCase(), () => addShape(k), { words: 'shape line arrow drop' });
   const txt = app.sel.length === 1 && isText(itemById(app.sel[0])) ? itemById(app.sel[0]) : null;

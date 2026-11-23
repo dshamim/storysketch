@@ -13,6 +13,7 @@ npm run test:visual        # pixel comparison of 13 UI states against tests/e2e/
 npm run update:baselines   # regenerate them — only for an intended visual change; review the images
 npm run check:icons        # src/ui/icons.js is up to date; add an icon in tools/build_icons.py then `npm run build:icons`
 npm run check:plugins      # fails if plugins/manifest.js is stale — run `npm run build:plugins` after adding/removing plugin files
+npm run check:props        # props follow docs/PROP-STYLE-GUIDE.md (new kits strictly; options are listed at the top of the file)
 npm run check:fonts        # (needs `uv` and the internet) the font plugins match their pinned source files; `npm run build:fonts` rewrites them
 ```
 

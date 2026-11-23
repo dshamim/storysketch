@@ -30,7 +30,7 @@ function renderLibrary() {
   for (const pack of propPacks()) {
     let inner = '', n = 0;
     for (const cat of propCats(pack)) {
-      const list = PROPS.filter((d) => d.pack === pack && d.cat === cat && d.id !== 'numbers' && matches('tab-props', d.name, d.id, d.cat, d.pack)); if (!list.length) continue;
+      const list = PROPS.filter((d) => d.pack === pack && d.cat === cat && d.id !== 'numbers' && matches('tab-props', d.name, d.id, d.cat, d.pack, ...(d.tags || []))); if (!list.length) continue;
       n += list.length;
       inner += `<h3 class="sh">${U.esc(cat)}</h3><div class="grid">` + list.map((d) => {
         const fake = { id: 'thumb-' + d.id, kind: d.id, ...propDefaults(d) };

@@ -159,6 +159,7 @@ Context:
 Any accessory works on any character. The character designer lists every installed accessory.
 
 ## Props — `props/*.js`
+**Drawing a prop? Read [`docs/PROP-STYLE-GUIDE.md`](../docs/PROP-STYLE-GUIDE.md) first** (scale, origin, lines, colours, ids, tags) and check it with `node tools/check_props.mjs --file <your file>`. `tags: ['couch', …]` (optional, but required for the new kits) are extra words the Props search and Ctrl+K match.
 ```js
 CP.register({ api: 1, version: '1.0.0', type: 'prop', id: 'lamp', name: 'Desk lamp', pack: 'Classroom props', cat: 'Furniture',
   colors: { line: '#5a5a5a', shade: '#e53935', light: '#fbc02d' },

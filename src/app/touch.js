@@ -155,7 +155,7 @@ function onPointerDown(e) {
   }
   flushCommit(); // a delayed edit (a shape, a text, a designer change) must be in the snapshot before this drag, or a cancelled drag would throw it away
   onDown(e);
-  if (app.drag) { app.drag.pid = e.pointerId; app.drag.s = [e.clientX, e.clientY]; app.drag.pt = e.pointerType; if (/^(ik:|up:|rot|scale|sh-|le-|tw-|torso|head)/.test(app.drag.kind)) hintDone('handles'); }
+  if (app.drag) { app.drag.pid = e.pointerId; app.drag.s = [e.clientX, e.clientY]; app.drag.pt = e.pointerType; if (/^(ik:|up:|rot|scale|gscale|grot|sh-|le-|tw-|torso|head)/.test(app.drag.kind)) hintDone('handles'); }
   if (e.pointerType === 'touch' && app.drag && app.drag.kind === 'move' && app.drag.hit) { endPress(); press = { id: e.pointerId, timer: setTimeout(firePress, LONG_PRESS_MS) }; }
 }
 function onPointerMove(e) {

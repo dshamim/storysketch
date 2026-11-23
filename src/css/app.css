@@ -315,3 +315,4 @@ html.touch .hint-card { top: 64px; } /* below the Done-typing button's row */
 @keyframes sheet-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
 .tool-pill button, .ui-btn, .ui-iconbtn, .ui-rail-btn { transition: background-color var(--ui-dur, 120ms) var(--ui-ease, ease-out), transform var(--ui-dur, 120ms) var(--ui-ease, ease-out); }
 .tool-pill button:active, .ui-iconbtn:active, .ui-rail-btn:active { transform: scale(0.96); }
+#workspace.fly-closed .hint-card { top: 64px; } /* with the library folded, the button that brings it back sits top-left of the page: do not cover it */

@@ -56,13 +56,15 @@ function rememberCommand(id) { try { localStorage.setItem(RECENT_KEY, JSON.strin
 
 /** Everything the palette can do, built fresh each time it opens (so new characters, pages and styles are always there). */
 function paletteCommands() {
+  // the menus only refresh their greyed-out items and ticks when they OPEN, so refresh them now, or the list would show how they were last time
+  for (const m of ['#menu-file', '#menu-edit', '#menu-view', '#menu-page', '#menu-position', '#menu-help']) $(m)?.dispatchEvent(new CustomEvent('ui-open', { detail: {} }));
   const cmds = [];
   const add = (group, id, label, run, o = {}) => cmds.push({ group, id, label, run, kbd: o.kbd || '', words: o.words || '', checked: o.checked ?? null, enabled: o.enabled !== false });
   // the menus are the list of actions (so a new menu item shows up here by itself, with its shortcut and its on / off state)
   const hasSel = app.sel.length > 0;
   for (const [menu, group] of [['#menu-file', 'File'], ['#menu-edit', 'Edit'], ['#menu-view', 'View'], ['#menu-page', 'Page'], ['#menu-position', 'Arrange'], ['#menu-help', 'Help']]) {
     for (const b of $$('[data-act]', $(menu))) {
-      const act = b.dataset.act; if (!ACTIONS[act] || b.hidden) continue; if (group === 'Arrange' && !hasSel) continue;
+      const act = b.dataset.act; if (!ACTIONS[act] || b.hidden || act === 'palette') continue; if (group === 'Arrange' && !hasSel) continue; // ('palette' = this very box)
       const label = ($('.grow', b) || b).textContent.trim(); const kbd = ($('kbd', b) || {}).textContent || '';
       add(group, 'act:' + act, label.replace(/…$/, ''), () => ACTIONS[act](), { kbd, checked: b.getAttribute('role') === 'menuitemcheckbox' ? b.getAttribute('aria-checked') === 'true' : null, enabled: !b.disabled && b.getAttribute('aria-disabled') !== 'true', words: group });
     }
@@ -83,8 +85,6 @@ function paletteCommands() {
   for (const s of RENDER.styleList()) add('Style', 'style:' + s.id, 'Drawing style: ' + (s.name || s.id), () => { setStyle(s.id); syncStyleControls(); }, { checked: curStyle() === s.id, words: 'look' });
   for (const p of CP.projects) add('Samples', 'sample:' + p.id, 'Open sample: ' + p.name, () => startProject('project:' + p.id), { words: p.description || '' });
   app.P.pages.forEach((p, i) => add('Pages', 'page:' + p.id, `Go to page ${i + 1}${p.name ? ': ' + p.name : ''}`, () => goPage(i), { words: 'page' }));
-  add('Help', 'shortcuts', 'Keyboard shortcuts', () => openShortcuts(), { kbd: '?' });
-  add('Help', 'hints-reset', 'Show the tips again', () => resetHints(), { words: 'hints help' });
   return cmds;
 }
 /** How well a command matches the words typed: 0 = not at all. Every word must match somewhere. */
@@ -103,7 +103,7 @@ function paletteResults(query) {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   if (!words.length) { // nothing typed: what you used last, then a few good starting points
     const byId = new Map(pal.all.map((c) => [c.id, c])); const recent = recentIds().map((id) => byId.get(id)).filter(Boolean).map((c) => ({ ...c, group: 'Recent' }));
-    const start = ['act:undo', 'act:export', 'tool:text', 'act:preview', 'shortcuts'].map((id) => byId.get(id)).filter((c) => c && !recent.some((r) => r.id === c.id)).map((c) => ({ ...c, group: recent.length ? 'Suggestions' : 'Try' }));
+    const start = ['act:undo', 'act:export', 'tool:text', 'act:preview', 'act:shortcuts'].map((id) => byId.get(id)).filter((c) => c && !recent.some((r) => r.id === c.id)).map((c) => ({ ...c, group: recent.length ? 'Suggestions' : 'Try' }));
     return [...recent, ...start];
   }
   return pal.all.map((c) => [c, paletteScore(c, words)]).filter(([, s]) => s > 0).sort((a, b) => b[1] - a[1]).slice(0, 40).map(([c]) => c);

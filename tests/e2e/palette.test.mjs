@@ -137,4 +137,28 @@ test('reduced motion: the overlays do not animate', { skip }, async () => {
   const n = await open(CLASSROOM); await n.page.keyboard.press('Control+k'); const d2 = await n.page.evaluate(() => getComputedStyle(document.querySelector('#palette .overlay-card')).animationDuration); assert.notEqual(d2, '0s', 'but it does animate otherwise'); await n.context.close();
 });
 
+test('the list is never stale: a menu closed with nothing picked does not leave its items greyed out, and ticks follow what is on now', { skip }, async () => {
+  const { page, errs, context } = await open(CLASSROOM);
+  await page.click('#btn-edit'); await page.keyboard.press('Escape'); // the Edit menu was last looked at with nothing picked: Group is greyed out in it
+  await page.evaluate(() => select(pg().items.slice(0, 2).map((i) => i.id))); await search(page, 'group'); const o = await options(page); assert.ok(o.length && /^Group/.test(o[0]), 'Group is offered: ' + o[0]); await page.keyboard.press('Enter'); await page.waitForTimeout(80);
+  assert.equal(await page.evaluate(() => new Set(pg().items.filter((i) => app.sel.includes(i.id)).map((i) => i.group)).size === 1 && !!pg().items[0].group), true, 'and it groups');
+  await page.evaluate(() => hideDetails()); await page.click('#details-toggle'); await search(page, 'details panel'); assert.equal(await page.locator('#pal-list [role=option] >> nth=0').locator('.pal-tick svg').count(), 1, 'Details opened from the ribbon button shows its tick'); await page.keyboard.press('Escape');
+  await page.evaluate(() => hideDetails()); await search(page, 'details panel'); assert.equal(await page.locator('#pal-list [role=option] >> nth=0').locator('.pal-tick svg').count(), 0, 'and no tick when it is closed'); await page.keyboard.press('Escape');
+  await page.evaluate(() => select([])); await search(page, 'duplicate'); assert.equal(await page.evaluate(() => document.querySelector('#pal-list [role=option]').getAttribute('aria-disabled')), 'true', 'Duplicate is greyed out when nothing is picked'); await page.keyboard.press('Escape');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('every thing appears once: Help items are not doubled, and the search does not offer itself', { skip }, async () => {
+  const { page, errs, context } = await open(CLASSROOM);
+  for (const [q, n] of [['keyboard shortcuts', 1], ['show the tips', 1], ['about storysketch', 1], ['search everything', 0]]) { await search(page, q); const o = (await options(page)).filter((t) => new RegExp(q.split(' ')[0], 'i').test(t)); const same = o.filter((t) => t.replace(/\s+/g, ' ').toLowerCase().includes(q.split(' ').slice(0, 2).join(' ').toLowerCase())); assert.equal(same.length, n, `"${q}" gives ${same.length} rows: ${o}`); await page.keyboard.press('Escape'); }
+  await page.keyboard.press('Control+k'); const sug = await page.evaluate(() => [...document.querySelectorAll('#pal-list [role=option]')].map((o) => o.textContent.trim())); assert.equal(sug.filter((t) => /Keyboard shortcuts/.test(t)).length, 1, 'one Keyboard shortcuts among the suggestions: ' + sug); await page.keyboard.press('Escape');
+  const all = await page.evaluate(() => { const ids = paletteCommands().map((c) => c.id); return ids.length - new Set(ids).size; }); assert.equal(all, 0, 'no command id is listed twice');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('Ctrl+K does not open the search behind a confirmation', { skip }, async () => {
+  const { page, errs, context } = await open(CLASSROOM); await page.evaluate(() => { uiConfirm('Delete page', 'Sure?', 'Delete page'); }); await page.waitForTimeout(100); assert.equal(await page.evaluate(() => !!document.querySelector('dialog:modal')), true);
+  await page.keyboard.press('Control+k'); assert.equal(await shown(page, '#palette'), false, 'not behind a modal dialog'); await page.keyboard.press('Escape'); assert.deepEqual(errs, []); await context.close();
+});
+
 test.after(async () => { if (browser) await browser.close(); server.close(); });

@@ -9,7 +9,7 @@ function renderAll() { renderFilmstrip(); renderPageTab(); renderLibrary(); rend
 function onKey(e) {
   const ctrl = e.ctrlKey || e.metaKey; const k = e.key;
   if (ctrl && k.toLowerCase() === 's') { e.preventDefault(); saveProject(e.shiftKey); return; }
-  if (ctrl && !e.shiftKey && !e.altKey && k.toLowerCase() === 'k') { e.preventDefault(); if (!$('#palette').hidden) closePalette(); else openPalette(); return; } // from anywhere, even a field (with the shortcut sheet open it swaps it for the search)
+  if (ctrl && !e.shiftKey && !e.altKey && k.toLowerCase() === 'k' && !$('dialog:modal')) { e.preventDefault(); if (!$('#palette').hidden) closePalette(); else openPalette(); return; } // from anywhere, even a field (with the shortcut sheet open it swaps it for the search)
   if (e.target.closest('.overlay')) return; // the palette and the shortcut sheet handle their own keys
   if (e.target.closest('input, textarea, select') || $('dialog:modal')) return;
   if (e.target.closest('#designer') && !(ctrl && (k.toLowerCase() === 'z' || k.toLowerCase() === 'y'))) return; // keys pressed in the designer must not delete, nudge, cut, duplicate or arm tools on the selected figure; only Undo / Redo get through

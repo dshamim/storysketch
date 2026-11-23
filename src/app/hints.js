@@ -33,7 +33,7 @@ function resetHints() { try { localStorage.removeItem(HINTS_KEY); } catch (e) { 
 /** Called after a selection change: pick the tip that fits what was picked. */
 function hintForSelection() {
   const it = app.sel.length === 1 ? itemById(app.sel[0]) : null; if (!it) return;
-  const id = it.type === 'text' ? 'text' : ['figure', 'shape', 'line'].includes(it.type) ? 'handles' : null; if (!id) return;
+  const id = it.type === 'text' ? 'text' : it.type === 'figure' ? 'handles' : null; if (!id) return; // (the pose tip is about a figure's dots: a box or a line has none, and must not use the tip up)
   const pick = app.sel[0]; setTimeout(() => { if (app.sel.length === 1 && app.sel[0] === pick) showHint(id); }, HINT_DELAY);
 }
 /** Called after every committed change: after a while of working, mention search once. */

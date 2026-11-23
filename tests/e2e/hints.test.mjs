@@ -95,4 +95,20 @@ test('motion is short, and with reduced motion the sheets, tips and overlays do 
   const b = await open(CLASSROOM, PORTRAIT); await b.page.evaluate(() => { setTab('tab-cast'); showFlyout(); showHint('search'); }); const [s1, s2] = await dur(b.page); assert.ok(parseFloat(s1) > 0 && parseFloat(s1) <= 0.25 && parseFloat(s2) > 0 && parseFloat(s2) <= 0.25, 'otherwise short (a quarter second at most): ' + s1 + ' ' + s2); await b.context.close();
 });
 
+test('the tip never covers the button that brings the library back (library folded, desktop and 1024 px tablet)', { skip }, async () => {
+  for (const [vp, label] of [[{ viewport: { width: 1440, height: 900 } }, 'desktop'], [{ viewport: { width: 1024, height: 768 }, hasTouch: true }, '1024 tablet']]) {
+    const { page, context, errs } = await open(CLASSROOM, vp); await page.evaluate(() => { hideFlyout(); select([]); }); await pick(page, await teacher(page)); assert.equal(await visible(page), true, label);
+    const r = await page.evaluate(() => { const b = (s) => { const e = document.querySelector(s); const r = e.getBoundingClientRect(); return { shown: !!r.width, box: [r.left, r.top, r.right, r.bottom] }; }; return { hint: b('#hint'), fly: b('#fly-open') }; });
+    assert.equal(r.fly.shown, true, 'the button is there'); const [a, c] = [r.hint.box, r.fly.box]; assert.equal(a[0] < c[2] && c[0] < a[2] && a[1] < c[3] && c[1] < a[3], false, `${label}: the tip must not cover "Show the library panel" ${JSON.stringify(r)}`);
+    assert.deepEqual(errs, []); await context.close();
+  }
+});
+
+test('the pose tip is for figures: picking a box first does not use it up, and a box or a line has none', { skip }, async () => {
+  const { page, context, errs } = await open(`${CLASSROOM} addItem(SHP.make('box', 300, 150, { w: 160, h: 90 })); select([]);`);
+  const box = await page.evaluate(() => pg().items.find((i) => i.type === 'shape').id); await pick(page, box); assert.equal(await visible(page), false, 'no pose tip for a box'); assert.deepEqual(await store(page), {});
+  await page.evaluate(() => select([])); await pick(page, await teacher(page)); assert.equal(await visible(page), true, 'the figure still gets it'); assert.match(await page.locator('#hint-text').innerText(), /pose a figure/);
+  assert.deepEqual(errs, []); await context.close();
+});
+
 test.after(async () => { if (browser) await browser.close(); server.close(); });

@@ -113,6 +113,17 @@
   <aside id="right" aria-label="Details" hidden>
     <div class="details-head"><h2 id="details-title">Page</h2><button class="ui-iconbtn sm" id="details-close" data-tip="Hide the details panel" aria-label="Hide the details panel"><span data-icon="close"></span></button></div>
     <div id="inspector"></div>
+    <div id="designer" role="region" aria-label="Character designer" hidden>
+      <div class="d-sticky">
+        <div class="d-top"><span class="muted small">Changes show everywhere this character appears.</span><button class="primary" id="d-close">Done</button></div>
+        <div id="d-preview"></div>
+        <div class="d-bar"><select id="d-pose" aria-label="Pose to preview"></select><label class="chk"><input type="checkbox" id="d-crayon"> styled</label></div>
+      </div>
+      <h4>Characters</h4>
+      <div class="d-cast" id="d-cast"></div>
+      <select id="d-templates" aria-label="Start a new character from a look"></select>
+      <div class="dform" id="d-form"></div>
+    </div>
   </aside>
 </main>
 
@@ -271,18 +282,6 @@
   </div>
 </div>
 
-<dialog id="designer">
-  <div class="dhead"><b>Character designer</b><select id="d-templates"></select><button id="d-close">Done</button></div>
-  <div class="dbody">
-    <div class="dcol" id="d-cast"></div>
-    <div class="dpreview">
-      <div id="d-preview"></div>
-      <div class="row"><select id="d-pose"></select><label class="chk"><input type="checkbox" id="d-crayon"> styled</label></div>
-    </div>
-    <div class="dform" id="d-form"></div>
-  </div>
-</dialog>
-
 <dialog id="upgradedlg">
   <form method="dialog" class="pad">
     <h3>This file is from an older version</h3>
@@ -318,11 +317,11 @@
   </div>
 </dialog>
 
-<dialog id="bookinfo">
+<dialog id="bookinfo" class="card" aria-labelledby="bookinfo-title">
   <form method="dialog" class="pad">
-    <h3 id="bookinfo-title">About this book</h3>
+    <h3 id="bookinfo-title">About</h3>
     <div id="bookinfo-body"></div>
-    <div class="row"><button value="ok" class="primary">OK</button></div>
+    <div class="row"><button value="ok" class="primary">Close</button></div>
   </form>
 </dialog>
 

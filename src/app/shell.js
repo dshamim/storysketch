@@ -110,7 +110,7 @@ function hideFlyout() { $('#left').hidden = true; $('#fly-open').hidden = false;
 // ---- details panel ----
 const detailsOpen = () => !$('#right').hidden;
 function showDetails() { $('#right').hidden = false; $('#workspace').classList.remove('details-closed'); $('#details-toggle').setAttribute('aria-pressed', 'true'); try { localStorage.setItem(DET_KEY, 'open'); } catch (e) { /* ignore */ } renderDetails(); requestAnimationFrame(renderOverlay); }
-function hideDetails() { $('#right').hidden = true; $('#workspace').classList.add('details-closed'); $('#details-toggle').setAttribute('aria-pressed', 'false'); try { localStorage.setItem(DET_KEY, 'closed'); } catch (e) { /* ignore */ } requestAnimationFrame(renderOverlay); }
+function hideDetails() { if (app.designer) return closeDesigner(); $('#right').hidden = true; $('#workspace').classList.add('details-closed'); $('#details-toggle').setAttribute('aria-pressed', 'false'); try { localStorage.setItem(DET_KEY, 'closed'); } catch (e) { /* ignore */ } requestAnimationFrame(renderOverlay); }
 
 // ---- filmstrip ----
 // A page's thumbnail is drawn in clean lines with its own id prefix (so gradient / clip ids never clash with the canvas).

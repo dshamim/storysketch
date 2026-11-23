@@ -99,6 +99,7 @@ function detailsTitle(sel) {
 }
 function renderDetails() {
   if ($('#right').hidden) return; // built when opened
+  if (app.designer) return renderDesigner(); // the designer has taken the panel over
   const el = $('#inspector'); const sel = selItems(); const tabs = detailTabs(sel);
   if (tabs.length && !tabs.includes(app.dtab)) app.dtab = tabs[0];
   $('#details-title').textContent = detailsTitle(sel);

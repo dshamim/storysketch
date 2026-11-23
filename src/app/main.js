@@ -9,7 +9,8 @@ function renderAll() { renderFilmstrip(); renderPageTab(); renderLibrary(); rend
 function onKey(e) {
   const ctrl = e.ctrlKey || e.metaKey; const k = e.key;
   if (ctrl && k.toLowerCase() === 's') { e.preventDefault(); saveProject(e.shiftKey); return; }
-  if (e.target.closest('input, textarea, select') || $('dialog[open]')) return;
+  if (e.target.closest('input, textarea, select') || $('dialog:modal')) return;
+  if (e.target.closest('#designer') && !ctrl) return; // typing / pressing keys in the designer must not delete, nudge or arm tools on the selected figure
   if (e.target.closest('[role=menu], .ui-popover')) return; // menus and popovers use these keys themselves
   if (e.target.closest('[role=tablist], .ui-film') && (k.startsWith('Arrow') || k === 'Home' || k === 'End')) return; // so do the rail and the page strip
   if ((k === ' ' || k === 'Enter') && e.target.closest('button, [role=menuitem], [role=tab], summary')) return; // Space/Enter press the focused button
@@ -90,11 +91,11 @@ function init() {
   $('#lsearch').addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.stopPropagation(); if (e.target.value) { e.target.value = ''; onSearch(); } else e.target.blur(); } });
   $('#plug-rescan').onclick = rescanPlugins;
   updatePluginBadge();
-  $('#open-designer').onclick = () => openDesigner(app.sel.length === 1 && itemById(app.sel[0])?.type === 'figure' ? itemById(app.sel[0]).cast : null);
+  $('#open-designer').onclick = newCharacter;
   $('#designer').addEventListener('input', onDesignerInput);
   $('#designer').addEventListener('click', onDesignerClick);
-  $('#d-close').onclick = () => { $('#designer').close(); commit(); };
-  $('#designer').addEventListener('close', () => { renderInspector(); commit(); });
+  $('#designer').addEventListener('keydown', onDesignerKey);
+  $('#d-close').onclick = closeDesigner;
   $('#page-name').oninput = (e) => { pg().name = e.target.value; updateFilmLabel(); commit(false); };
   $('#page-notes').oninput = (e) => { pg().notes = e.target.value; commit(false); };
   $('#page-size').onchange = (e) => { const [w, h] = e.target.value.split('x').map(Number); app.P.settings.pageW = w; app.P.settings.pageH = h; renderStage(); scheduleFilm(true); commit(); };

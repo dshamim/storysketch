@@ -49,7 +49,7 @@ const STATES = {
   'details-look-shape': `${classroom} addItem(SHP.make('box', 500, 640, { fill: 'colour', text: 'Hello' })); renderAll(); select([pg().items.at(-1).id]); showDetails();`,
   'chalk-styled': `restore(STORE.fresh('project:sample-chalkboard')); app.page = 0; setPreview(true); renderAll(); select([]);`,
   'animals-dog-selected': `restore(STORE.fresh('project:sample-animals')); app.page = 0; setPreview(true); renderAll(); select([pg().items.find((i) => i.cast === 'rex').id]);`,
-  'dialog-designer': `${classroom} select([]); document.querySelector('#open-designer').click();`,
+  'designer-panel': `${classroom} select([]); openDesigner('teacher');`,
   'popover-export': `${classroom} select([]); document.querySelector('#open-export').click();`,
   'menu-file': `${classroom} select([]); document.querySelector('#btn-file').click();`,
   'menu-edit-selection': `${classroom} select([pg().items[3].id]); document.querySelector('#btn-edit').click();`,

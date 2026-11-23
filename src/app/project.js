@@ -41,7 +41,8 @@ function askUpgrade() {
     d.returnValue = ''; d.addEventListener('close', () => res(d.returnValue || 'cancel'), { once: true }); d.showModal();
   });
 }
-function showBookInfo(title, html) { $('#bookinfo-title').textContent = title; $('#bookinfo-body').innerHTML = html; $('#bookinfo').showModal(); }
+// About and the "opened a file" report are a card in the corner, not a modal: the page stays usable while it is shown
+function showBookInfo(title, html) { const d = $('#bookinfo'); $('#bookinfo-title').textContent = title; $('#bookinfo-body').innerHTML = html; if (d.open) d.close(); d.show(); }
 
 // After a refresh Chrome needs a fresh OK to write the remembered file. Ask from our own dialog so the
 // click that triggers Chrome's prompt is a direct user gesture (otherwise the prompt can silently fail).

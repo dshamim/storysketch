@@ -20,6 +20,7 @@
 5. **Select several** with Ctrl/Shift-click or by dragging a box. **Group** Ctrl+G (Ctrl+Shift+G ungroups). **Lock** Ctrl+Shift+L. **Zoom**: Ctrl + wheel or the − / + buttons; Space-drag to pan; Ctrl+0 fits the page. **Alt+click** steps through everything stacked under the pointer.
 6. **Style**: pick it in the ribbon with nothing selected. `P` (or *Styled view*) shows the drawing style; editing is clean and fast. Chalk offers a blackboard page colour.
 7. **Export** → Whole page, Selection or every layer → PNG or SVG. For AI image tools pick *Clean lines*, a page-colour background, 1×. Text is exported as drawn lines, so it looks the same on any computer.
-8. **Characters**: **New character** in the Characters panel opens the designer (looks, and *Character type*: person or four-legged animal; *New character from a starting look…* includes Dog, Cat and Dinosaur).
+8. **Characters**: **New character** in the Characters panel makes one and opens the **designer** in the Details column; to change an existing one select it and press **Edit character** in the ribbon. The designer has a live preview, *Character type* (person or four-legged animal), colours, clothes, hair and accessories; *New character from a starting look…* includes Dog, Cat and Dinosaur. Choosing another figure on the page switches it to that character; **Done** (or Esc) goes back to the normal Details. Undo works as usual.
+9. **Add-ons** (rail): see what is installed, any problems, and **Refresh add-ons** after adding your own files to `plugins/`.
 
 Project files: **File ▸ Save as…** once, then **Save** / Ctrl+S. Older files made with the tool's former name (Crayon Poser) open normally.

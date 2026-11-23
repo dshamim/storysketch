@@ -37,7 +37,7 @@ function ribbonFor(sel) {
   const mode = rbSelect('data-k="mode"', 'Colour', opts(MODE_OPTS, it.mode || 'auto'));
   if (it.type === 'figure') {
     const c = castById(it.cast); if (!c) return '<span class="ui-muted">Missing character</span>' + rbSep + position;
-    return rbSelect('data-k="expr"', 'Expression', opts(FIG.expressions(c), it.expr)) + rbMenuBtn('pose', 'pose', 'Pose') + rbIconBtn('mirror', 'flip-h', 'Mirror pose') + rbSep + mode + rbSep + position + rbRotate(it);
+    return rbSelect('data-k="expr"', 'Expression', opts(FIG.expressions(c), it.expr)) + rbMenuBtn('pose', 'pose', 'Pose') + rbIconBtn('mirror', 'flip-h', 'Mirror pose') + rbSep + rbBtn('design', 'pencil', 'Edit character') + rbSep + mode + rbSep + position + rbRotate(it);
   }
   const def = PROP_BY_ID[it.kind]; if (!def) return '<span class="ui-muted">Add-on not installed</span>' + rbSep + position;
   const P = { ...propDefaults(def).params, ...(it.params || {}) };

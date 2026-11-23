@@ -1,6 +1,6 @@
 # StorySketch — UI revamp plan
 
-**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) and Phase 3 (ribbon, mini bar, Details panel, arrange, snapping) and Phase 4 (text tool) and Phase 4b (shapes and arrows) are done; next is Phase 5 (dialogs become panels). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
+**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) and Phase 3 (ribbon, mini bar, Details panel, arrange, snapping) and Phase 4 (text tool) and Phase 4b (shapes and arrows) and Phase 5 (dialogs become panels) are done; next is Phase 6 (touch and tablet). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
 Goal: an interface that is as simple as **Canva's**: clear logical groups, graphical icons, controls shown only when relevant, a first-class **text tool**
 and a small set of **shape / arrow / pencil** tools.
 
@@ -333,3 +333,18 @@ Decisions and differences from the plan:
 - **An empty shape is never deleted** (only empty text items are). Double-click or Enter starts typing.
 - **Pencil (freehand) skipped** by decision: it needs smoothing and a different hit area and is not needed for the first release.
 - Known small limits: double-click on a shape inside a group does not start typing (Enter does); Alt-click cycling through overlapping items uses the outer box; pressing keys quickly stacks several toasts.
+
+## 16. Phase 5 notes (dialogs become panels)
+Built: Add-ons as a rail tab (`#tab-addons`, `renderPlugins`), the Character designer inside the Details panel (`#designer`, "designer mode"), the About / "opened a file" card, tests in `tests/e2e/designer.test.mjs` and `workflows.test.mjs`.
+
+Decisions and differences from the plan:
+- **Designer mode takes over the Details panel** (`app.designer`): the normal inspector is hidden, the title reads "Character designer", and **Done / X / Esc** restore the panel to how it was (if Details were closed before, they close again). The existing `d-*` ids and handlers were kept; the dialog is gone.
+- **What the modal used to do for free** is now done on purpose: keys pressed inside the designer (Delete, Backspace, arrows, R O Y L A T) are ignored so the selected figure is never touched; every change is a debounced `commit(false)` (one undo step per edit) instead of one commit when closing; `renderAll` / `renderDetails` refresh the designer after Undo, Open or page changes, and move it to another character (or close it) if its character is gone.
+- **Following the selection:** choosing a single figure on the page switches the designer to that figure's character. Choosing anything else leaves it on the same character.
+- **Character type** is two picker tiles (each drawn as the current character, in that skeleton's standing pose) instead of a dropdown. Words: "Person (stick figure)" and "Four-legged animal" (Q-e from the plan is still worth a five-minute test with the owner's wife).
+- **New character** creates a character from the first person starting look and opens it (before, the button opened the designer on an existing character, which was misleading). Undo removes it.
+- **Entry points:** ribbon ▸ **Edit character** (new), Details ▸ Look ▸ *Edit this character…*, Characters ▸ **New character**. There is no per-tile pencil in the Characters panel yet (a tile click adds the character to the page).
+- **Save as template** uses an inline name row (no `prompt()`), Enter saves, Esc cancels the row first.
+- **Rail:** Add-ons is the sixth tab (the separate bottom rail is gone).
+- **Modals left:** only the Open / Save steps (older file, permission to write, could not save, taking long) and destructive confirms (unsaved changes, delete page, clear the only page, delete character). `grep showModal src/` lists only those. About and the "opened a file" report are a non-modal card in the corner. The keyboard guard in `main.js` now ignores keys only for modal dialogs (`dialog:modal`), so the card does not switch shortcuts off.
+- **Not done:** a per-character pencil on the Characters panel tiles; the designer is still the old form controls restyled lightly (the full look of the Details panel is a phase 7 polish item).

@@ -129,5 +129,8 @@ const STORE = (() => {
   function undo() { if (!hist.past.length) return null; hist.future.push(hist.last); hist.last = hist.past.pop(); return JSON.parse(hist.last); }
   function redo() { if (!hist.future.length) return null; hist.past.push(hist.last); hist.last = hist.future.pop(); return JSON.parse(hist.last); }
 
-  return { lastLoad, normalizeCast, starterCast, fresh, migrate, load, autosave, serialize, snapshot, undo, redo };
+  /** The project as it was at the last snapshot (to throw away a half-finished drag without touching the undo history). */
+  function revert() { return hist.last ? JSON.parse(hist.last) : null; }
+
+  return { lastLoad, normalizeCast, starterCast, fresh, migrate, load, autosave, serialize, snapshot, undo, redo, revert };
 })();

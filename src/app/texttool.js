@@ -19,7 +19,7 @@ function addTextBox(left, top, w = 0) {
 }
 function setTool(tool) {
   app.tool = tool || null;
-  $('#stage').classList.toggle('tool-text', app.tool === 'text'); $('#stage').classList.toggle('tool-draw', isDrawTool(app.tool));
+  $('#stage').classList.toggle('tool-text', app.tool === 'text'); $('#stage').classList.toggle('tool-draw', isDrawTool(app.tool)); $('#stage').classList.toggle('tool-hand', app.tool === 'hand');
   const b = $('#add-textbox'); if (b) b.setAttribute('aria-pressed', String(app.tool === 'text'));
   for (const t of $$('[data-shape-add]')) t.setAttribute('aria-pressed', String(t.dataset.shapeAdd === app.tool));
   if (app.tool === 'text') toast('Click on the page to type, or drag to draw a box. Esc to cancel.');

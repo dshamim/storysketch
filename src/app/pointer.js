@@ -8,7 +8,7 @@ function onDown(e) {
   // take the focus away from a text box we have just started. Cancel them, and move the focus off any field ourselves, as a mouse press would.
   if (e.pointerType !== 'mouse') { e.preventDefault(); const a = document.activeElement; if (a && a !== document.body && !(app.edit && a === textField() && overTextBeingEdited(e))) a.blur(); }
   // pan: middle button, or hold Space and drag
-  if (e.button === 1 || (e.button === 0 && app.space)) {
+  if (e.button === 1 || (e.button === 0 && (app.space || app.tool === 'hand'))) {
     e.preventDefault(); app.drag = { kind: 'pan', c0: [e.clientX, e.clientY], v0: [app.view.cx, app.view.cy], k: zoom() };
     $('#stage').setPointerCapture(e.pointerId); $('#stage').classList.add('panning'); return;
   }
@@ -31,7 +31,7 @@ function onDown(e) {
   // Shape / line tool (R O Y L A): drag to draw; a plain click drops a default-sized one
   if (isDrawTool(app.tool) && !app.space) { app.drag = startDraw(toPage(e), e); $('#stage').setPointerCapture(e.pointerId); return; }
   const P = toPage(e); const h = e.target.closest('[data-h]');
-  const add = e.shiftKey || e.ctrlKey || e.metaKey;
+  const add = e.shiftKey || e.ctrlKey || e.metaKey || app.addMode; // addMode: the touch tool bar's "Select several" (a finger has no Shift key)
   // Alt+click cycles through stacked items (but Alt on a pose dot still means its usual thing)
   if (e.altKey && !add && !(h && app.sel.length === 1 && !h.dataset.h.startsWith('g') && !['scale', 'rot'].includes(h.dataset.h))) {
     const it = cyclePick(P); app.lastClick = null;

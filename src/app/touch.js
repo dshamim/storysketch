@@ -39,3 +39,88 @@ function initTouch() {
   if (coarseQuery.addEventListener) coarseQuery.addEventListener('change', applyTouch);
   applyTouch();
 }
+
+// ---------- gestures ----------
+// One input model: Pointer Events for mouse, finger and pen. This wraps the handlers in pointer.js with what touch needs:
+//  - each drag belongs to the finger (or mouse) that started it, so a second finger can not drive it;
+//  - a second finger means "pinch / pan the page": the first finger's half-made drag is cancelled and reverted;
+//  - a finger that wobbles a little is still a tap (6 px of slop); a still finger held down for half a second is a long-press;
+//  - palm rejection: while a pen is down, or was a moment ago, touches are ignored.
+const SLOP = 6, LONG_PRESS_MS = 550, PEN_QUIET_MS = 600;
+const touches = new Map();           // pointerId -> [x, y] of the fingers on the page
+const consumed = new Set();          // fingers that were part of a gesture (or palms): ignore them until they lift
+let pinch = null, press = null, penDown = false, penUntil = 0;
+const near = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+
+// Stop a drag that has not been committed: put the page back as it was at the last snapshot (a drag that never moved only needs dropping).
+function cancelDrag() {
+  const d = app.drag; if (!d) return false; app.drag = null; app.guides = [];
+  $('#marquee')?.setAttribute('visibility', 'hidden'); $('#stage').classList.remove('panning');
+  const edits = !['pan', 'textsel', 'marquee', 'textbox'].includes(d.kind);
+  if (edits && (d.moved || d.it)) {
+    const P = STORE.revert();
+    if (P) { const was = app.dirty; restore(P); setDirty(was); return true; } // a cancelled drag leaves no trace: not even the "unsaved" mark
+    if (d.it) pg().items = pg().items.filter((i) => i !== d.it); // a shape being drawn is on the page before the first snapshot
+    renderStage();
+  } else renderOverlay();
+  return true;
+}
+function endPress() { if (press) { clearTimeout(press.timer); press = null; } }
+function pinchState() { const [a, b] = pinch.ids.map((id) => touches.get(id)); return { d: Math.max(10, near(a, b)), m: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] }; }
+function startPinch() {
+  const ids = [...touches.keys()].slice(0, 2); cancelDrag(); endPress(); if (app.edit) renderOverlay();
+  for (const id of ids) consumed.add(id);
+  pinch = { ids, ...{ d: 0, m: [0, 0] } }; Object.assign(pinch, pinchState());
+}
+function pinchMove() {
+  const s = pinchState(); const f = s.d / pinch.d;
+  zoomTo(app.view.z * f, { clientX: pinch.m[0], clientY: pinch.m[1] });          // the spot between the fingers stays put while zooming…
+  app.view.cx -= (s.m[0] - pinch.m[0]) / zoom(); app.view.cy -= (s.m[1] - pinch.m[1]) / zoom(); // …and the page follows the fingers (two-finger pan)
+  applyView(); renderOverlay(); pinch.d = s.d; pinch.m = s.m;
+}
+function firePress() { // long-press on something: select it and open its "More" menu (the touch version of a right-click)
+  const p = press; press = null; const d = app.drag; if (!p || !d || d.pid !== p.id || d.moved || d.kind !== 'move' || !d.hit) return;
+  cancelDrag(); consumed.add(p.id); try { navigator.vibrate?.(12); } catch (e) { /* ignore */ }
+  const more = $('#minibar [data-mb="more"]'); if (more && !$('#minibar').hidden) UI.showPopover(more, $('#menu-more'), { placement: 'bottom-start' });
+}
+function onPointerDown(e) {
+  if (e.pointerType === 'pen') { penDown = true; penUntil = Date.now() + PEN_QUIET_MS; }
+  if (e.pointerType === 'touch') {
+    if (penDown || Date.now() < penUntil) { e.preventDefault(); consumed.add(e.pointerId); return; } // a palm resting while the pen draws
+    touches.set(e.pointerId, [e.clientX, e.clientY]);
+    if (touches.size === 2 && !pinch) { e.preventDefault(); startPinch(); return; }
+    if (touches.size > 2 || pinch) { e.preventDefault(); consumed.add(e.pointerId); return; }
+  }
+  flushCommit(); // a delayed edit (a shape, a text, a designer change) must be in the snapshot before this drag, or a cancelled drag would throw it away
+  onDown(e);
+  if (app.drag) { app.drag.pid = e.pointerId; app.drag.s = [e.clientX, e.clientY]; app.drag.pt = e.pointerType; }
+  if (e.pointerType === 'touch' && app.drag && app.drag.kind === 'move' && app.drag.hit) { endPress(); press = { id: e.pointerId, timer: setTimeout(firePress, LONG_PRESS_MS) }; }
+}
+function onPointerMove(e) {
+  if (e.pointerType === 'pen') penUntil = Date.now() + PEN_QUIET_MS;
+  if (e.pointerType === 'touch') {
+    if (touches.has(e.pointerId)) touches.set(e.pointerId, [e.clientX, e.clientY]);
+    if (pinch && pinch.ids.includes(e.pointerId)) { pinchMove(); return; }
+    if (consumed.has(e.pointerId)) return;
+  }
+  const d = app.drag; if (d && d.pid != null && d.pid !== e.pointerId) return; // somebody else's drag
+  if (d && d.pt === 'touch' && !d.moved && d.s && near(d.s, [e.clientX, e.clientY]) < SLOP) return; // still a tap
+  if (press && d && d.moved !== false) endPress(); if (press && d && d.s && near(d.s, [e.clientX, e.clientY]) >= SLOP) endPress();
+  onMove(e);
+}
+function liftFinger(e) {
+  if (e.pointerType === 'pen') { penDown = false; penUntil = Date.now() + PEN_QUIET_MS; }
+  if (e.pointerType !== 'touch') return false;
+  touches.delete(e.pointerId); if (pinch && pinch.ids.includes(e.pointerId)) pinch = null;
+  if (press && press.id === e.pointerId) endPress();
+  if (consumed.has(e.pointerId)) { consumed.delete(e.pointerId); return true; }
+  return false;
+}
+function onPointerUp(e) {
+  if (liftFinger(e)) return;
+  const d = app.drag; if (d && d.pid != null && d.pid !== e.pointerId) return;
+  onUp(e);
+}
+function onPointerCancel(e) { // the browser took the touch away: nothing was meant, so undo whatever the drag did instead of committing it
+  const owner = app.drag && app.drag.pid === e.pointerId; liftFinger(e); if (owner) cancelDrag();
+}

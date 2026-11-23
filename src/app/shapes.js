@@ -28,7 +28,7 @@ function drawMove(d, P, e) {
     if (U.len([e.clientX - d.c0[0], e.clientY - d.c0[1]]) < 5) return; // a click, not yet a drag
     d.it = SHP.make(d.tool, d.P0[0], d.P0[1]); d.it.id = U.uid(); pg().items.push(d.it); // no undo step until the mouse is released
   }
-  if (isLine(d.it)) SHP.setEnds(d.it, d.P0, e.shiftKey ? SHP.snapAngle(d.P0, P) : P); else Object.assign(d.it, SHP.fromDrag(d.P0, P, e.shiftKey));
+  if (isLine(d.it)) SHP.setEnds(d.it, d.P0, e.shiftKey ? SHP.snapAngle(d.P0, P) : fingerLine(e, d.P0, P)); else Object.assign(d.it, SHP.fromDrag(d.P0, P, e.shiftKey || fingerSquare(e, d.P0, P)));
   scheduleRender();
 }
 function drawEnd(d) {
@@ -43,7 +43,7 @@ function startShapeHandle(d, it, kind) {
 function dragShapeHandle(d, P, e) {
   const it = d.it;
   if (d.kind.startsWith('sh-')) Object.assign(it, SHP.resize(d.f, d.kind.slice(3), P, e.shiftKey));
-  else { const Q = e.shiftKey ? SHP.snapAngle(d.fixed, P) : P; if (d.idx === 0) SHP.setEnds(it, Q, d.fixed); else SHP.setEnds(it, d.fixed, Q); }
+  else { const Q = e.shiftKey ? SHP.snapAngle(d.fixed, P) : fingerLine(e, d.fixed, P); if (d.idx === 0) SHP.setEnds(it, Q, d.fixed); else SHP.setEnds(it, d.fixed, Q); }
 }
 // the handles of a selected shape or line, in the item's own frame (k = 1 / on-screen scale)
 function shapeHandles(it, k) {
@@ -70,6 +70,13 @@ function setShapeProp(it, key, val) {
   it[key] = val; scheduleRender(); commit(false); renderOverlay(); if (key === 'start' || key === 'end' || key === 'text') { renderLayers(); if (!$('#right').hidden) $('#details-title').textContent = detailsTitle(selItems()); } // the layer name and the Details title follow the arrowheads and the words
 }
 const isFlat = (it) => isShape(it) || isLine(it);
+// A finger has no Shift key: a line that is within 4 degrees of a 45 degree step snaps to it, and a shape that is within 6 percent of square becomes square.
+function fingerLine(e, A, P) {
+  if (e.pointerType !== 'touch') return P; const dx = P[0] - A[0], dy = P[1] - A[1], len = Math.hypot(dx, dy); if (len < 30) return P;
+  const ang = Math.atan2(dy, dx) * 180 / Math.PI, step = Math.round(ang / 45) * 45; if (Math.abs(ang - step) > 4) return P;
+  const r = step * Math.PI / 180; return [A[0] + Math.cos(r) * len, A[1] + Math.sin(r) * len];
+}
+function fingerSquare(e, A, P) { if (e.pointerType !== 'touch') return false; const w = Math.abs(P[0] - A[0]), h = Math.abs(P[1] - A[1]), m = Math.max(w, h); return m > 30 && Math.abs(w - h) <= 0.06 * m; }
 // controls carry data-shape="key"; buttons data-shape-step="width:1" / data-shape-set="key=value" / data-shape-color="key=#rrggbb"
 function onShapeInput(t) {
   const it = itemById(app.sel[0]); if (!isFlat(it)) return; const k = t.dataset.shape;

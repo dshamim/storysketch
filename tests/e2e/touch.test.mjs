@@ -116,4 +116,102 @@ test('touch handles: every handle has a 44 px grab area behind it, and a finger 
   assert.equal(await mp.evaluate(() => document.querySelectorAll('#overlay [data-halo]').length), 0); await mp.close(); assert.deepEqual(errs, []);
 });
 
+// ---- gestures: several fingers, long-press, palm, hand tool ----
+const touchEvt = (cdp, type, pts) => cdp.send('Input.dispatchTouchEvent', { type, touchPoints: pts.map(([x, y, id]) => ({ x, y, id })) });
+const CLASSROOM = () => { restore(STORE.fresh('project:sample-classroom')); app.page = 0; setPreview(false); renderAll(); commit(); };
+const tableSpot = async (page) => page.evaluate(() => { const it = pg().items.find((i) => i.kind === 'table'); const b = document.querySelector(`#items [data-id="${it.id}"]`).getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2 - 40, it.id]; }); // on the tabletop line
+const view = (page) => page.evaluate(() => ({ z: app.view.z, cx: app.view.cx, cy: app.view.cy }));
+const same = async (page, before) => assert.equal(JSON.stringify(await items(page)), before, 'the page is untouched');
+
+test('two fingers pinch and pan the page; they never move, change or select anything', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); const before = JSON.stringify(await items(page)); const sel0 = await page.evaluate(() => app.sel.length);
+  // both fingers land on empty page (left of the shelf) and move apart: zoom in around the middle
+  await touchEvt(cdp, 'touchStart', [[500, 250, 1]]); await touchEvt(cdp, 'touchStart', [[500, 250, 1], [700, 250, 2]]);
+  const P0 = await page.evaluate(() => toPage({ clientX: 600, clientY: 250 }));
+  for (let i = 1; i <= 8; i++) await touchEvt(cdp, 'touchMove', [[500 - 12 * i, 250, 1], [700 + 12 * i, 250, 2]]);
+  const P1 = await page.evaluate(() => toPage({ clientX: 600, clientY: 250 })); const v1 = await view(page);
+  assert.ok(v1.z > 1.8, 'zoomed in: ' + v1.z); assert.ok(Math.abs(P0[0] - P1[0]) < 3 && Math.abs(P0[1] - P1[1]) < 3, 'the page point between the fingers stayed under them');
+  // both fingers drag right: the page follows (two-finger pan)
+  for (let i = 1; i <= 6; i++) await touchEvt(cdp, 'touchMove', [[404 + 20 * i, 250, 1], [796 + 20 * i, 250, 2]]);
+  const v2 = await view(page); assert.ok(v2.cx < v1.cx - 20, 'the page moved with the fingers: ' + v1.cx + ' -> ' + v2.cx); await touchEvt(cdp, 'touchEnd', []);
+  await page.waitForTimeout(100); await same(page, before); assert.equal(await page.evaluate(() => app.sel.length), sel0); assert.equal(await page.evaluate(() => !!app.drag), false);
+  // pinch back in: not smaller than the whole page
+  await touchEvt(cdp, 'touchStart', [[600, 400, 1]]); await touchEvt(cdp, 'touchStart', [[600, 400, 1], [900, 400, 2]]);
+  for (let i = 1; i <= 5; i++) await touchEvt(cdp, 'touchMove', [[600 + 28 * i, 400, 1], [900 - 28 * i, 400, 2]]); await touchEvt(cdp, 'touchEnd', []); // fingers end 20 px apart: a very small pinch
+  assert.ok((await view(page)).z >= 1 && (await view(page)).z < v1.z, 'zoomed out, never below the whole page');
+  // one finger left down after the pinch must not turn into a tap or a drag when it lifts
+  await touchEvt(cdp, 'touchStart', [[500, 300, 1]]); await touchEvt(cdp, 'touchStart', [[500, 300, 1], [600, 300, 2]]); await touchEvt(cdp, 'touchEnd', [[600, 300, 2]]); await touchEvt(cdp, 'touchMove', [[620, 340, 2]]); await touchEvt(cdp, 'touchEnd', []);
+  await page.waitForTimeout(100); await same(page, before); assert.equal(await page.evaluate(() => !!app.drag), false);
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('a second finger lands mid-drag: the drag is undone, not committed, and the second finger can not drive it', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); const before = JSON.stringify(await items(page)); const [x, y] = await tableSpot(page); await page.evaluate(() => setDirty(false));
+  await touchEvt(cdp, 'touchStart', [[x, y, 1]]); for (let i = 1; i <= 5; i++) await touchEvt(cdp, 'touchMove', [[x + 14 * i, y + 4 * i, 1]]);
+  assert.notEqual(JSON.stringify(await items(page)), before, 'the table follows the finger'); assert.equal(await page.evaluate(() => !!app.drag), true);
+  await touchEvt(cdp, 'touchStart', [[x + 70, y + 20, 1], [560, 650, 2]]); await page.waitForTimeout(60);
+  await same(page, before); assert.equal(await page.evaluate(() => !!app.drag), false, 'the half-made drag is gone');
+  for (let i = 1; i <= 4; i++) await touchEvt(cdp, 'touchMove', [[x + 70 + 5 * i, y + 20, 1], [560 + 30 * i, 650, 2]]); // the second finger moves: only zoom / pan, nothing is dragged
+  await touchEvt(cdp, 'touchEnd', []); await page.waitForTimeout(100); await same(page, before);
+  assert.equal(await page.evaluate(() => app.dirty), false, 'nothing was committed: the project is not marked unsaved');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('a touch that the browser cancels undoes the drag too (a pose, a move, a handle)', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); const before = JSON.stringify(await items(page)); const [x, y] = await tableSpot(page);
+  await touchEvt(cdp, 'touchStart', [[x, y, 1]]); for (let i = 1; i <= 5; i++) await touchEvt(cdp, 'touchMove', [[x + 10 * i, y, 1]]); assert.notEqual(JSON.stringify(await items(page)), before);
+  await touchEvt(cdp, 'touchCancel', []); await page.waitForTimeout(100); await same(page, before); assert.equal(await page.evaluate(() => !!app.drag), false);
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('a wobbly tap is a tap: 5 px of finger jitter selects but does not move or commit; a real drag still moves', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); const before = JSON.stringify(await items(page)); const [x, y, id] = await tableSpot(page); const rev0 = await page.evaluate(() => app.rev);
+  await touchEvt(cdp, 'touchStart', [[x, y, 1]]); await touchEvt(cdp, 'touchMove', [[x + 3, y + 2, 1]]); await touchEvt(cdp, 'touchMove', [[x + 5, y + 1, 1]]); await touchEvt(cdp, 'touchEnd', []); await page.waitForTimeout(120);
+  await same(page, before); assert.deepEqual(await page.evaluate(() => app.sel), [id], 'selected'); assert.equal(await page.evaluate(() => app.rev), rev0, 'no commit');
+  await dragTouch(cdp, [x, y], [x + 60, y + 30]); await page.waitForTimeout(100); assert.notEqual(JSON.stringify(await items(page)), before, 'a real drag moves it'); assert.ok(await page.evaluate(() => app.rev) > rev0);
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('long-press on something selects it and opens its More menu; it does not move it and the finger lifting does nothing more', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); const before = JSON.stringify(await items(page)); const [x, y, id] = await tableSpot(page);
+  await touchEvt(cdp, 'touchStart', [[x, y, 1]]); await page.waitForTimeout(800);
+  assert.equal(await page.locator('#menu-more').isVisible(), true, 'the More menu opened'); assert.deepEqual(await page.evaluate(() => app.sel), [id]); await touchEvt(cdp, 'touchEnd', []); await page.waitForTimeout(100);
+  assert.equal(await page.locator('#menu-more').isVisible(), true, 'and stays open after the finger lifts'); await same(page, before);
+  // a long-press on empty page does nothing; moving cancels the press
+  await page.keyboard.press('Escape'); const [ex, ey] = await screenOf(page, 100, 100); await touchEvt(cdp, 'touchStart', [[ex, ey, 1]]); await page.waitForTimeout(800); await touchEvt(cdp, 'touchEnd', []);
+  assert.equal(await page.locator('#menu-more').isVisible(), false);
+  await touchEvt(cdp, 'touchStart', [[x, y, 1]]); await touchEvt(cdp, 'touchMove', [[x + 30, y, 1]]); await page.waitForTimeout(800); await touchEvt(cdp, 'touchEnd', []); assert.equal(await page.locator('#menu-more').isVisible(), false, 'moving first makes it a drag, not a press');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('palm rejection: while a pen is down (and for a moment after) finger touches on the page are ignored', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); await page.evaluate(() => select([])); const [x, y, id] = await tableSpot(page); const before = JSON.stringify(await items(page));
+  const [px, py] = await screenOf(page, 100, 120);
+  await cdp.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: px, y: py, button: 'left', buttons: 1, clickCount: 1, pointerType: 'pen' });
+  await page.touchscreen.tap(x, y); await page.waitForTimeout(80); assert.deepEqual(await page.evaluate(() => app.sel), [], 'a palm on the table while the pen is down does nothing');
+  await cdp.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: px, y: py, button: 'left', buttons: 0, clickCount: 1, pointerType: 'pen' });
+  await page.touchscreen.tap(x, y); await page.waitForTimeout(80); assert.deepEqual(await page.evaluate(() => app.sel), [], 'still ignored for a moment after the pen lifts');
+  await page.waitForTimeout(800); await page.touchscreen.tap(x, y); await page.waitForTimeout(80); assert.deepEqual(await page.evaluate(() => app.sel), [id], 'a finger works again after the quiet moment');
+  await same(page, before); assert.deepEqual(errs, []); await context.close();
+});
+
+test('the hand tool pans with one finger; V (select) puts it away; Select several adds to the selection with plain taps', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); const before = JSON.stringify(await items(page)); await page.evaluate(() => zoomTo(2.5));
+  await page.evaluate(() => setTool('hand')); const v0 = await view(page); await dragTouch(cdp, [500, 400], [400, 340]); await page.waitForTimeout(100);
+  const v1 = await view(page); assert.ok(v1.cx > v0.cx + 10 && v1.cy > v0.cy + 5, 'the page moved with the finger'); await same(page, before); assert.equal(await page.evaluate(() => app.tool), 'hand');
+  await page.keyboard.press('v'); assert.equal(await page.evaluate(() => app.tool), null, 'V selects again');
+  await page.evaluate(() => { zoomTo(1); select([]); app.addMode = true; }); const [x, y, id] = await tableSpot(page); const lily = await page.evaluate(() => { const it = pg().items.find((i) => i.cast === 'teacher'); const b = document.querySelector(`#items [data-id="${it.id}"]`).getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2 - 60, it.id]; }); // (the teacher: a stick figure is thin, so on her body)
+  await tapAt(page, x, y); await tapAt(page, lily[0], lily[1]); assert.ok((await page.evaluate(() => app.sel)).includes(id) && (await page.evaluate(() => app.sel.length)) >= 2, 'two taps = two things selected');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('finger drawing: a line that is nearly level / 45 degrees snaps, a shape that is nearly square becomes square; a clearly different one is left alone (no Shift on a tablet)', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(() => { app.P = STORE.fresh('blank'); renderAll(); });
+  const [sx, sy] = await screenOf(page, 200, 200);
+  const draw = async (tool, to) => { await page.evaluate((t) => setTool(t), tool); await dragTouch(cdp, [sx, sy], [sx + to[0], sy + to[1]]); await page.waitForTimeout(120); return (await items(page)).at(-1); };
+  const l1 = await draw('line', [200, 8]); assert.equal(l1.rot, 0, 'within 4 degrees of level: level'); const l2 = await draw('line', [150, 150]); assert.equal(Math.round(l2.rot), 45, '45 degrees'); const l3 = await draw('line', [200, 40]); assert.notEqual(Math.round(l3.rot), 0, 'a clearly slanted line stays slanted');
+  const b1 = await draw('box', [200, 208]); assert.equal(b1.w, b1.h, 'nearly square becomes square'); const b2 = await draw('box', [200, 120]); assert.notEqual(b2.w, b2.h);
+  assert.deepEqual(errs, []); await context.close();
+});
+
 test.after(async () => { if (browser) await browser.close(); server.close(); });

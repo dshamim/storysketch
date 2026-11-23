@@ -223,3 +223,9 @@ html.touch .layer { min-height: 48px; } html.touch .layer button { min-width: 44
 html.touch #right summary, html.touch #left summary { min-height: 44px; display: flex; align-items: center; }
 html.touch .ui-menu [role=menuitem], html.touch .ui-menu [role=menuitemcheckbox] { min-height: 48px; }
 html.touch #overlay [data-h]:not([data-halo]) { transform-box: fill-box; transform-origin: center; transform: scale(1.6); } /* the handle you see; the 44 px halo behind it is what you grab */
+
+/* ---- touch: the page itself never scrolls or pulls to refresh; no grey tap flash; the hand tool ---- */
+html.touch, html.touch body { overscroll-behavior: none; }
+html.touch * { -webkit-tap-highlight-color: transparent; }
+html.touch #stage-wrap, html.touch #stage { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+#stage.tool-hand { cursor: grab; } #stage.tool-hand.panning { cursor: grabbing; }

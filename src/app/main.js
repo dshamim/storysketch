@@ -41,6 +41,7 @@ function onKey(e) {
   else if (k === 'h' || k === 'H') { for (const it of movable(app.sel.map(itemById))) it.flip = !it.flip; renderStage(); commit(); }
   else if (k === 'Escape') { if (app.tool) setTool(null); else select([]); }
   else if ((k === 't' || k === 'T') && !ctrl) setTool(app.tool === 'text' ? null : 'text')
+  else if ((k === 'v' || k === 'V') && !ctrl && !e.altKey) setTool(null) // V = Select (the hand tool is on the touch tool bar; H already flips)
   else if (!ctrl && !e.altKey && DRAW_KEYS[k.toLowerCase()]) { const t = e.shiftKey && k.toLowerCase() === 'a' ? 'double' : DRAW_KEYS[k.toLowerCase()]; setTool(app.tool === t ? null : t); } // R box, O circle, Y triangle, L line, A arrow, Shift+A double arrow
   else if (k === 'Enter' && app.sel.length === 1 && hasWords(itemById(app.sel[0]))) { e.preventDefault(); startEdit(app.sel[0]); }
   else if (k === '/') { e.preventDefault(); showFlyout(); $('#lsearch').focus(); }
@@ -56,7 +57,8 @@ function init() {
   $('#defs-holder').innerHTML = `<defs>${RENDER.defs()}</defs>`;
   renderStyleControls();
   const stage = $('#stage');
-  stage.addEventListener('pointerdown', onDown); stage.addEventListener('pointermove', onMove); stage.addEventListener('pointerup', onUp); stage.addEventListener('pointercancel', onUp);
+  stage.addEventListener('pointerdown', onPointerDown); stage.addEventListener('pointermove', onPointerMove); stage.addEventListener('pointerup', onPointerUp); stage.addEventListener('pointercancel', onPointerCancel);
+  stage.addEventListener('contextmenu', (e) => e.preventDefault()); // a long-press must not open the browser's own menu
   stage.addEventListener('wheel', onWheel, { passive: false }); // not passive, so Ctrl+wheel zooms the page instead of Chrome
   stage.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); }); // no auto-scroll on middle-drag
   const endSpace = () => { app.space = false; $('#stage').classList.remove('canpan'); };

@@ -1,5 +1,5 @@
 // Props: Scenery backdrops (ground, sky, hills, wall). Shared pieces that make a page look like a place; the Home, School and Park kits sit on them.
-// They are page-wide: up to 1000 wide. Put them at the back (Position > Send to back) and lock them. Floor pieces stand on y = 0, centred on x = 0.
+// They are page-wide: up to 1000 wide. Their `place` hint makes a click on the tile put them in the right spot, filling the page, behind everything else. Floor pieces stand on y = 0, centred on x = 0.
 // Style guide: docs/PROP-STYLE-GUIDE.md. These use paper fills (so what is behind is hidden) and hatching for colour.
 (() => {
   const PACK = 'Scenery', CAT = 'Scenery';
@@ -8,7 +8,7 @@
 
   CP.register({ api: 1, version: '1.0.0', pack: PACK, items: [
     // ---------- ground ----------
-    { type: 'prop', id: 'scenery-ground', name: 'Ground', cat: CAT, tags: ['grass', 'lawn', 'floor', 'road', 'path', 'pavement', 'field'],
+    { type: 'prop', id: 'scenery-ground', name: 'Ground', cat: CAT, place: { x: 0.5, y: 1, rank: 30, fit: { width: 1 } }, tags: ['grass', 'lawn', 'floor', 'road', 'path', 'pavement', 'field'],
       colors: { line: '#6f6f6f', grass: '#43a047', sand: '#c9a15a', road: '#78909c', wood: '#a0724a', lane: '#f9a825' },
       params: [
         { key: 'kind', label: 'Ground', type: 'select', options: { grass: 'Grass', sand: 'Sandy path', road: 'Road', floor: 'Wooden floor' }, def: 'grass' },
@@ -25,9 +25,9 @@
           const top = []; for (let x = -W; x <= W; x += 25) top.push([x, -D + Math.sin(x / 70) * 5]); p.curve(top, { stroke: 'sand', w: 4.5 });
           for (let i = 0; i < Math.round(W / 22); i++) p.ell(-W + 20 + r() * W * 2 - 40, -D + 14 + r() * (D - 30), 5 + r() * 5, 3 + r() * 3, { stroke: 'sand', w: 2, fill: 'paper' });
         } else if (P.kind === 'road') {
-          p.rect(-W, -D, W * 2, D, { ...none, fill: 'paper', hatch: 'road', hg: 7, ha: 0, halpha: 0.4 });
-          p.line([[-W, -D], [W, -D]], O); p.line([[-W, -D + 12], [W, -D + 12]], { stroke: 'line', w: 2.5 });
-          for (let x = -W + 20; x < W - 60; x += 110) p.line([[x, -D / 2], [x + 60, -D / 2]], { stroke: 'lane', w: 6 });
+          p.rect(-W, -D, W * 2, D, { ...none, fill: 'paper', hatch: 'road', hg: 10, ha: 12, halpha: 0.55 });
+          p.line([[-W, -D], [W, -D]], O); p.line([[-W, -D + 14], [W, -D + 14]], { stroke: 'line', w: 3 });
+          for (let x = -W + 20; x < W - 70; x += 120) p.line([[x, -D / 2 + 8], [x + 70, -D / 2 + 8]], { stroke: 'lane', w: 7 });
         } else { // wooden floor
           p.rect(-W, -D, W * 2, D, { ...none, fill: 'paper', hatch: 'wood', hg: 14, ha: 0, halpha: 0.25 });
           p.line([[-W, -D], [W, -D]], { stroke: 'wood', w: 4.5 }); const rows = Math.max(2, Math.round(D / 38)); const rh = D / rows;
@@ -37,7 +37,7 @@
       } },
 
     // ---------- sky ----------
-    { type: 'prop', id: 'scenery-sky', name: 'Sky', cat: CAT, tags: ['day', 'night', 'dusk', 'sunset', 'sun', 'moon', 'stars', 'background'],
+    { type: 'prop', id: 'scenery-sky', name: 'Sky', cat: CAT, place: { x: 0.5, y: 0.8, rank: 10, fit: { width: 1, height: 0.8 } }, tags: ['day', 'night', 'dusk', 'sunset', 'sun', 'moon', 'stars', 'background'],
       colors: { line: '#6f6f6f', sky: '#64b5f6', sun: '#f9a825', dusk: '#ff8a65', dusk2: '#7e57c2', night: '#3949ab', star: '#fff59d' },
       params: [
         { key: 'time', label: 'Time of day', type: 'select', options: { day: 'Day', dusk: 'Sunset', night: 'Night' }, def: 'day' },
@@ -46,7 +46,7 @@
       draw(p, P, item) {
         const W = P.width / 2, H = P.height, r = rngOf(item, 's'); const none = { stroke: false };
         if (P.time === 'night') {
-          p.rect(-W, -H, W * 2, H, { ...none, fill: 'paper', hatch: 'night', hg: 5, ha: 0, halpha: 0.8 }); // dense hatching: a solid dark fill would turn to grey dust in chalk
+          p.rect(-W, -H, W * 2, H, { ...none, fill: 'paper', hatch: 'night', hg: 6, ha: 0, halpha: 0.65 }); // dense hatching: a solid dark fill would turn to grey dust in chalk
           for (let i = 0; i < Math.round(W / 14); i++) { const x = -W + 24 + r() * (W * 2 - 48), y = -H + 24 + r() * (H - 90), s = 4 + r() * 6; p.line([[x - s, y], [x + s, y]], { stroke: 'star', w: 2.2 }); p.line([[x, y - s], [x, y + s]], { stroke: 'star', w: 2.2 }); }
           const mx = W * 0.55, my = -H * 0.72; p.poly([[mx + 4, my - 46], [mx - 22, my - 36], [mx - 44, my - 6], [mx - 40, my + 24], [mx - 14, my + 46], [mx + 20, my + 46], [mx - 4, my + 30], [mx - 18, my + 4], [mx - 12, my - 24]], { stroke: 'star', w: 3.5, fill: 'star', smooth: true });
         } else if (P.time === 'dusk') {
@@ -63,7 +63,7 @@
       } },
 
     // ---------- hills ----------
-    { type: 'prop', id: 'scenery-hills', name: 'Hills', cat: CAT, tags: ['hill', 'mountain', 'countryside', 'horizon', 'background'],
+    { type: 'prop', id: 'scenery-hills', name: 'Hills', cat: CAT, place: { x: 0.5, y: 0.8, rank: 20, fit: { width: 1 } }, tags: ['hill', 'mountain', 'countryside', 'horizon', 'background'],
       colors: { line: '#6f6f6f', far: '#5c8fb5', near: '#43a047' },
       params: [{ key: 'width', label: 'Width', type: 'range', min: 300, max: 1000, step: 20, def: 1000 }, { key: 'height', label: 'Height', type: 'range', min: 80, max: 300, step: 10, def: 190 }],
       draw(p, P) {
@@ -72,7 +72,7 @@
       } },
 
     // ---------- wall ----------
-    { type: 'prop', id: 'scenery-wall', name: 'Room wall', cat: CAT, tags: ['room', 'indoor', 'inside', 'wallpaper', 'interior', 'background'],
+    { type: 'prop', id: 'scenery-wall', name: 'Room wall', cat: CAT, place: { x: 0.5, y: 0.8, rank: 15, fit: { width: 1, height: 0.8 } }, tags: ['room', 'indoor', 'inside', 'wallpaper', 'interior', 'background'],
       colors: { line: '#8a5a33', wall: '#f4a261', trim: '#8a5a33', glass: '#4fc3f7', door: '#1e88e5' },
       params: [
         { key: 'paper', label: 'Wallpaper', type: 'select', options: { plain: 'Plain', stripes: 'Stripes', dots: 'Dots' }, def: 'plain' },
@@ -84,7 +84,7 @@
         if (P.paper === 'stripes') for (let x = -W + 40; x < W; x += 80) p.line([[x, -H + 6], [x, -34]], { stroke: 'wall', w: 4 });
         if (P.paper === 'dots') for (let y = -H + 70, row = 0; y < -60; y += 90, row++) for (let x = -W + 50 + (row % 2 ? 45 : 0); x < W - 20; x += 90) p.circ(x, y, 5, { stroke: 'wall', w: 2.5, fill: 'wall' });
         p.rect(-W, -34, W * 2, 34, { ...O, stroke: 'trim', fill: 'paper' }); p.line([[-W, -H], [W, -H]], { stroke: 'trim', w: 4.5 }); // skirting board and top edge
-        if (P.window) { const cx = W * 0.3, top = -420, h = 190, w = 170;
+        if (P.window) { const cx = W * 0.3, top = -(H - 100), h = 190, w = 170; // (100 below the top of the wall, whatever its height)
           p.rect(cx - w / 2, top, w, h, { stroke: 'trim', w: 4.5, fill: 'paper', hatch: 'glass', hg: 6, halpha: 0.4, ha: 55 });
           p.line([[cx, top], [cx, top + h]], { stroke: 'trim', w: 3 }); p.line([[cx - w / 2, top + h / 2], [cx + w / 2, top + h / 2]], { stroke: 'trim', w: 3 });
           p.rect(cx - w / 2 - 12, top + h, w + 24, 12, { stroke: 'trim', w: 3.5, fill: 'paper' }); }

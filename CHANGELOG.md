@@ -8,6 +8,8 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 ## Unreleased — first props of the new kits
 - **Scenery (8 props, pack "Scenery"):** ground (grass, sandy path, road, wooden floor), sky (day, sunset, night), hills, room wall (plain, stripes or dots; window and door), picket fence, stepping stones, clouds, and a window that can show any picture.
 - **Home: the house** (`home-house`): front view with a 340-high door (an adult fits through it), open or shut door, lights on or off, chimney.
+- **Backdrops land in the right place with one click.** Sky, ground, hills and the room wall have a `place` hint: they appear filling the page (also on other page sizes), in the right spot (the sky ends where the ground begins) and **behind everything else**, in order (sky, wall, hills, ground), wherever you add them from. Props can use `place: { x, y, rank, fit }`; the checker requires it for anything over 800 wide.
+- The room wall's window follows the wall's height; the night sky is lighter hatching; the road is clearer.
 - A new sample scene (`scene-home-day`) is in the screenshot tests.
 - **Fixed:** library thumbnails used up the same counter as item ids, so adding props changed the ids, and with them the crayon wobble, of everything added afterwards. They now have their own counter, so new props no longer move other pictures.
 

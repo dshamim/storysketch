@@ -12,8 +12,20 @@ function addFigure(castId) {
   addItem({ type: 'figure', cast: castId, x, y: y + 20, s: 1, rot: 0, flip: false, mode: 'auto', pose: FIG.fromPreset(c, pr), expr: pr.expr || 'happy', look: 0, detach: {} });
 }
 function addProp(kind) {
-  const def = PROP_BY_ID[kind]; const [x, y] = nextSpot(); const d = propDefaults(def);
+  const def = PROP_BY_ID[kind]; const d = propDefaults(def);
+  if (def.place) return addBackdrop(def, d); // a backdrop (sky, ground, wall...) goes where it belongs and behind everything else
+  const [x, y] = nextSpot();
   addItem({ type: 'prop', kind, x, y: y + 60, s: 1, rot: 0, flip: false, mode: 'auto', colors: d.colors, params: d.params });
+}
+// A prop may say where it belongs: place: { x, y, rank, fit: { width, height } }  (x, y = fractions of the page; rank = how far back it sits, lower = further back;
+// fit = the fraction of the page its width / height settings should fill). Backdrops then land in the right spot, fill the page and sit behind the other things in order.
+function addBackdrop(def, d) {
+  const { pageW: W, pageH: H } = app.P.settings; const pl = def.place; const params = { ...d.params };
+  for (const [key, frac] of Object.entries(pl.fit || {})) { const q = (def.params || []).find((r) => r.key === key); if (!q) continue; const v = (key === 'width' ? W : H) * frac; params[key] = Math.max(q.min ?? v, Math.min(q.max ?? v, Math.round(v / (q.step || 1)) * (q.step || 1))); }
+  const it = { id: U.uid(), type: 'prop', kind: def.id, x: Math.round(W * (pl.x ?? 0.5)), y: Math.round(H * (pl.y ?? 1)), s: 1, rot: 0, flip: false, mode: 'auto', colors: d.colors, params };
+  const rankOf = (o) => (o.type === 'prop' && PROP_BY_ID[o.kind]?.place ? PROP_BY_ID[o.kind].place.rank ?? 50 : Infinity);
+  const items = pg().items; let at = items.findIndex((o) => rankOf(o) > (pl.rank ?? 50)); if (at < 0) at = items.length;
+  items.splice(at, 0, it); select([it.id]); renderStage(); commit();
 }
 function deleteSel() {
   if (!app.sel.length) return;

@@ -52,7 +52,8 @@ for (const d of props) {
   for (const sl of d.slots || []) if (!slotKinds.has(sl.kind)) here(`slot "${sl.key}" asks for kind "${sl.kind}" but no add-on has that kind`, strict);
   // ---- drawing ----
   const declared = new Set(Object.keys(d.colors || {}));
-  for (const P of combos(d)) for (const setup of slotSetups(d)) {
+  const all = combos(d);
+  for (const P of all) for (const setup of slotSetups(d)) {
     const label = JSON.stringify(P) + (setup.none ? ' with empty slots' : '');
     const run = () => { const pen = new Pen(d.colors || {}); const full = { ...P }; if (setup.none) for (const sl of d.slots || []) full[sl.key] = 'none'; d.draw(pen, full, { id: 'check-1', kind: d.id }, { slot() {} }); return pen.o; };
     let a, b; try { a = run(); b = run(); } catch (e) { here(`draw() throws with ${label}: ${e.message}`, true); continue; }
@@ -65,6 +66,7 @@ for (const d of props) {
     const pts = a.reduce((n, q) => n + q.pts.length + (q.more || []).reduce((m, c) => m + c.length, 0), 0); if (pts > LIMITS.maxPoints) here(`${pts} points with ${label}; keep it under ${LIMITS.maxPoints}`);
     const bb = RENDER.primsBBox(a); const w = bb.x1 - bb.x0, h = bb.y1 - bb.y0;
     if (w > LIMITS.page[0] + LIMITS.slack || h > LIMITS.page[1] + LIMITS.slack) here(`is ${Math.round(w)} x ${Math.round(h)} with ${label}; it must fit a 1000 x 750 page at scale 1`);
+    if (strict && P === all[0] && !setup.none && w > 800 && !d.place && !d.floating) here('is page-wide (over 800 wide with its default settings) so it needs a place hint: place: { x: 0.5, y: 1, rank: 10, fit: { width: 1 } } (see the guide, section 3)');
     const floor = !(d.floating || /floating|sky|cloud|sun|moon|star|bird|kite|balloon/i.test(d.cat + ' ' + d.id + ' ' + (d.tags || []).join(' ')));
     if (floor && Math.abs(bb.y1) > LIMITS.floorTol && !d.floating) here(`bottom is at y=${Math.round(bb.y1)} with ${label}; a floor prop stands on y=0 with its bottom centre at x=0 (set floating: true for things that float, centred on 0,0)`);
     if (floor && Math.abs((bb.x0 + bb.x1) / 2) > Math.max(60, w * 0.35) && w < 600) here(`is not centred on x=0 (centre ${Math.round((bb.x0 + bb.x1) / 2)}) with ${label}`);

@@ -48,7 +48,7 @@ function setTextProp(it, key, val) {
 // controls carry data-text="key" (inputs), data-text-set="key=value", data-text-toggle="weight|underline" or data-text-step="size:4"
 function onTextInput(t) {
   const it = itemById(app.sel[0]); if (!isText(it)) return; const k = t.dataset.text;
-  if (k === 'w' && t.dataset.auto !== undefined) setTextProp(it, 'w', t.checked ? 0 : Math.round(TXT.box(it).w)); // "fit the box to the text" on / off
+  if (k === 'w' && t.dataset.auto !== undefined) setTextProp(it, 'w', t.checked ? 0 : Math.round(TXT.layout(it).W)); // "fit the box to the text" on / off
   else if (t.type === 'checkbox') setTextProp(it, k, k === 'weight' ? (t.checked ? 'bold' : 'normal') : t.checked);
   else if (NUMERIC.includes(k) && (t.value === '' || isNaN(+t.value))) return;
   else setTextProp(it, k, t.value);

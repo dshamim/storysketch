@@ -6,7 +6,7 @@
 
 Why data, not font files: the page never asks the computer to draw text in a font. It reads these outlines and draws them as
 ordinary shapes, so a page looks the same on every machine and in every export, with nothing to install, and a font plugin
-is data only (it can never run code), which matters for a shared gallery later.
+is declarative (outlines, spacing, licence; no drawing code), so a shared gallery could later accept one as plain data.
 
 What it does for every font in tools/fonts/sources.json:
   1. downloads the exact files (pinned commit), checks the sha256 and the licence, keeps the full OFL text next to the plugin;

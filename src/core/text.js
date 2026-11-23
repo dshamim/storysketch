@@ -60,7 +60,12 @@ const TXT = (() => {
     });
     return { lines, W, H, x0, y0, pitch, size, text: str };
   }
-  const box = (item) => { const L = layout(item); return { x0: L.x0, y0: L.y0, x1: L.x0 + L.W, y1: L.y0 + L.H, w: L.W, h: L.H }; };
+  // The box also covers every letter's ink: a font's ascenders, descenders and overhanging letters can reach beyond the hand-drawn line box,
+  // and the selection frame, the click area, crop and Line up all use this box. (The layout, caret and wrapping do not change.)
+  const box = (item) => {
+    const it = norm(item); const L = layout(it); const font = fontOf(it); const e = font ? FONTS.extent(font.id, it.weight, L.size) : { up: 0, down: 0, left: 0, right: 0 };
+    const x0 = L.x0 - e.left, y0 = L.y0 - e.up, x1 = L.x0 + L.W + e.right, y1 = L.y0 + L.H + e.down; return { x0, y0, x1, y1, w: x1 - x0, h: y1 - y0 };
+  };
 
   /** Drawing primitives for the text. */
   function prims(item) {
@@ -72,7 +77,7 @@ const TXT = (() => {
         const base = l.y + L.size; let n = 0;
         for (let i = 0; i < text.length; i++) {
           const ch = text[i], nc = FONTS.norm(ch); if (nc === ' ' || nc === '') continue; const x = l.xs[i], fill = it.colors === 'rainbow' ? PALETTE[n++ % PALETTE.length] : stroke;
-          const g = FONTS.glyph(font.id, it.weight, ch, L.size, x, base);
+          const g = FONTS.glyph(font.id, it.weight, ch, L.size, x, base, L.size * (+it.s || 1));
           if (g) pen.path(g.pts, { closed: true, stroke: false, w: 0, fill, more: g.more, glyph: true });
           else pen.text(ch, x, l.y, L.size, { align: 'left', stroke: fill, w, spacing: 0, wordy: false });
         }

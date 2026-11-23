@@ -42,15 +42,16 @@ const FONTS = (() => {
     }
     return out;
   }
-  /** Flatten commands to a polyline in font units. `q` = pieces per curve. */
+  /** Flatten commands to a polyline in font units. `q` = the most pieces a curve gets (a curve whose control polygon is a quarter em long); shorter curves get proportionally fewer, so tiny brush wiggles stay cheap. */
+  const pieces = (len, q) => Math.max(1, Math.min(q, Math.ceil(len * q / 250)));
   function flatten(cmds, q) {
     const pts = []; let x = 0, y = 0;
     for (const c of cmds) {
       if (c[0] === 'M' || c[0] === 'L') { x = c[1]; y = c[2]; pts.push([x, y]); }
       else if (c[0] === 'Q') {
-        const [, cx, cy, ex, ey] = c; for (let i = 1; i <= q; i++) { const t = i / q, u = 1 - t; pts.push([u * u * x + 2 * u * t * cx + t * t * ex, u * u * y + 2 * u * t * cy + t * t * ey]); } x = ex; y = ey;
+        const [, cx, cy, ex, ey] = c; const n = pieces(Math.hypot(cx - x, cy - y) + Math.hypot(ex - cx, ey - cy), q); for (let i = 1; i <= n; i++) { const t = i / n, u = 1 - t; pts.push([u * u * x + 2 * u * t * cx + t * t * ex, u * u * y + 2 * u * t * cy + t * t * ey]); } x = ex; y = ey;
       } else if (c[0] === 'C') {
-        const [, c1x, c1y, c2x, c2y, ex, ey] = c; for (let i = 1; i <= q; i++) { const t = i / q, u = 1 - t; pts.push([u * u * u * x + 3 * u * u * t * c1x + 3 * u * t * t * c2x + t * t * t * ex, u * u * u * y + 3 * u * u * t * c1y + 3 * u * t * t * c2y + t * t * t * ey]); } x = ex; y = ey;
+        const [, c1x, c1y, c2x, c2y, ex, ey] = c; const n = pieces(Math.hypot(c1x - x, c1y - y) + Math.hypot(c2x - c1x, c2y - c1y) + Math.hypot(ex - c2x, ey - c2y), q); for (let i = 1; i <= n; i++) { const t = i / n, u = 1 - t; pts.push([u * u * u * x + 3 * u * u * t * c1x + 3 * u * t * t * c2x + t * t * t * ex, u * u * u * y + 3 * u * u * t * c1y + 3 * u * t * t * c2y + t * t * t * ey]); } x = ex; y = ey;
       }
     }
     // the closing line back to the start is implied; drop a repeated last point
@@ -69,11 +70,12 @@ const FONTS = (() => {
     }
     cache.set(key, r); return r;
   }
-  const quality = (size) => Math.max(2, Math.min(12, Math.ceil(size / 22))); // pieces per curve: more for big letters
+  // pieces per curve, from how big the letters really are (text size x the item scale), generous enough for the largest export (4x): no flat facets
+  const quality = (px) => Math.max(4, Math.min(24, Math.ceil(px / 3)));
 
   /** The letter as contours at (x, baseline y) at this text size. { pts: biggest outline, more: the others (holes, dots) } or null. */
-  function glyph(id, weight, ch, size, x, y) {
-    const cs = contours(id, weight, ch, quality(size)); if (!cs.length) return null; const k = scaleOf(id, weight, size);
+  function glyph(id, weight, ch, size, x, y, px = size) {
+    const cs = contours(id, weight, ch, quality(px)); if (!cs.length) return null; const k = scaleOf(id, weight, size);
     const map = (p) => p.map(([u, v]) => [x + u * k, y + v * k]);
     return { pts: map(cs[0]), more: cs.length > 1 ? cs.slice(1).map(map) : null };
   }
@@ -89,5 +91,16 @@ const FONTS = (() => {
     }
     return out;
   }
-  return { register, get, list, has, glyph, advances, scaleOf, weightOf, norm, CAPFIT };
+  /** How far the ink of any letter can reach beyond the line's box, as { up, down, left, right } in px at this size (up/down measured from the hand-drawn line box: the caps' top and 0.3 x size below the baseline). */
+  function extent(id, weight, size) {
+    const w = weightOf(fonts[id], weight); if (!w) return { up: 0, down: 0, left: 0, right: 0 };
+    if (!w.ext) {
+      let y0 = 0, y1 = 0, x0 = 0, x1 = 0; // control points reach at least as far as the curve, so this never under-reports
+      for (const g of Object.values(w.glyphs)) { if (!g.d) continue; if (!g.cmds) g.cmds = parse(g.d); for (const c of g.cmds.flat()) for (let i = 1; i + 1 < c.length; i += 2) { y0 = Math.min(y0, c[i + 1]); y1 = Math.max(y1, c[i + 1]); x0 = Math.min(x0, c[i]); x1 = Math.max(x1, c[i] - g.a); } }
+      w.ext = { y0, y1, x0, x1 };
+    }
+    const k = scaleOf(id, weight, size); const e = w.ext;
+    return { up: Math.max(0, -e.y0 * k - size), down: Math.max(0, e.y1 * k - size * 0.3), left: Math.max(0, -e.x0 * k), right: Math.max(0, e.x1 * k) };
+  }
+  return { register, get, list, has, glyph, advances, scaleOf, weightOf, norm, extent, CAPFIT };
 })();

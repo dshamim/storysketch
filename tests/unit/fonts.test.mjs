@@ -36,6 +36,20 @@ test('capital letters are about the same height in every font, so switching font
   for (const f of fonts()) { const g = FONTS.glyph(f.id, 'normal', 'H', 100, 0, 100); const ys = g.pts.map((p) => p[1]); const h = 100 - Math.min(...ys); assert.ok(h > 80 && h < 102, `${f.id}: H is ${h.toFixed(1)} tall at size 100`); }
 });
 
+test('every letter\'s ink stays inside the text box (ascenders, descenders, brackets, overhangs), for every font and weight, so selection, click area, crop and Line up are right', () => {
+  const text = 'bdfhklgjpqy()[]{}|/@$&%Hold my bag fjord';
+  for (const f of fonts()) for (const weight of ['normal', 'bold']) for (const size of [30, 100]) {
+    const it = T(text, { font: f.id, size, weight, align: 'left' }); const b = TXT.box(it); let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9;
+    for (const q of TXT.prims(it)) for (const c of [q.pts, ...(q.more || [])]) for (const [x, y] of c) { x0 = Math.min(x0, x); x1 = Math.max(x1, x); y0 = Math.min(y0, y); y1 = Math.max(y1, y); }
+    const tol = size * 0.01; assert.ok(y0 >= b.y0 - tol && y1 <= b.y1 + tol && x0 >= b.x0 - tol && x1 <= b.x1 + tol, `${f.id} ${weight} ${size}: ink ${[x0, y0, x1, y1].map(Math.round)} is outside the box ${[b.x0, b.y0, b.x1, b.y1].map(Math.round)}`);
+  }
+  const hand = TXT.box(T('Hello', { font: 'hand' })); assert.equal(hand.h, 48 * 1.3, 'the hand-drawn box is exactly as before');
+});
+test('round letters stay smooth however big the text is made: detail follows size x scale (checked on the turning angle of an o)', () => {
+  const turn = (it) => { const o = TXT.prims(it)[0]; const c = o.more ? [o.pts, ...o.more][0] : o.pts; let worst = 0; for (let i = 0; i < c.length; i++) { const a = c[(i + c.length - 1) % c.length], b = c[i], d = c[(i + 1) % c.length]; const t1 = Math.atan2(b[1] - a[1], b[0] - a[0]), t2 = Math.atan2(d[1] - b[1], d[0] - b[0]); let r = Math.abs(t2 - t1); if (r > Math.PI) r = 2 * Math.PI - r; worst = Math.max(worst, r); } return worst * 180 / Math.PI; };
+  for (const [size, s] of [[30, 1], [30, 6], [48, 4], [150, 1]]) assert.ok(turn({ ...T('o', { font: 'nunito', size }), s }) < 12, `size ${size} x ${s}: facets`);
+  const n = (s) => TXT.prims({ ...T('o', { font: 'nunito', size: 30 }), s })[0].pts.length; assert.ok(n(6) > n(1) * 2, 'a scaled-up text gets more detail');
+});
 test('a font text lays out like any text: lines, wrapping, a box centred on the origin, and a caret between every letter', () => {
   for (const f of fonts()) {
     const L = TXT.layout(T('the quick brown fox jumps over the lazy dog', { font: f.id, w: 300 }));

@@ -93,6 +93,12 @@ test('saving records the font like any plugin; a file whose font is missing open
   assert.deepEqual(errs, []); await context.close();
 });
 
+test('the Add-ons panel lists the fonts as fonts, with their version', { skip }, async () => {
+  const { page, errs, context } = await open(WORDS); await page.click('#rail-addons'); const rows = await page.locator('#plug-list .plug-row').allInnerTexts();
+  const nun = rows.find((r) => /Nunito/.test(r)); assert.match(nun, /Font · nunito · v1\.0\.0/); assert.equal(rows.filter((r) => /^[^\n]+\nFont ·/.test(r)).length, 5, 'five fonts');
+  assert.deepEqual(errs, []); await context.close();
+});
+
 test('search finds fonts when a text is picked ("font nunito"), and only then', { skip }, async () => {
   const { page, errs, context } = await open(WORDS);
   await page.keyboard.press('Control+k'); await page.fill('#pal-input', 'nunito'); assert.match(await page.locator('#pal-list [role=option]').first().innerText(), /Font: Nunito/);

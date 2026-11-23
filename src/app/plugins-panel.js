@@ -13,7 +13,7 @@ function renderPlugins() {
   $('#plug-summary').innerHTML = '<div class="plug-chips">' + Object.entries(TYPE_LABEL).map(([t, l]) => `<span class="chip"><b>${counts[t] || 0}</b> ${l}</span>`).join('') + '</div>';
   $('#plug-warn').innerHTML = CP.warnings.length ? `<p class="warn"><b>${CP.warnings.length} problem${CP.warnings.length === 1 ? '' : 's'}</b> — these were not loaded:<br>${CP.warnings.map((w) => '• ' + U.esc(w)).join('<br>')}</p>` : '<p class="muted small">No problems.</p>';
   $('#plug-list').innerHTML = CP.loaded.slice().sort((a, b) => a.type.localeCompare(b.type) || String(a.name).localeCompare(b.name)).map((r) =>
-    `<div class="plug-row" title="${U.esc(r.file)}"><span class="plug-name">${U.esc(r.name)}</span><span class="plug-meta">${U.esc(TYPE_LABEL[r.type] || r.type)} · <code>${U.esc(r.id)}</code>${r.version ? ' · v' + U.esc(r.version) : ''}</span></div>`).join('');
+    `<div class="plug-row" title="${U.esc(r.file)}"><span class="plug-name">${U.esc(r.name)}</span><span class="plug-meta">${U.esc(r.type === 'font' ? 'Font' : TYPE_LABEL[r.type] || r.type)} · <code>${U.esc(r.id)}</code>${r.version ? ' · v' + U.esc(r.version) : ''}</span></div>`).join('');
 }
 async function rescanPlugins() {
   if (!STORAGE.current.supported) { $('#plug-status').textContent = 'This browser can\'t write files — run python3 tools/build_plugins.py, then reload the page.'; return; }

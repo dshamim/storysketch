@@ -273,7 +273,7 @@ CP.register({ api: 1, version: '1.0.0', type: 'style', id: 'pencil', name: 'Penc
 - `order` puts it in the style list (lower first; Crayon, the default, is 10).
 
 ## Fonts — `fonts/*.js`
-A font plugin is **data only**: the outlines of the letters (y down, 1000 units to the em, baseline at 0), the step each letter takes, kerning pairs and the licence. The page never needs the font installed; it draws the outlines as shapes, so every style can finish them.
+A font plugin is **declarative**: it holds no drawing code, only the outlines of the letters (y down, 1000 units to the em, baseline at 0), the step each letter takes, kerning pairs and the licence (it is still a `.js` file that calls `CP.register`, like the others). The page never needs the font installed; it draws the outlines as shapes, so every style can finish them.
 Do not write one by hand: `npm run build:fonts` (needs `uv`) turns the pinned, hash-checked source fonts listed in `tools/fonts/sources.json` into `plugins/fonts/<id>.js`. To add a font:
 1. Check its licence. It must be the **SIL Open Font License** (or similar) **without a Reserved Font Name** (the copyright line must not say "with Reserved Font Name"), because the converted letters are a modified version.
 2. Add an entry to `tools/fonts/sources.json` (the file, its sha256 and, for a variable font, the weights to cut), run `npm run build:fonts`, then `python3 tools/build_plugins.py`.

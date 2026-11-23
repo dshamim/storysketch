@@ -1,0 +1,478 @@
+{
+ "api": 1,
+ "version": "1.0.0",
+ "id": "sample-park",
+ "name": "Sample — A day at the park (6 pages)",
+ "description": "From the park gate to the lamppost at dusk: playground, sandpit and seesaw, the pond, a picnic and going home. Shows the Park props (trees in four seasons, slide, swings, pond, bench, fountain, lamppost), the scenery pieces and children at scale. Crayon style.",
+ "settings": {
+  "style": "crayon"
+ },
+ "cast": [
+  "teacher",
+  "lily",
+  "leo",
+  "sam",
+  "mia",
+  "ahmed"
+ ],
+ "pages": [
+  {
+   "name": "The park gate",
+   "notes": "A winding path, a signpost (pick the word and the arrow in Details), a railing, a tree and a bush. Trees come in four seasons.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "day",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750
+    },
+    {
+     "type": "prop",
+     "kind": "park-fence",
+     "x": 700,
+     "y": 640,
+     "params": {
+      "width": 520
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "park-tree",
+     "x": 190,
+     "y": 690,
+     "params": {
+      "season": "spring"
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "park-bush",
+     "x": 880,
+     "y": 690
+    },
+    {
+     "type": "prop",
+     "kind": "park-path",
+     "x": 560,
+     "y": 740,
+     "params": {
+      "length": 200,
+      "width": 150
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "park-sign",
+     "x": 330,
+     "y": 715
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 600,
+     "floor": 725,
+     "pose": "wave"
+    },
+    {
+     "type": "figure",
+     "cast": "leo",
+     "x": 690,
+     "floor": 735,
+     "pose": "stand"
+    },
+    {
+     "type": "figure",
+     "cast": "mia",
+     "x": 780,
+     "floor": 740,
+     "pose": "walk"
+    }
+   ]
+  },
+  {
+   "name": "The playground",
+   "notes": "Slide (add a roof in Details), swings (set how far they swing) and a roundabout. Everything is storybook scale, so children fit.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "day",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750
+    },
+    {
+     "type": "prop",
+     "kind": "park-slide",
+     "x": 170,
+     "y": 690
+    },
+    {
+     "type": "prop",
+     "kind": "park-swing",
+     "x": 560,
+     "y": 700,
+     "s": 0.85
+    },
+    {
+     "type": "prop",
+     "kind": "park-roundabout",
+     "x": 855,
+     "y": 735,
+     "s": 0.8
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 360,
+     "floor": 730,
+     "pose": "cheer"
+    },
+    {
+     "type": "figure",
+     "cast": "sam",
+     "x": 700,
+     "floor": 740,
+     "pose": "stand"
+    },
+    {
+     "type": "figure",
+     "cast": "mia",
+     "x": 460,
+     "floor": 735,
+     "pose": "jump"
+    }
+   ]
+  },
+  {
+   "name": "Sandpit and seesaw",
+   "notes": "The sandpit has a bucket, a spade and a sandcastle you can switch on. The seesaw tilts either way. The climbing frame has a rope net.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "day",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750
+    },
+    {
+     "type": "prop",
+     "kind": "park-climbingframe",
+     "x": 190,
+     "y": 690,
+     "s": 0.9
+    },
+    {
+     "type": "prop",
+     "kind": "park-sandpit",
+     "x": 560,
+     "y": 745
+    },
+    {
+     "type": "prop",
+     "kind": "park-seesaw",
+     "x": 880,
+     "y": 725,
+     "params": {
+      "tilt": "left"
+     },
+     "s": 0.55
+    },
+    {
+     "type": "figure",
+     "cast": "ahmed",
+     "x": 380,
+     "floor": 735,
+     "pose": "point"
+    },
+    {
+     "type": "figure",
+     "cast": "leo",
+     "x": 720,
+     "floor": 745,
+     "pose": "stand"
+    }
+   ]
+  },
+  {
+   "name": "By the pond",
+   "notes": "The pond can have ducks and lily pads. The bench and the flowerbed are drawn at human scale; the child on the bench is in the sit pose.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "day",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750
+    },
+    {
+     "type": "prop",
+     "kind": "park-pond",
+     "x": 520,
+     "y": 705,
+     "s": 1.1
+    },
+    {
+     "type": "prop",
+     "kind": "park-bench",
+     "x": 170,
+     "y": 690
+    },
+    {
+     "type": "prop",
+     "kind": "park-tree",
+     "x": 790,
+     "y": 690,
+     "params": {
+      "season": "autumn"
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "park-flowerbed",
+     "x": 720,
+     "y": 740,
+     "params": {
+      "width": 260
+     }
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 170,
+     "floor": 690,
+     "pose": "sit"
+    },
+    {
+     "type": "figure",
+     "cast": "ahmed",
+     "x": 610,
+     "floor": 738,
+     "pose": "point"
+    }
+   ]
+  },
+  {
+   "name": "A picnic",
+   "notes": "A picnic blanket with a basket, a kite, a ball. A figure cannot hold the kite yet: place it by the hand.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "day",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750
+    },
+    {
+     "type": "prop",
+     "kind": "park-tree",
+     "x": 190,
+     "y": 685
+    },
+    {
+     "type": "prop",
+     "kind": "park-blanket",
+     "x": 520,
+     "y": 740,
+     "s": 1.2
+    },
+    {
+     "type": "prop",
+     "kind": "park-ball",
+     "x": 770,
+     "y": 740
+    },
+    {
+     "type": "prop",
+     "kind": "park-kite",
+     "x": 800,
+     "y": 200,
+     "s": 0.9
+    },
+    {
+     "type": "figure",
+     "cast": "mia",
+     "x": 430,
+     "floor": 742,
+     "pose": "cheer"
+    },
+    {
+     "type": "figure",
+     "cast": "sam",
+     "x": 610,
+     "floor": 744,
+     "pose": "stand"
+    },
+    {
+     "type": "figure",
+     "cast": "teacher",
+     "x": 700,
+     "floor": 720,
+     "pose": "wave",
+     "flip": true
+    }
+   ]
+  },
+  {
+   "name": "Going home",
+   "notes": "Evening: the sky is set to sunset, the lamppost light is on and the leaves have turned. Same props, different mood.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "dusk",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750
+    },
+    {
+     "type": "prop",
+     "kind": "park-fountain",
+     "x": 300,
+     "y": 705,
+     "s": 0.8
+    },
+    {
+     "type": "prop",
+     "kind": "park-lamppost",
+     "x": 580,
+     "y": 690,
+     "params": {
+      "light": true
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "park-tree",
+     "x": 820,
+     "y": 690,
+     "params": {
+      "season": "autumn"
+     },
+     "s": 0.9
+    },
+    {
+     "type": "prop",
+     "kind": "park-scooter",
+     "x": 700,
+     "y": 742
+    },
+    {
+     "type": "prop",
+     "kind": "park-bin",
+     "x": 800,
+     "y": 700
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 450,
+     "floor": 735,
+     "pose": "walk"
+    },
+    {
+     "type": "figure",
+     "cast": "leo",
+     "x": 500,
+     "floor": 738,
+     "pose": "walk"
+    }
+   ]
+  }
+ ]
+}

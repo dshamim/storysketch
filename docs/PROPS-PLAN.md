@@ -1,6 +1,6 @@
 # Plan: props for stories
 
-**Status:** steps 0 to 2 done: scale rules, checker, style guide; the shared scenery pieces; and the whole Home kit (26 props) with the sample project "A day at home". The School kit (20 props, sample "A day at school") is done; Park is next. Written 2026-11-23.
+**Status:** steps 0 to 2 done: scale rules, checker, style guide; the shared scenery pieces; and the whole Home kit (26 props) with the sample project "A day at home". The School kit (20 props, sample "A day at school") and the Park kit (22 props, sample "A day at the park") are done. The first round of kits is complete. Written 2026-11-23.
 
 ## Why
 Today the tool ships **73 props: 15 for an airport and 58 for a classroom** (26 of those are art supplies). A story needs places. The first round gives stories a **home, a school (building and bus) and a park**, generic and not tied to any country.
@@ -16,7 +16,7 @@ All rules are in [`PROP-STYLE-GUIDE.md`](PROP-STYLE-GUIDE.md) and are checked by
 | **1. Shared pieces** | the few pieces all three kits need: ground (grass, path, road, floor), sky (day, dusk, night), hills, a wall with a window and a door | **drawn**; checker clean; contact sheet and a day and a night scene reviewed by the owner |
 | **2. Home** | see below | **done**: checker clean; five room pages in the sample project "A day at home" reviewed by the owner |
 | **3. School and bus** | see below | **done**: checker clean; sample project "A day at school" |
-| **4. Park** | see below | same, sample project "Park" |
+| **4. Park** | see below | **done**: checker clean; six pages in the sample project "A day at the park" |
 
 Each kit is one commit and one contact sheet (all five drawing styles) for the owner to approve before the next kit starts.
 Order inside a kit: the big anchor props first (house, bus, slide), then furniture and fittings, then small things.

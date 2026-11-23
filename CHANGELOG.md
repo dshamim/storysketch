@@ -5,6 +5,12 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
+## Unreleased — the Park kit
+- **22 Park props** (pack "Park props"): playground (slide with optional roof, swings that can swing, seesaw that tilts, roundabout, climbing frame with a rope net, sandpit with bucket, spade and sandcastle), nature (tree in four seasons, bush with berries, pond with ducks and lily pads, flowerbed, grassy hill with a path), fittings (park bench, fountain with water on or off, lamppost with a light, litter bin, signpost with a choice of words and arrow, railing, winding path) and picnic and play (picnic blanket with basket, kite, beach ball, scooter).
+- **New sample project "A day at the park"** (6 pages): the park gate, the playground, sandpit and seesaw, the pond, a picnic, and going home at sunset.
+- Props arrive in a new folder `plugins/props/park/`; the checker already covered it (all 22 pass, 0 problems).
+- Not built: a swing a child can sit on (use the Sit pose beside the swing), holding a kite (place it by the hand).
+
 ## Unreleased — the School kit
 - **20 School props** (pack "School props"): school building (flag-free front with clock gable, doors open or shut, lights on or off), school gate, school bus (door open, lights on), bus stop with shelter, zebra crossing, crossing-patrol sign, flagpole, hand bell; lockers (2 to 6 doors, one open), classroom door, assembly stage with curtain and microphone, canteen table with benches, lunch tray; football goal, ball (football, basketball, tennis), running track, trophy; backpack and lunchbox.
 - **New sample project "A day at school"** (5 pages): the bus and bus stop, the school front, the corridor, the canteen with the stage, and sports day.

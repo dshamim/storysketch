@@ -89,7 +89,7 @@ test('a dog: add from template, 13 handles, its own poses and limbs, designer hi
 test('New project offers a blank page and every sample project', { skip }, async () => {
   const page = await browser.newPage(); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   await page.click('#btn-file'); await page.click('[data-act="new"]');
-  assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('#start-cards [data-start]')].map((b) => b.dataset.start)), ['blank', 'project:sample-airport', 'project:sample-animals', 'project:sample-chalkboard', 'project:sample-classroom', 'project:sample-home', 'project:sample-school']);
+  assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('#start-cards [data-start]')].map((b) => b.dataset.start)), ['blank', 'project:sample-airport', 'project:sample-animals', 'project:sample-chalkboard', 'project:sample-classroom', 'project:sample-home', 'project:sample-park', 'project:sample-school']);
   await page.click('#start-cards [data-start="project:sample-animals"]');
   await page.waitForFunction(() => app.P.pages.length === 3 && app.P.settings.style === 'marker'); await page.close();
 });

@@ -30,7 +30,7 @@ test('first run shows the start screen over the editor; Escape closes it', { ski
   assert.equal(await page.locator('#start').isVisible(), true);
   assert.equal(await page.evaluate(() => document.querySelector('#workspace').inert), true, 'the editor behind it is not reachable');
   assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('#start-cards [data-start]')].map((b) => b.dataset.start)),
-    ['blank', 'project:sample-airport', 'project:sample-animals', 'project:sample-chalkboard', 'project:sample-classroom', 'project:sample-home', 'project:sample-school']);
+    ['blank', 'project:sample-airport', 'project:sample-animals', 'project:sample-chalkboard', 'project:sample-classroom', 'project:sample-home', 'project:sample-park', 'project:sample-school']);
   assert.ok(await page.locator('#start-cards .start-thumb svg').count() >= 4, 'samples show previews');
   await page.keyboard.press('Escape'); assert.equal(await page.locator('#start').isVisible(), false);
   assert.equal(await page.evaluate(() => document.querySelector('#workspace').inert), false);

@@ -347,4 +347,6 @@ Decisions and differences from the plan:
 - **Save as template** uses an inline name row (no `prompt()`), Enter saves, Esc cancels the row first.
 - **Rail:** Add-ons is the sixth tab (the separate bottom rail is gone).
 - **Modals left:** only the Open / Save steps (older file, permission to write, could not save, taking long) and destructive confirms (unsaved changes, delete page, clear the only page, delete character). `grep showModal src/` lists only those. About and the "opened a file" report are a non-modal card in the corner. The keyboard guard in `main.js` now ignores keys only for modal dialogs (`dialog:modal`), so the card does not switch shortcuts off.
+- **Keys in the designer:** only Undo / Redo (Ctrl+Z, Ctrl+Y) get through; Ctrl+X / C / V / D / G, Delete, arrows and tool keys are ignored while focus is inside the panel (a test presses them all).
+- **The corner card** can sit over part of the page (bottom right); Esc does not close it yet, use its Close button.
 - **Not done:** a per-character pencil on the Characters panel tiles; the designer is still the old form controls restyled lightly (the full look of the Details panel is a phase 7 polish item).

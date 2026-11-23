@@ -10,7 +10,7 @@ function onKey(e) {
   const ctrl = e.ctrlKey || e.metaKey; const k = e.key;
   if (ctrl && k.toLowerCase() === 's') { e.preventDefault(); saveProject(e.shiftKey); return; }
   if (e.target.closest('input, textarea, select') || $('dialog:modal')) return;
-  if (e.target.closest('#designer') && !ctrl) return; // typing / pressing keys in the designer must not delete, nudge or arm tools on the selected figure
+  if (e.target.closest('#designer') && !(ctrl && (k.toLowerCase() === 'z' || k.toLowerCase() === 'y'))) return; // keys pressed in the designer must not delete, nudge, cut, duplicate or arm tools on the selected figure; only Undo / Redo get through
   if (e.target.closest('[role=menu], .ui-popover')) return; // menus and popovers use these keys themselves
   if (e.target.closest('[role=tablist], .ui-film') && (k.startsWith('Arrow') || k === 'Home' || k === 'End')) return; // so do the rail and the page strip
   if ((k === ' ' || k === 'Enter') && e.target.closest('button, [role=menuitem], [role=tab], summary')) return; // Space/Enter press the focused button

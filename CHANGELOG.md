@@ -7,13 +7,13 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 
 ## Unreleased — designer and add-ons as panels (revamp phase 5)
 - **The Character designer is a side panel**, not a pop-up. It opens in the Details column with a live preview and a pose picker on top (they stay in view while you scroll), the cast as a small strip, then Name, Main colour, **Character type**, Body, Clothes, Hair, Accessories and Face. Open it with **Edit character** in the ribbon (new), Details ▸ Look ▸ *Edit this character…*, or **New character** in the Characters panel (it now really makes a new character and has its name ready to type). **Done**, the panel's X or **Esc** close it and Details return to how they were.
-- **The page stays live while you design.** Pick another figure on the page and the designer switches to its character; Undo / Redo work (every change is one step, not one big step at the end); Delete, arrow keys and the tool keys do nothing to the page while you are in the designer.
-- **Character type is a picker**: People or Four-legged animal as two tiles, each drawn as your character. Changing it still resets placed figures to the standing pose, and one Undo puts everything back.
+- **The page stays live while you design.** Pick another figure on the page and the designer switches to its character; Undo / Redo work (every change is one step, not one big step at the end); Delete, the arrow keys, the tool keys and Ctrl+X / C / V / D / G do nothing to the page while you are in the designer (Undo and Redo still work).
+- **Character type is a picker**: "Person (stick figure)" or "Four-legged animal" as two tiles, each drawn as your character. Changing it still resets placed figures to the standing pose, and one Undo puts everything back.
 - **Save as template** asks for the name inside the panel (no browser pop-up).
 - **Add-ons is a tab in the rail** (with its problem badge): what is installed, problems, *Refresh add-ons*, and a compact list of everything loaded.
 - **About** and the "opened a file" report are a card in the corner, not a modal. Only the Open / Save steps (older file, permission, could not save) and delete confirmations still block the page.
 
-## Earlier — shapes and arrows (revamp phase 4b)
+## Unreleased — shapes and arrows (revamp phase 4b)
 - **Shapes tab** in the rail: **Box, Circle, Triangle** and **Line, Arrow, Double arrow**. Click a tile to add one to the page, or use the quick keys **R** (box), **O** (circle), **Y** (triangle), **L** (line), **A** (arrow), **Shift+A** (double arrow), then **drag** on the page to draw it. A plain click drops a default size. **Shift** gives a perfect square or circle, or keeps a line on 15 degree steps. **Esc** cancels. One undo step per drawing.
 - **Handles that fit the thing.** A shape has eight resize handles (sides and corners; the opposite side stays put; Shift on a corner keeps the proportions) and the round turn handle. A line has two round end handles. Both still move, scale, rotate, flip, group, lock, line up, copy and undo like any other object.
 - **Look.** Ribbon: fill, fill colour, outline colour, thickness, line style (solid, dashed, dotted). Details ▸ Look adds colour swatches, rounded corners (box), see-through, width and height, arrowheads for lines. Fills: none, colour, shading lines, solid (hides what is behind).

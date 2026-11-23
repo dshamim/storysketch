@@ -36,9 +36,12 @@ test('opens from the ribbon as a side panel: nothing modal, the page stays usabl
   assert.equal(await page.locator('#details-title').innerText(), 'Character designer'); assert.equal(await page.inputValue('#d-form [data-d="name"]'), 'Teacher');
   assert.equal(await page.locator('#d-preview svg').count(), 1, 'live preview on top'); assert.ok(await page.locator('#d-cast .tile').count() >= 5, 'the cast to pick from');
   assert.equal(await page.evaluate(() => document.querySelector('dialog[open]') === null), true, 'no dialog of any kind is open');
-  // the page still takes clicks: pick another figure and the designer follows it
-  const lily = await page.evaluate(() => { const it = pg().items.find((i) => i.cast === 'lily'); const r = document.querySelector(`#items [data-id="${it.id}"]`).getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2, it.id]; });
-  await page.evaluate((id) => select([id]), lily[2]); assert.equal(await page.inputValue('#d-form [data-d="name"]'), 'Lily', 'choosing a figure edits its character');
+  // the page still takes clicks: choose Lily (designer follows), then really click the teacher on the page
+  const lilyId = await page.evaluate(() => pg().items.find((i) => i.cast === 'lily').id); await page.evaluate((id) => select([id]), lilyId); assert.equal(await page.inputValue('#d-form [data-d="name"]'), 'Lily', 'choosing a figure edits its character');
+  const tc = await page.evaluate((i) => { const b = document.querySelector(`#items [data-id="${i}"]`).getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2 - 60]; }, await teacherId(page)); // on her body (a stick figure is thin)
+  await page.mouse.click(tc[0], tc[1]); assert.equal(await page.inputValue('#d-form [data-d="name"]'), 'Teacher', 'a real click on a figure on the page switches the designer to it');
+  // a row in the Layers panel does the same
+  await page.click('#rail-layers'); await page.click(`#layers [data-layer="${lilyId}"] .ln`); assert.equal(await page.inputValue('#d-form [data-d="name"]'), 'Lily', 'a Layers row too'); await page.click('#rail-cast'); await selectTeacher(page);
   // Done puts Details back to closed
   await page.click('#d-close'); assert.equal(await designerOn(page), false); assert.equal(await page.evaluate(() => $('#right').hidden), true, 'Details closes again, as it was');
   // with Details open before, it stays open
@@ -55,7 +58,7 @@ test('keys pressed in the designer never touch the page: Delete, Backspace, arro
   const { page, errs } = await open(); await selectTeacher(page); await page.click('#ribbon-sel [data-act="design"]');
   const before = await page.evaluate(() => JSON.stringify(pg().items)); const n = await page.evaluate(() => pg().items.length);
   for (const where of ['#d-cast .tile', '#d-form [data-swatch]', '#d-form [data-dtype]', '#d-close']) {
-    await page.focus(where); for (const k of ['Delete', 'Backspace', 'ArrowRight', 'ArrowUp', 'r', 'o', 'l', 'a', 't', 'y']) await page.keyboard.press(k);
+    await page.focus(where); for (const k of ['Delete', 'Backspace', 'ArrowRight', 'ArrowUp', 'r', 'o', 'l', 'a', 't', 'y', 'Control+x', 'Control+c', 'Control+v', 'Control+d', 'Control+g', 'Control+Shift+l', 'Control+a']) await page.keyboard.press(k);
     assert.equal(await page.evaluate(() => app.tool), null, `no tool armed from ${where}`); assert.equal(await page.evaluate(() => pg().items.length), n, `nothing deleted from ${where}`);
     if (!(await designerOn(page))) await page.click('#ribbon-sel [data-act="design"]'); // Enter / Space on Done would close it; not pressed here, but be safe
   }
@@ -130,8 +133,9 @@ test('nothing blocks the page: About and the "opened a file" report are a corner
   await page.evaluate(() => showBookInfo('Opened sample.json', '<p>Plugins this book uses that differ here:</p>')); assert.equal(await page.locator('#bookinfo').isVisible(), true); assert.equal(await modal(page), false);
   assert.match(await page.locator('#bookinfo-title').innerText(), /Opened/);
   // the page is still clickable with the card showing
-  const id = await teacherId(page); const r = await page.evaluate((i) => { const b = document.querySelector(`#items [data-id="${i}"]`).getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2]; }, id);
-  await page.evaluate(() => select([])); await page.keyboard.press('Control+a'); assert.ok(await page.evaluate(() => app.sel.length) > 1, 'Ctrl+A still selects');
+  const id = await page.evaluate(() => pg().items.find((i) => i.kind === 'table').id); const r = await page.evaluate((i) => { const b = document.querySelector(`#items [data-id="${i}"]`).getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2 - 40]; }, id); // the tabletop: not under the card
+  await page.evaluate(() => select([])); await page.mouse.click(r[0], r[1]); assert.ok((await page.evaluate(() => app.sel)).includes(id), 'a real click on the page still selects with the card showing');
+  await page.keyboard.press('Control+a'); assert.ok(await page.evaluate(() => app.sel.length) > 1, 'Ctrl+A still selects');
   // every <dialog> that can still open modally is one of the allowed kinds
   assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('dialog')].map((d) => d.id).sort()), ['bookinfo', 'msgdlg', 'permdlg', 'upgradedlg']);
   assert.deepEqual(errs, []); await page.close();

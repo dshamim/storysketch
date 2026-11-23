@@ -43,6 +43,8 @@ const STATES = [
   ['export popover', `select([]); document.querySelector('#open-export').click();`],
   ['file menu', `select([]); document.querySelector('#btn-file').click();`],
   ['About card', `select([]); showAbout();`],
+  ['search open with results', `select([]); openPalette(); document.querySelector('#pal-input').value = 'add'; renderPalette();`],
+  ['shortcut sheet', `select([]); openShortcuts();`],
 ];
 
 // the accessible name of every control the user can reach, computed the way a screen reader would (roughly)
@@ -78,19 +80,19 @@ const SMALL24 = (page) => page.evaluate(() => {
 
 test('every control has an accessible name, in every panel, menu and overlay', { skip }, async () => {
   const { page, errs, context } = await open(CLASSROOM);
-  for (const [name, js] of STATES) { await page.evaluate(() => { UI.closePopover(false); if (app.designer) closeDesigner(); }); await page.evaluate(js); await page.waitForTimeout(120); assert.deepEqual(await UNNAMED(page), [], `controls without a name: ${name}`); }
+  for (const [name, js] of STATES) { await page.evaluate(() => { UI.closePopover(false); closeOverlay('palette'); closeOverlay('shortcuts'); if (app.designer) closeDesigner(); }); await page.evaluate(js); await page.waitForTimeout(120); assert.deepEqual(await UNNAMED(page), [], `controls without a name: ${name}`); }
   assert.deepEqual(errs, []); await context.close();
 });
 
 test('headings never skip a level, in every panel and overlay', { skip }, async () => {
   const { page, errs, context } = await open(CLASSROOM); let total = 0;
-  for (const [name, js] of STATES) { await page.evaluate(() => { UI.closePopover(false); if (app.designer) closeDesigner(); }); await page.evaluate(js); await page.waitForTimeout(120); const h = await HEADINGS(page); total += h.n; assert.deepEqual(h.bad, [], `heading order: ${name}`); }
+  for (const [name, js] of STATES) { await page.evaluate(() => { UI.closePopover(false); closeOverlay('palette'); closeOverlay('shortcuts'); if (app.designer) closeDesigner(); }); await page.evaluate(js); await page.waitForTimeout(120); const h = await HEADINGS(page); total += h.n; assert.deepEqual(h.bad, [], `heading order: ${name}`); }
   assert.ok(total > 15, 'the check looked at ' + total + ' headings'); assert.deepEqual(errs, []); await context.close();
 });
 
 test('controls are at least 24 px on a desktop screen (WCAG 2.2), in every panel and overlay', { skip }, async () => {
   const { page, errs, context } = await open(CLASSROOM); const bad = [];
-  for (const [name, js] of STATES) { await page.evaluate(() => { UI.closePopover(false); if (app.designer) closeDesigner(); }); await page.evaluate(js); await page.waitForTimeout(120); for (const b of await SMALL24(page)) bad.push(`${name}: ${b}`); }
+  for (const [name, js] of STATES) { await page.evaluate(() => { UI.closePopover(false); closeOverlay('palette'); closeOverlay('shortcuts'); if (app.designer) closeDesigner(); }); await page.evaluate(js); await page.waitForTimeout(120); for (const b of await SMALL24(page)) bad.push(`${name}: ${b}`); }
   assert.deepEqual([...new Set(bad)], [], 'controls smaller than 24 px'); assert.deepEqual(errs, []); await context.close();
 });
 

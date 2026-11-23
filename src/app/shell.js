@@ -17,7 +17,7 @@ const ACTIONS = {
   selectall: selectAll, group: () => groupSel(), ungroup: () => ungroupSel(), lock: () => toggleLockSel(),
   preview: () => setPreview(!app.preview), zoomin: () => zoomTo(app.view.z * 1.25), zoomout: () => zoomTo(app.view.z / 1.25), zoomfit: () => zoomFit(), zoomsel: () => zoomSel(),
   library: () => (flyoutOpen() ? hideFlyout() : showFlyout()), details: () => (detailsOpen() ? hideDetails() : showDetails()), snap: () => setSnap(!app.snap),
-  about: () => showAbout(),
+  about: () => showAbout(), palette: () => openPalette(), shortcuts: () => openShortcuts(), 'hints-reset': () => resetHints(),
   'page-rename': () => openNotes(true), 'page-dup': () => duplicatePage(), 'page-earlier': () => movePage(app.page, -1), 'page-later': () => movePage(app.page, 1), 'page-del': () => deletePage(),
 };
 

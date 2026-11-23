@@ -9,6 +9,8 @@ function renderAll() { renderFilmstrip(); renderPageTab(); renderLibrary(); rend
 function onKey(e) {
   const ctrl = e.ctrlKey || e.metaKey; const k = e.key;
   if (ctrl && k.toLowerCase() === 's') { e.preventDefault(); saveProject(e.shiftKey); return; }
+  if (ctrl && !e.shiftKey && !e.altKey && k.toLowerCase() === 'k') { e.preventDefault(); if (!$('#palette').hidden) closePalette(); else openPalette(); return; } // from anywhere, even a field (with the shortcut sheet open it swaps it for the search)
+  if (e.target.closest('.overlay')) return; // the palette and the shortcut sheet handle their own keys
   if (e.target.closest('input, textarea, select') || $('dialog:modal')) return;
   if (e.target.closest('#designer') && !(ctrl && (k.toLowerCase() === 'z' || k.toLowerCase() === 'y'))) return; // keys pressed in the designer must not delete, nudge, cut, duplicate or arm tools on the selected figure; only Undo / Redo get through
   if (e.target.closest('[role=menu], .ui-popover')) return; // menus and popovers use these keys themselves
@@ -45,6 +47,7 @@ function onKey(e) {
   else if (!ctrl && !e.altKey && DRAW_KEYS[k.toLowerCase()]) { const t = e.shiftKey && k.toLowerCase() === 'a' ? 'double' : DRAW_KEYS[k.toLowerCase()]; setTool(app.tool === t ? null : t); } // R box, O circle, Y triangle, L line, A arrow, Shift+A double arrow
   else if ((k === 'Enter' || k === 'F2') && app.sel.length === 1 && hasWords(itemById(app.sel[0]))) { e.preventDefault(); startEdit(app.sel[0]); }
   else if (k === '/') { e.preventDefault(); showFlyout(); $('#lsearch').focus(); }
+  else if (k === '?') { e.preventDefault(); openShortcuts(); }
   else if (k === 'PageUp') { e.preventDefault(); goPage(app.page - 1); }
   else if (k === 'PageDown') { e.preventDefault(); goPage(app.page + 1); }
   else if (k.startsWith('Arrow') && app.sel.length) { e.preventDefault(); const st = e.shiftKey ? 10 : 1; for (const it of movable(app.sel.map(itemById))) { if (k === 'ArrowLeft') it.x -= st; if (k === 'ArrowRight') it.x += st; if (k === 'ArrowUp') it.y -= st; if (k === 'ArrowDown') it.y += st; } scheduleRender(); commit(false); }
@@ -53,7 +56,7 @@ function onKey(e) {
 function init() {
   let firstRun = true; try { firstRun = !localStorage.getItem('storysketch/project'); } catch (e) { /* ignore */ }
   app.P = STORE.load(); STORE.snapshot(app.P);
-  initTouch(); initShell(); initText(); initShapes();
+  initTouch(); initShell(); initText(); initShapes(); initPalette();
   $('#defs-holder').innerHTML = `<defs>${RENDER.defs()}</defs>`;
   renderStyleControls();
   const stage = $('#stage');

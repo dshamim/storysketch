@@ -20,6 +20,7 @@
   </nav>
   <div class="grow"></div>
   <span class="ui-status" id="project-status" tabindex="0"><span id="file-name">Untitled</span><span id="save-state" class="ui-badge"></span></span>
+  <button class="ui-iconbtn" id="open-palette" data-tip="Search everything" data-kbd="Ctrl+K" aria-label="Search everything" aria-haspopup="dialog"><span data-icon="search"></span></button>
   <button class="ui-iconbtn" id="undo" data-tip="Undo" data-kbd="Ctrl+Z" aria-label="Undo"><span data-icon="undo"></span></button>
   <button class="ui-iconbtn" id="redo" data-tip="Redo" data-kbd="Ctrl+Shift+Z" aria-label="Redo"><span data-icon="redo"></span></button>
   <button class="ui-btn primary" id="open-export"><span data-icon="export"></span>Export</button>
@@ -195,6 +196,10 @@
   <button role="menuitemcheckbox" id="menu-touch" aria-checked="false" data-act="touch"><span data-icon="check" class="tick"></span><span class="grow">Touch-friendly sizes</span></button>
 </div>
 <div class="ui-popover ui-menu" role="menu" id="menu-help" aria-label="Help" hidden>
+  <button role="menuitem" data-act="palette"><span data-icon="search"></span><span class="grow">Search everything…</span><kbd class="ui-kbd">Ctrl+K</kbd></button>
+  <button role="menuitem" data-act="shortcuts"><span data-icon="keyboard"></span><span class="grow">Keyboard shortcuts</span><kbd class="ui-kbd">?</kbd></button>
+  <button role="menuitem" data-act="hints-reset"><span data-icon="sparkle"></span><span class="grow">Show the tips again</span></button>
+  <hr>
   <button role="menuitem" data-act="about"><span data-icon="info"></span><span class="grow">About StorySketch</span></button>
 </div>
 <div class="ui-popover ui-menu" role="menu" id="menu-page" aria-label="Page options" hidden>
@@ -292,6 +297,22 @@
   </div>
 </div>
 
+<!-- search everything (Ctrl+K) and the shortcut sheet (?): overlays, not modal dialogs -->
+<div class="overlay" id="palette" hidden>
+  <div class="overlay-card palette-card" role="dialog" aria-modal="true" aria-label="Search everything">
+    <div class="palette-box"><span data-icon="search"></span><input id="pal-input" class="ui-input" type="text" role="combobox" aria-expanded="true" aria-controls="pal-list" aria-autocomplete="list" aria-label="Search everything" placeholder="Search actions, characters, props, styles…" autocomplete="off" spellcheck="false" enterkeyhint="go"></div>
+    <ul id="pal-list" role="listbox" aria-label="Results"></ul>
+    <p class="palette-foot muted small"><span class="hint-mouse"><kbd class="ui-kbd">↑</kbd> <kbd class="ui-kbd">↓</kbd> to move · <kbd class="ui-kbd">Enter</kbd> to do it · <kbd class="ui-kbd">Esc</kbd> to close</span><span class="hint-touch">Tap a result to do it. Tap outside to close.</span></p>
+    <p id="pal-status" class="sr-only" role="status" aria-live="polite"></p>
+  </div>
+</div>
+<div class="overlay" id="shortcuts" hidden>
+  <div class="overlay-card shortcuts-card" role="dialog" aria-modal="true" aria-labelledby="shortcuts-title">
+    <div class="shortcuts-head"><h2 id="shortcuts-title">Keyboard shortcuts</h2><button class="ui-iconbtn" id="shortcuts-close" type="button" aria-label="Close the shortcut list"><span data-icon="close"></span></button></div>
+    <div id="shortcuts-body" class="shortcuts-body"></div>
+  </div>
+</div>
+
 <dialog id="upgradedlg">
   <form method="dialog" class="pad">
     <h3>This file is from an older version</h3>
@@ -368,6 +389,8 @@
 <script src="src/app/ribbon.js"></script>
 <script src="src/app/inspector.js"></script>
 <script src="src/app/designer.js"></script>
+<script src="src/app/hints.js"></script>
+<script src="src/app/palette.js"></script>
 <script src="src/app/export.js"></script>
 <script src="src/app/project.js"></script>
 <script src="src/app/plugins-panel.js"></script>

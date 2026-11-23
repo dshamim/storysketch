@@ -48,6 +48,8 @@ const STATES = {
   'shapes-tab': `${classroom} select([]); document.querySelector('#rail-shapes').click();`,
   'shapes-styled': `${classroom} addItem(SHP.make('box', 260, 640, { w: 260, h: 120, fill: 'colour', fillColor: '#ffd966', text: 'Our class', textSize: 44 })); addItem(SHP.make('circle', 560, 640, { w: 130, h: 130, fill: 'hatch', fillColor: '#2f6fd6', dash: 'dashed' })); addItem(SHP.make('triangle', 760, 640, { fill: 'solid', fillColor: '#e0402f' })); addItem(SHP.make('double', 500, 520, { pts: [[-180, 0], [180, 0]], dash: 'dotted' })); pg().items.at(-1).rot = -6; setPreview(true); renderAll(); select([]);`,
   'details-look-shape': `${classroom} addItem(SHP.make('box', 500, 640, { fill: 'colour', text: 'Hello' })); renderAll(); select([pg().items.at(-1).id]); showDetails();`,
+  'palette-open': `${classroom} select([]); openPalette(); document.querySelector('#pal-input').value = 'add'; renderPalette();`,
+  'shortcut-sheet': `${classroom} select([]); openShortcuts();`,
   'chalk-styled': `restore(STORE.fresh('project:sample-chalkboard')); app.page = 0; setPreview(true); renderAll(); select([]);`,
   'animals-dog-selected': `restore(STORE.fresh('project:sample-animals')); app.page = 0; setPreview(true); renderAll(); select([pg().items.find((i) => i.cast === 'rex').id]);`,
   'designer-panel': `${classroom} select([]); openDesigner('teacher');`,
@@ -69,6 +71,7 @@ const TOUCH_STATES = {
   'touch-upright-selected': [TABLET_UPRIGHT, `${classroom} ${teacher}`],
   'touch-upright-library-sheet': [TABLET_UPRIGHT, `${classroom} ${teacher} setTab('tab-cast'); showFlyout();`],
   'touch-upright-designer-sheet': [TABLET_UPRIGHT, `${classroom} ${teacher} openDesigner('teacher');`],
+  'touch-upright-search': [TABLET_UPRIGHT, `${classroom} select([]); openPalette(); document.querySelector('#pal-input').value = 'add'; renderPalette();`],
   'touch-small-details-slideover': [TABLET_SMALL, `${classroom} ${teacher} showDetails();`],
 };
 for (const [name, [ctxOpts, setup]] of Object.entries(TOUCH_STATES)) {

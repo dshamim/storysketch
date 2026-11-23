@@ -5,6 +5,13 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
+## Unreleased — the Home kit
+- **26 Home props** (pack "Home props"): house, front door, garden gate, letterbox; sofa (2 or 3 seats), armchair, coffee table, TV on a cabinet, wall clock (set the hour and minutes), fireplace; dining table with chairs, fridge, cooker, sink and cupboard, kettle, plates and cup; bed, bunk bed, cot, bedside table with lamp, toy box, teddy bear, slippers; bath, basin and mirror; child's bicycle. Each has story states (door open, lights on, fire lit, tap running, pot on the cooker, water and bubbles in the bath…) and search words.
+- **Scale:** every seat is 80 high (a child or adult in the Sit pose fits on any of them), counters and the dining table 128, the bed mattress 80.
+- **New sample project "A day at home"** (5 pages: living room, kitchen, bedroom, bathroom, outside), built only from the scenery pieces and the Home props, with people sitting on the furniture.
+- `tools/check_props.mjs --sheet` now draws every value of every option, labelled, so one sheet shows all the states of a prop.
+- Tests: every sample project is checked for unknown props, characters, poses, option values and pictures (this found an invalid value in the classroom sample, drawn the same as before).
+
 ## Unreleased — first props of the new kits
 - **Scenery (8 props, pack "Scenery"):** ground (grass, sandy path, road, wooden floor), sky (day, sunset, night), hills, room wall (plain, stripes or dots; window and door), picket fence, stepping stones, clouds, and a window that can show any picture.
 - **Home: the house** (`home-house`): front view with a 340-high door (an adult fits through it), open or shut door, lights on or off, chimney.

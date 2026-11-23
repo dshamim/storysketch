@@ -30,6 +30,16 @@ At scale 1: **a child is about 250 units tall and an adult about 320.** (Measure
 | Wardrobe | 351 high | existing |
 | Suitcase | 139 high | existing |
 | Plant | 147 high | existing |
+| **Every seat** (chair, sofa, armchair, bench, bed edge) | **seat top 80 high**; a child or adult in the `sit` pose then fits | measured with the `sit` pose |
+| Sofa | 300 wide (3-seat 340), back 160, arms 120 | Home kit |
+| Armchair | 160 wide, back 160 | Home kit |
+| Coffee table | 160 wide, 70 high | Home kit |
+| Counters, kitchen units, dining table | **128 high** (the same as the classroom table) | Home kit |
+| Fridge | 120 wide, 300 high (a little shorter than an adult) | Home kit |
+| Bed | 300 long, mattress top 80 (a seat height), headboard 170 | Home kit |
+| Bunk bed | 300 long, 320 high, lower mattress 70, upper 220 | Home kit |
+| Bath | 280 long, rim 110 | Home kit |
+| Wall clock | about 100 across | Home kit |
 
 Furniture and small things are **human scale**: draw them in proportion to the 250 / 320 people above.
 
@@ -45,7 +55,7 @@ Furniture and small things are **human scale**: draw them in proportion to the 2
 | Slide, climbing frame | platform about 220 high, whole thing at most 340 high |
 | Swing frame | about 330 high, seat 80 from the ground |
 | Tree | 450 to 650 high |
-| Bench | seat 70 high, back 170 high, about 260 wide |
+| Bench | seat 80 high, back 170 high, about 260 wide |
 
 Do **not** shrink a building so that a person looks right next to it. Keep the numbers above. The checker only enforces that a prop fits the page; you must check the proportions by eye, so do step 5.
 
@@ -63,6 +73,7 @@ Draw objects from the **front, with a slight look-down**: a table top is a thin 
 - Use `stroke: 'line'` (the prop's main colour slot) for outlines. Round joins are automatic.
 
 ## 6. Colour
+- **One kit, one set of defaults.** Home props use the same slot names and default colours: `line` is wood `#8a5a33` (or metal `#6f6f6f` for appliances and taps), `fabric` `#3f8ae0` for sofas, armchairs and bedding, `accent` `#e53935` for blankets and small touches, `soft` `#fbc02d` for cushions and toys, `body` `#cfd8dc` for white goods. Reuse them so a sofa, an armchair and a bed look like one set.
 - Declare **named colour slots** in `colors`. **`line` is required** (the main outline colour). Add a slot for each part people may want to recolour (`cushion`, `roof`, `door`). Use the slot **name** in `stroke`, `fill` and `hatch`. Anything else must be a `#hex` colour. A misspelt slot name silently draws nothing; the checker catches it.
 - **Objects use calm outline colours:** wood `#8a5a33`, grey metal and stone `#6f6f6f`. Use a hue from the shared palette (`CP.helpers.PAL`: `#e53935 #fb8c00 #fbc02d #43a047 #1e88e5 #8e24aa #d81b60 #00897b`) for toys, signs and accents, not for whole pieces of furniture.
 - **Solid surfaces need `fill: 'paper'`.** It paints the page colour, so a thing in front hides what is behind it. Without it, layered props show through each other.

@@ -27,7 +27,7 @@
      {"type": "figure", "cast": "sam", "x": 630, "floor": 650, "pose": "sitdrum", "s": 1.08},
      {"type": "prop", "kind": "drum", "x": 705, "y": 650, "s": 1.08},
      {"type": "figure", "cast": "mia", "x": 846, "floor": 650, "pose": "sing", "expr": "talk", "s": 1.08},
-     {"type": "prop", "kind": "notes", "x": 824, "y": 358, "params": {"kind": "pair"}, "s": 1.08}
+     {"type": "prop", "kind": "notes", "x": 824, "y": 358, "params": {"kind": "both"}, "s": 1.08}
     ] }
  ]
 }

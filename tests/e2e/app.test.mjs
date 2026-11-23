@@ -89,7 +89,7 @@ test('a dog: add from template, 13 handles, its own poses and limbs, designer hi
 test('New project offers a blank page and every sample project', { skip }, async () => {
   const page = await browser.newPage(); await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs
   await page.click('#btn-file'); await page.click('[data-act="new"]');
-  assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('#start-cards [data-start]')].map((b) => b.dataset.start)), ['blank', 'project:sample-airport', 'project:sample-animals', 'project:sample-chalkboard', 'project:sample-classroom']);
+  assert.deepEqual(await page.evaluate(() => [...document.querySelectorAll('#start-cards [data-start]')].map((b) => b.dataset.start)), ['blank', 'project:sample-airport', 'project:sample-animals', 'project:sample-chalkboard', 'project:sample-classroom', 'project:sample-home']);
   await page.click('#start-cards [data-start="project:sample-animals"]');
   await page.waitForFunction(() => app.P.pages.length === 3 && app.P.settings.style === 'marker'); await page.close();
 });
@@ -103,7 +103,7 @@ test('every sample page keeps all its items inside the page and renders in every
       restore(STORE.fresh('project:' + sp.id)); const { pageW: W, pageH: H } = app.P.settings;
       app.P.pages.forEach((pgx, i) => {
         app.page = i; if (!pgx.items.length) out.push(`${sp.id} p${i + 1}: empty`);
-        for (const it of pgx.items) { const b = pageBBox([it]); if (b.x < 0 || b.y < 0 || b.x + b.w > W || b.y + b.h > H) out.push(`${sp.id} p${i + 1} ${it.cast || it.kind} is outside the page`); }
+        for (const it of pgx.items) { const b = pageBBox([it]); const bleed = it.kind && CP.props[it.kind]?.place ? 16 : 0; /* a backdrop is meant to run off the edge, by a line's width */ if (b.x < -bleed || b.y < -bleed || b.x + b.w > W + bleed || b.y + b.h > H + bleed) out.push(`${sp.id} p${i + 1} ${it.cast || it.kind} is outside the page`); }
         for (const st of RENDER.styleList().map((x) => x.id)) { setStyle(st); setPreview(true); renderAll(); }
       });
     }

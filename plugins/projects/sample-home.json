@@ -1,0 +1,510 @@
+{
+ "api": 1,
+ "version": "1.0.0",
+ "id": "sample-home",
+ "name": "Sample \u2014 A day at home (5 pages)",
+ "description": "A family home from morning to evening: living room, kitchen, bedroom, bathroom and the front garden. Shows the Home props, the scenery pieces and people sitting on the furniture. Crayon style.",
+ "settings": {
+  "style": "crayon"
+ },
+ "cast": [
+  "teacher",
+  "lily",
+  "leo",
+  "sam",
+  "mia"
+ ],
+ "pages": [
+  {
+   "name": "Living room",
+   "notes": "Click a tile in Props > Scenery (wall, ground) and it fills the page behind everything. Sofa, armchair and chairs all have a seat 80 high, so a person in the Sit pose fits on any of them. Try the TV and fireplace switches in Details.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-wall",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "paper": "plain",
+      "window": false,
+      "door": false,
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750,
+     "params": {
+      "kind": "floor",
+      "width": 1000,
+      "depth": 150
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-window",
+     "x": 820,
+     "y": 300,
+     "s": 1,
+     "params": {
+      "curtains": true,
+      "view": "tree"
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-fireplace",
+     "x": 152,
+     "y": 690
+    },
+    {
+     "type": "prop",
+     "kind": "home-clock",
+     "x": 140,
+     "y": 360,
+     "params": {
+      "hour": 3,
+      "minute": 0
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-sofa",
+     "x": 450,
+     "y": 695,
+     "params": {
+      "seats": "2",
+      "cushion": true
+     }
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 410,
+     "floor": 695,
+     "pose": "sit"
+    },
+    {
+     "type": "prop",
+     "kind": "home-coffeetable",
+     "x": 450,
+     "y": 742,
+     "params": {
+      "on": "book"
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-armchair",
+     "x": 680,
+     "y": 695
+    },
+    {
+     "type": "figure",
+     "cast": "teacher",
+     "x": 690,
+     "floor": 695,
+     "pose": "sit",
+     "flip": true
+    },
+    {
+     "type": "prop",
+     "kind": "home-tv",
+     "x": 900,
+     "y": 700,
+     "s": 0.9,
+     "params": {
+      "on": true
+     }
+    }
+   ]
+  },
+  {
+   "name": "Kitchen",
+   "notes": "Counters and the table are 128 high, so a kettle or plates placed on them sit at y 128 above the floor. Try the fridge door, the pot on the cooker and the running tap in Details.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-wall",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "paper": "dots",
+      "window": false,
+      "door": false,
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750,
+     "params": {
+      "kind": "floor",
+      "width": 1000,
+      "depth": 150
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-window",
+     "x": 300,
+     "y": 290,
+     "params": {
+      "curtains": false,
+      "view": "sun"
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-clock",
+     "x": 560,
+     "y": 210,
+     "params": {
+      "hour": 8,
+      "minute": 0
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-fridge",
+     "x": 90,
+     "y": 690
+    },
+    {
+     "type": "prop",
+     "kind": "home-sink",
+     "x": 260,
+     "y": 690,
+     "params": {
+      "water": true
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-kettle",
+     "x": 190,
+     "y": 552,
+     "s": 0.8,
+     "params": {
+      "steam": true
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-cooker",
+     "x": 430,
+     "y": 690,
+     "params": {
+      "pot": true
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-dining-table",
+     "x": 720,
+     "y": 700,
+     "params": {
+      "cloth": true
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-plates",
+     "x": 720,
+     "y": 572,
+     "params": {
+      "count": 2
+     },
+     "s": 0.8
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 556,
+     "floor": 700,
+     "pose": "sittable"
+    },
+    {
+     "type": "figure",
+     "cast": "leo",
+     "x": 884,
+     "floor": 700,
+     "pose": "sittable",
+     "flip": true
+    }
+   ]
+  },
+  {
+   "name": "Bedroom",
+   "notes": "The bed, bunk bed and cot are all drawn so a child can sit on the edge (mattress top about 70 to 90). The bedside lamp and the window show night or day.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-wall",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "paper": "stripes",
+      "window": false,
+      "door": false,
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750,
+     "params": {
+      "kind": "floor",
+      "width": 1000,
+      "depth": 150
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-window",
+     "x": 500,
+     "y": 290,
+     "params": {
+      "curtains": true,
+      "view": "night"
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-bunkbed",
+     "x": 152,
+     "y": 700,
+     "s": 0.92
+    },
+    {
+     "type": "prop",
+     "kind": "home-bed",
+     "x": 620,
+     "y": 700
+    },
+    {
+     "type": "prop",
+     "kind": "home-nightstand",
+     "x": 855,
+     "y": 700,
+     "params": {
+      "on": true
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-toybox",
+     "x": 385,
+     "y": 700,
+     "s": 0.9
+    },
+    {
+     "type": "prop",
+     "kind": "home-teddy",
+     "x": 700,
+     "y": 612,
+     "s": 0.7
+    },
+    {
+     "type": "figure",
+     "cast": "leo",
+     "x": 640,
+     "floor": 700,
+     "pose": "sit",
+     "flip": true
+    },
+    {
+     "type": "prop",
+     "kind": "home-slippers",
+     "x": 505,
+     "y": 702,
+     "s": 0.9
+    }
+   ]
+  },
+  {
+   "name": "Bathroom",
+   "notes": "A bath with bubbles, a basin with a mirror and a pair of slippers. The bath rim is 110 high, so a child can lean over it.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-wall",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "paper": "dots",
+      "window": false,
+      "door": false,
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750,
+     "params": {
+      "kind": "floor",
+      "width": 1000,
+      "depth": 150
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-window",
+     "x": 810,
+     "y": 300,
+     "params": {
+      "curtains": false,
+      "view": "sun",
+      "cross": false
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-bath",
+     "x": 260,
+     "y": 700,
+     "s": 1.1,
+     "params": {
+      "water": true,
+      "bubbles": true
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-basin",
+     "x": 590,
+     "y": 700
+    },
+    {
+     "type": "prop",
+     "kind": "home-slippers",
+     "x": 460,
+     "y": 712
+    },
+    {
+     "type": "figure",
+     "cast": "leo",
+     "x": 680,
+     "floor": 700,
+     "pose": "stand",
+     "flip": true
+    }
+   ]
+  },
+  {
+   "name": "Outside",
+   "notes": "The house door is 340 high, so an adult fits through it. Open the door, switch the lights on, change the sky to sunset or night in Details, and the whole scene follows.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "day",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-clouds",
+     "x": 280,
+     "y": 140,
+     "params": {
+      "count": 2
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-house",
+     "x": 400,
+     "y": 655,
+     "s": 0.85,
+     "params": {
+      "open": true,
+      "lights": false
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-letterbox",
+     "x": 45,
+     "y": 690,
+     "params": {
+      "flag": true
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-fence",
+     "x": 770,
+     "y": 690,
+     "params": {
+      "width": 140
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-gate",
+     "x": 895,
+     "y": 690
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-stones",
+     "x": 400,
+     "y": 745,
+     "params": {
+      "count": 3
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "home-bicycle",
+     "x": 590,
+     "y": 735,
+     "s": 0.9
+    },
+    {
+     "type": "figure",
+     "cast": "teacher",
+     "x": 300,
+     "floor": 700,
+     "pose": "wave"
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 500,
+     "floor": 700,
+     "pose": "cheer"
+    }
+   ]
+  }
+ ]
+}

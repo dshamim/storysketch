@@ -298,3 +298,20 @@ html.touch #export fieldset { display: flex; flex-wrap: wrap; gap: 0 14px; }
 @keyframes ov-fade { from { opacity: 0; } to { opacity: 1; } } @keyframes ov-pop { from { opacity: 0; transform: translateY(-6px) scale(.985); } to { opacity: 1; transform: none; } }
 html.touch .pal-opt { min-height: 48px; } html.touch .palette-box .ui-input { min-height: 44px; }
 @media (max-width: 900px) { .overlay { padding-top: 56px; } }
+
+/* ---- one-time tips ---- */
+.hint-card { position: absolute; left: 12px; top: 12px; z-index: 6; max-width: min(340px, calc(100% - 24px)); display: flex; align-items: center; gap: 10px; padding: 8px 8px 8px 14px; background: var(--ui-tooltip-bg, #1f2430); color: #fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22); font-size: 13px; line-height: 1.35; animation: hint-in var(--ui-dur, 120ms) var(--ui-ease, ease-out); }
+.hint-card[hidden] { display: none; }
+.hint-card .ui-btn { flex: none; background: rgba(255, 255, 255, 0.14); border-color: transparent; color: #fff; }
+.hint-card .ui-btn:hover { background: rgba(255, 255, 255, 0.24); }
+html.touch .hint-card { top: 64px; } /* below the Done-typing button's row */
+@keyframes hint-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* ---- wording that depends on where the panels are ---- */
+.where-below { display: none; } @media (max-width: 900px) { .where-left { display: none; } .where-below { display: inline; } }
+
+/* ---- motion: short and gentle; with prefers-reduced-motion the duration token is 0 so none of it plays ---- */
+@media (max-width: 900px) { #left:not([hidden]), #right:not([hidden]) { animation: sheet-up var(--ui-dur, 120ms) var(--ui-ease, ease-out); } }
+@keyframes sheet-up { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.tool-pill button, .ui-btn, .ui-iconbtn, .ui-rail-btn { transition: background-color var(--ui-dur, 120ms) var(--ui-ease, ease-out), transform var(--ui-dur, 120ms) var(--ui-ease, ease-out); }
+.tool-pill button:active, .ui-iconbtn:active, .ui-rail-btn:active { transform: scale(0.96); }

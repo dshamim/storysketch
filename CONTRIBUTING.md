@@ -27,3 +27,8 @@ npm run check:plugins      # fails if plugins/manifest.js is stale — run `npm 
 
 ## Layout
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
+
+## Accessibility checks
+- `npm run test:e2e` always runs `tests/e2e/a11y.test.mjs`: every control has a name, headings keep their order, controls are at least 24 px, the Tab key reaches everything with a visible focus mark. When you add a panel or an overlay, add it to the `STATES` list at the top of that file.
+- For the Lighthouse score as well (optional, heavy): `npm i --no-save lighthouse puppeteer-core`, then `node tools/a11y-audit.mjs` (desktop) and `node tools/a11y-audit.mjs touch` (a tablet held upright). It exits with 1 if any state scores under 95.
+- New menu items show up in search by themselves; new shortcuts need a line in `SHORTCUTS` in `src/app/palette.js` and a key check in `tests/e2e/palette.test.mjs`.

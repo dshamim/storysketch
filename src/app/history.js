@@ -3,7 +3,7 @@
 // ---------- commit / history ----------
 let commitTimer = 0, commitPending = null;
 function commit(now = true) {
-  const go = () => { commitPending = null; app.rev = (app.rev || 0) + 1; if (!app.edit) STORE.snapshot(app.P); // while typing in a text, the whole edit becomes one undo step when it ends
+  const go = () => { commitPending = null; app.rev = (app.rev || 0) + 1; hintTick(); if (!app.edit) STORE.snapshot(app.P); // while typing in a text, the whole edit becomes one undo step when it ends
      STORE.autosave(app.P); setDirty(true); scheduleFilm(); };
   clearTimeout(commitTimer); if (now) go(); else { commitPending = go; commitTimer = setTimeout(go, 350); }
 }

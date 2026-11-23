@@ -43,6 +43,7 @@ const STATES = [
   ['export popover', `select([]); document.querySelector('#open-export').click();`],
   ['file menu', `select([]); document.querySelector('#btn-file').click();`],
   ['About card', `select([]); showAbout();`],
+  ['a tip showing', `localStorage.setItem('storysketch/hints-mode', 'on'); select([]); showHint('handles');`],
   ['search open with results', `select([]); openPalette(); document.querySelector('#pal-input').value = 'add'; renderPalette();`],
   ['shortcut sheet', `select([]); openShortcuts();`],
 ];
@@ -106,6 +107,41 @@ test('the Layers list is the keyboard way to the page: pick a thing, then Delete
   await page.keyboard.press('Delete'); assert.equal(await page.evaluate((id) => !!itemById(id), id), false, 'Delete removes it');
   // the icon buttons in a row say which layer they are for
   const lab = await page.locator('#layers [data-layer] [data-vis]').first().getAttribute('aria-label'); assert.match(lab, /^(Hide|Show) .+/, lab);
+  assert.deepEqual(errs, []); await context.close();
+});
+
+// Walk the page with the Tab key like a keyboard user: every stop is on screen, has a visible focus mark, nothing traps the focus, the order goes top to bottom.
+async function tabWalk(page, max = 160) {
+  await page.evaluate(() => { document.activeElement && document.activeElement.blur(); window.scrollTo(0, 0); }); const stops = [];
+  for (let i = 0; i < max; i++) {
+    await page.keyboard.press('Tab');
+    const s = await page.evaluate(() => {
+      const e = document.activeElement; if (!e || e === document.body) return { body: true }; const r = e.getBoundingClientRect(); const cs = getComputedStyle(e);
+      const ring = (cs.outlineStyle !== 'none' && parseFloat(cs.outlineWidth) > 0) || (cs.boxShadow && cs.boxShadow !== 'none');
+      const wrap = e.closest('.ui-check, .ui-switch'); const wcs = wrap && getComputedStyle(wrap.querySelector('.ui-check-box, .ui-switch-track') || wrap); const sibRing = wrap && wcs && ((wcs.outlineStyle !== 'none' && parseFloat(wcs.outlineWidth) > 0) || (wcs.boxShadow && wcs.boxShadow !== 'none'));
+      const cx = r.left + r.width / 2, cy = r.top + r.height / 2; const top = document.elementFromPoint(Math.min(innerWidth - 1, Math.max(0, cx)), Math.min(innerHeight - 1, Math.max(0, cy)));
+      return { id: e.id || '', cls: typeof e.className === 'string' ? e.className : '', tag: e.tagName.toLowerCase(), label: (e.getAttribute('aria-label') || e.textContent || e.title || '').trim().slice(0, 24), ring: !!(ring || sibRing), onScreen: r.width > 0 && r.height > 0 && r.right > 0 && r.bottom > 0 && r.left < innerWidth && r.top < innerHeight, covered: !!top && top !== e && !e.contains(top) && !top.contains(e) && !(e.matches('input[type=checkbox], input[type=radio], textarea') ), y: Math.round(r.top), x: Math.round(r.left) };
+    });
+    if (s.body) { if (stops.length) { stops.push(s); break; } continue; } stops.push(s); // (the very first Tab just lands on the document)
+  }
+  return stops;
+}
+test('keyboard walk-through: Tab visits every control in a sensible order, each one is on screen with a visible focus mark, and nothing traps the focus', { skip }, async () => {
+  const { page, errs, context } = await open(`${CLASSROOM} ${TEACHER} showDetails();`);
+  const stops = await tabWalk(page); const real = stops.filter((s) => !s.body);
+  assert.ok(real.length > 40, 'the walk visited ' + real.length + ' controls'); assert.equal(stops.at(-1).body, true, 'the focus leaves the page at the end (no trap) after ' + real.length + ' stops');
+  const bad = real.filter((s) => !s.ring || !s.onScreen || s.covered).map((s) => `${s.tag}#${s.id} "${s.label}" ring:${s.ring} onScreen:${s.onScreen} covered:${s.covered}`); assert.deepEqual(bad, [], 'stops without a visible focus mark, off screen, or covered');
+  const ids = real.map((s) => s.id); const at = (id) => ids.indexOf(id); assert.ok(at('btn-file') >= 0 && at('btn-file') < at('open-palette') && at('open-palette') < at('open-export') && at('open-export') < at('rail-cast'), 'top bar first, then the rail: ' + ids.slice(0, 14).join(' '));
+  assert.ok(ids.includes('details-close') && ids.includes('zoom-in') && real.some((x) => /ui-film-item/.test(x.cls)), 'the Details panel and the page strip are reachable: ' + ids.filter(Boolean).join(' '));
+  assert.ok(real.some((x) => /^ui-select|rb-|ui-iconbtn|ui-btn/.test(x.cls) && x.y > 50 && x.y < 110), 'the ribbon controls are tab stops too');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('keyboard: menus, the search and the shortcut sheet open from the keyboard and Esc brings the focus back to where it was', { skip }, async () => {
+  const { page, errs, context } = await open(CLASSROOM);
+  await page.focus('#btn-file'); await page.keyboard.press('Enter'); assert.equal(await page.locator('#menu-file').isVisible(), true, 'Enter opens the File menu'); await page.keyboard.press('ArrowDown'); assert.equal(await page.evaluate(() => document.activeElement.closest('#menu-file') !== null), true, 'arrow keys move inside it'); await page.keyboard.press('Escape'); assert.equal(await page.locator('#menu-file').isVisible(), false); assert.equal(await page.evaluate(() => document.activeElement.id), 'btn-file', 'focus back on File');
+  await page.focus('#open-palette'); await page.keyboard.press('Enter'); assert.equal(await page.evaluate(() => document.activeElement.id), 'pal-input'); await page.keyboard.press('Escape'); assert.equal(await page.evaluate(() => document.activeElement.id), 'open-palette', 'focus back on the search button');
+  await page.focus('#open-export'); await page.keyboard.press('Enter'); assert.equal(await page.locator('#export').isVisible(), true); await page.keyboard.press('Escape'); assert.equal(await page.evaluate(() => document.activeElement.id), 'open-export');
   assert.deepEqual(errs, []); await context.close();
 });
 

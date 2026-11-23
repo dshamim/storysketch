@@ -9,6 +9,12 @@
 - **Page strip** (bottom): a thumbnail per page, **+** to add one, **⋯** for rename, duplicate, move and delete, **Notes** for the page name and notes. Page Up / Page Down change page.
 - **Details panel** (right, hidden until you want it): **Details** in the ribbon, or double-click something. Tabs follow the selection: *Look*, *Pose*, *Arrange*.
 
+## Finding things and learning the keys
+- **Search everything:** press **Ctrl+K** (or the magnifier at the top). Type a few letters of anything you want to do or add: *marker*, *teacher*, *table*, *go to page 2*, *export*. Use the arrow keys and Enter, or click or tap a result. The things you used last are listed first.
+- **Keyboard shortcuts:** press **?** (or Help ▸ Keyboard shortcuts) for the whole list.
+- **Tips:** a few small hints appear once, when they help. **Help ▸ Show the tips again** brings them back.
+- **Keyboard only:** Tab moves through the screen from the top bar to the page strip. To work on something on the page, pick it in the **Layers** panel, then use Delete, the arrow keys and **F2** (type inside a text or a shape).
+
 ## On a tablet
 - Everything works with a finger. The controls get bigger by themselves on a touch screen (or switch it on in **View ▸ Touch-friendly sizes**).
 - **Tool bar** at the bottom of the page: **Select**, **Hand** (drag the page around), **Text**, **Shapes** (opens the shapes) and **Several** (tap things to add them to the selection).

@@ -41,6 +41,7 @@ test('the ribbon follows the selection: page settings, then character, prop and 
 
 test('first-run task: add a character, pose it from the ribbon, turn it, line up, duplicate and delete — without opening a menu bar', { skip }, async () => {
   const { page, errs } = await open();
+  await page.evaluate(() => localStorage.setItem('storysketch/hints-mode', 'on')); // the tips are ON here: none may get in the way of a new person
   await page.click('#cast-grid .tile >> nth=0');
   const arm = () => page.evaluate(() => JSON.stringify(pg().items[0].pose.armR));
   const before = await arm(); await page.click('#ribbon-sel [data-rb="pose"]'); assert.equal(await page.locator('#pop-pose').isVisible(), true);

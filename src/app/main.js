@@ -56,7 +56,7 @@ function onKey(e) {
 function init() {
   let firstRun = true; try { firstRun = !localStorage.getItem('storysketch/project'); } catch (e) { /* ignore */ }
   app.P = STORE.load(); STORE.snapshot(app.P);
-  initTouch(); initShell(); initText(); initShapes(); initPalette();
+  initTouch(); initShell(); initText(); initShapes(); initPalette(); initHints();
   $('#defs-holder').innerHTML = `<defs>${RENDER.defs()}</defs>`;
   renderStyleControls();
   const stage = $('#stage');

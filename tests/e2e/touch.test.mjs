@@ -17,8 +17,9 @@ const skip = browser ? false : 'no Chromium available';
 
 const LANDSCAPE = { viewport: { width: 1180, height: 820 }, hasTouch: true, deviceScaleFactor: 1 }; // a tablet held sideways
 const PORTRAIT = { viewport: { width: 820, height: 1180 }, hasTouch: true, deviceScaleFactor: 1 };
+// (reduced motion below: the layout tests measure positions, so they must not depend on animation timing)
 async function openTouch(opts = LANDSCAPE, { start = false } = {}) {
-  const context = await browser.newContext({ ...opts, acceptDownloads: true }); const page = await context.newPage(); const errs = [];
+  const context = await browser.newContext({ reducedMotion: 'reduce', ...opts, acceptDownloads: true }); const page = await context.newPage(); const errs = [];
   page.on('pageerror', (e) => errs.push(e.message)); page.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
   await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P);
   if (!start) await page.evaluate(() => { hideStart(); localStorage.clear(); });
@@ -41,6 +42,7 @@ const items = (page) => page.evaluate(() => JSON.parse(JSON.stringify(pg().items
 
 async function firstRunTask(viewport) {
   const { page, cdp, errs, context } = await openTouch(viewport, { start: true });
+  await page.evaluate(() => localStorage.setItem('storysketch/hints-mode', 'on')); // the tips are ON for this task: a real new person sees them at exactly this moment, so none may get in the way
   // 1. the start screen: tap a sample
   assert.equal(await page.locator('#start').isVisible(), true); await tap(page, '#start-cards [data-start="project:sample-classroom"]');
   assert.equal(await page.locator('#start').isVisible(), false, 'the sample opened'); const n0 = (await items(page)).length; assert.ok(n0 > 3);

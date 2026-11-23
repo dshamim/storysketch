@@ -133,5 +133,5 @@ function renderLayers() {
       <button data-gz="up" data-gid="${g}" title="Bring the group forward" aria-label="Bring the group ${U.esc(groupName(g))} forward">▲</button><button data-gz="down" data-gid="${g}" title="Send the group backward" aria-label="Send the group ${U.esc(groupName(g))} backward">▼</button></div>`);
     out.push(...rows.map((it) => row(it, true)));
   }
-  $('#layers').innerHTML = !items.length ? '<p class="muted">Nothing on this page yet. Add characters or props from the left.</p>' : !out.length ? noMatch('tab-layers') : out.join('');
+  $('#layers').innerHTML = !items.length ? '<p class="muted">Nothing on this page yet. Add a character, a prop or a shape <span class="where-left">from the left</span><span class="where-below">from the bar below</span>.</p>' : !out.length ? noMatch('tab-layers') : out.join('');
 }

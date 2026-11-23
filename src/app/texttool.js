@@ -64,7 +64,7 @@ const textField = () => $('#text-input');
 function startEdit(id, { all = false, caret = null, fresh = false } = {}) {
   const it = itemById(id); if (!hasWords(it) || it.locked) return;
   if (app.edit && app.edit.id !== id) endEdit();
-  const ta = textField(); ta.value = it.text || ''; app.edit = { id, fresh };
+  const ta = textField(); ta.value = it.text || ''; app.edit = { id, fresh }; if (!fresh) hintDone('text'); // (the tip about double-clicking a text: they just did)
   if (!(app.sel.length === 1 && app.sel[0] === id)) select([id]);
   ta.focus({ preventScroll: true });
   const n = ta.value.length; if (all) ta.setSelectionRange(0, n); else { const c = caret == null ? n : Math.max(0, Math.min(n, caret)); ta.setSelectionRange(c, c); }

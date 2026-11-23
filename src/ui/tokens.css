@@ -77,10 +77,8 @@
   --ui-dur: 120ms; --ui-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ui-z-popover: 50; --ui-z-tooltip: 60; --ui-z-dialog: 70; --ui-z-toast: 80;
 }
-/* fingers need bigger targets: 44 px minimum (WCAG 2.5.5), applied wherever the main pointer is coarse */
-@media (pointer: coarse) {
-  :root { --ui-control-h: 44px; --ui-control-h-sm: 40px; --ui-icon: 22px; }
-}
+/* fingers need bigger targets: 44 px minimum (WCAG 2.5.5). `html.touch` is set by src/app/touch.js: automatically when the main pointer is coarse, or from View > Touch-friendly sizes */
+html.touch { --ui-control-h: 48px; --ui-control-h-sm: 44px; --ui-icon: 22px; }
 @media (prefers-reduced-motion: reduce) {
   :root { --ui-dur: 0ms; }
 }

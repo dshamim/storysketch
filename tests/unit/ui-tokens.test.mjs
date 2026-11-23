@@ -27,7 +27,7 @@ test('every token that is a colour is a 6-digit hex or a reference (so tests can
 });
 test('spacing scale is on a 4 px grid', () => { for (const k of ['s-1', 's-2', 's-3', 's-4', 's-5', 's-6', 's-8', 's-10']) assert.equal(parseInt(vars[k]) % 4, 0, k); });
 test('touch screens get 44 px controls (WCAG 2.5.5)', () => {
-  const m = css.match(/@media \(pointer: coarse\)\s*\{[^}]*--ui-control-h:\s*(\d+)px/); assert.ok(m, 'no coarse-pointer rule'); assert.ok(+m[1] >= 44);
+  const m = css.match(/html\.touch\s*\{[^}]*--ui-control-h:\s*(\d+)px/); assert.ok(m, 'no html.touch rule'); assert.ok(+m[1] >= 44); const sm = css.match(/html\.touch\s*\{[^}]*--ui-control-h-sm:\s*(\d+)px/); assert.ok(sm && +sm[1] >= 44, 'the small size is 44 px in touch mode too');
 });
 test('reduced-motion preference removes animation time', () => { assert.match(css, /prefers-reduced-motion[\s\S]*--ui-dur:\s*0ms/); });
 

@@ -209,3 +209,17 @@ form.pad { padding: 18px 20px; max-width: 520px; }
 
 /* A card in the corner (About, "opened a file" report): not a modal, the page stays usable */
 dialog.card { position: fixed; inset: auto 20px 84px auto; margin: 0; width: min(360px, calc(100vw - 40px)); max-height: 60vh; overflow-y: auto; z-index: 40; border: 1px solid var(--ui-border); box-shadow: var(--ui-sh-3, 0 10px 30px rgba(0,0,0,.2)); }
+
+/* ---- touch mode (html.touch): 44 px targets everywhere, bigger canvas handles ---- */
+html.touch :where(#left, #right, dialog) button { min-height: 44px; padding: 6px 14px; }
+html.touch :where(#left, #right, dialog) :is(select, input[type=text], input[type=number], textarea) { min-height: 44px; font-size: 16px; }
+html.touch #right input[type=color] { width: 48px; height: 44px; }
+html.touch #right input[type=range], html.touch #left input[type=range] { height: 44px; }
+html.touch .chk, html.touch .same, html.touch #right label.tog, html.touch .acc > label { min-height: 44px; display: flex; align-items: center; gap: 8px; }
+html.touch .sw { gap: 0; }
+html.touch .sw button { width: 44px; height: 44px; min-height: 44px; padding: 10px; border: 0; background-clip: content-box; box-shadow: none; } /* a 24 px dot inside a 44 px target */
+html.touch .rb-color { width: 48px; height: 44px; }
+html.touch .layer { min-height: 48px; } html.touch .layer button { min-width: 44px; min-height: 44px; font-size: 14px; }
+html.touch #right summary, html.touch #left summary { min-height: 44px; display: flex; align-items: center; }
+html.touch .ui-menu [role=menuitem], html.touch .ui-menu [role=menuitemcheckbox] { min-height: 48px; }
+html.touch #overlay [data-h]:not([data-halo]) { transform-box: fill-box; transform-origin: center; transform: scale(1.6); } /* the handle you see; the 44 px halo behind it is what you grab */

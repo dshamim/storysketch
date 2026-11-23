@@ -58,7 +58,7 @@ function renderOverlay() {
   for (const id of app.sel) {
     const it = itemById(id); if (!it || it.hidden) continue;
     const b = localBBox(it); const k = 1 / (z * it.s);
-    s += `<g transform="${xform(it)}"><rect x="${b.x0}" y="${b.y0}" width="${b.w}" height="${b.h}" fill="none" stroke="${it.locked ? '#9a948c' : '#2563eb'}" stroke-dasharray="${6 * k} ${4 * k}" stroke-width="${1.4 * k}"/>`;
+    s += `<g transform="${xform(it)}" data-k="${k}"><rect x="${b.x0}" y="${b.y0}" width="${b.w}" height="${b.h}" fill="none" stroke="${it.locked ? '#9a948c' : '#2563eb'}" stroke-dasharray="${6 * k} ${4 * k}" stroke-width="${1.4 * k}"/>`;
     const editing = hasWords(it) && app.edit && app.edit.id === it.id;
     if (editing) s += textEditOverlay(it, k);
     if (app.sel.length === 1 && !it.locked && !editing) {
@@ -91,7 +91,7 @@ function renderOverlay() {
       `<line x1="${cx}" y1="${gb.y}" x2="${cx}" y2="${ty}" stroke="#7c3aed" stroke-width="${1.3 * k}"/><circle data-h="grot" cx="${cx}" cy="${ty}" r="${7.5 * k}" fill="#fff" stroke="#7c3aed" stroke-width="${1.8 * k}" class="h-rot"/>`;
   }
   for (const g of app.guides || []) { const k1 = 1 / z; s += g.axis === 'x' ? `<line x1="${g.pos}" y1="${g.from - 12 * k1}" x2="${g.pos}" y2="${g.to + 12 * k1}" stroke="#e5389a" stroke-width="${1.3 * k1}" pointer-events="none"/>` : `<line x1="${g.from - 12 * k1}" y1="${g.pos}" x2="${g.to + 12 * k1}" y2="${g.pos}" stroke="#e5389a" stroke-width="${1.3 * k1}" pointer-events="none"/>`; }
-  ov.innerHTML = s; positionMiniBar();
+  ov.innerHTML = s; addHalos(ov); positionMiniBar();
 }
 const movable = (items) => items.filter((it) => it && !it.locked);
 const selItems = () => app.sel.map(itemById).filter((it) => it && !it.hidden);

@@ -4,6 +4,9 @@
 function toPage(e) { const svg = $('#stage'); const pt = svg.createSVGPoint(); pt.x = e.clientX; pt.y = e.clientY; const q = pt.matrixTransform(svg.getScreenCTM().inverse()); return [q.x, q.y]; }
 
 function onDown(e) {
+  // Finger and pen: the browser sends "compatibility" mouse events AFTER the finger lifts, and their default (moving the focus to the page) would
+  // take the focus away from a text box we have just started. Cancel them, and move the focus off any field ourselves, as a mouse press would.
+  if (e.pointerType !== 'mouse') { e.preventDefault(); const a = document.activeElement; if (a && a !== document.body && !(app.edit && a === textField() && overTextBeingEdited(e))) a.blur(); }
   // pan: middle button, or hold Space and drag
   if (e.button === 1 || (e.button === 0 && app.space)) {
     e.preventDefault(); app.drag = { kind: 'pan', c0: [e.clientX, e.clientY], v0: [app.view.cx, app.view.cy], k: zoom() };

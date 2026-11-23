@@ -12,7 +12,7 @@ const doRedo = () => restore((flushCommit(), STORE.redo()));
 function selectAll() { select(pg().items.filter((i) => i.type !== 'limbs' && !i.hidden && !i.locked).map((i) => i.id)); }
 const ACTIONS = {
   new: () => showStart(), open: () => openProject(), save: () => saveProject(false), saveas: () => saveProject(true),
-  export: () => pops.export.open(true), addons: () => openPlugins(),
+  export: () => pops.export.open(true), addons: () => openPlugins(), touch: () => toggleTouch(),
   undo: doUndo, redo: doRedo, cut: () => copySel(true), copy: () => copySel(false), paste: () => pasteInto(), duplicate: () => duplicateSel(), delete: () => deleteSel(),
   selectall: selectAll, group: () => groupSel(), ungroup: () => ungroupSel(), lock: () => toggleLockSel(),
   preview: () => setPreview(!app.preview), zoomin: () => zoomTo(app.view.z * 1.25), zoomout: () => zoomTo(app.view.z / 1.25), zoomfit: () => zoomFit(), zoomsel: () => zoomSel(),
@@ -100,7 +100,7 @@ function syncEditMenu() {
   setItemEnabled('group', n > 1); setItemEnabled('ungroup', selItems().some((i) => i.group)); setItemEnabled('paste', !!getClip());
 }
 function setSnap(on) { app.snap = on; try { localStorage.setItem('storysketch/snap', on ? 'on' : 'off'); } catch (e) { /* ignore */ } syncViewMenu(); toast(on ? 'Snapping on — hold Alt to move freely' : 'Snapping off'); }
-function syncViewMenu() { $('#menu-snap').setAttribute('aria-checked', String(app.snap)); $('#menu-details')?.setAttribute('aria-checked', String(detailsOpen()));  $('#menu-preview').setAttribute('aria-checked', String(!!app.preview)); $('#menu-library').setAttribute('aria-checked', String(flyoutOpen())); }
+function syncViewMenu() { $('#menu-touch')?.setAttribute('aria-checked', String(touchUI())); $('#menu-snap').setAttribute('aria-checked', String(app.snap)); $('#menu-details')?.setAttribute('aria-checked', String(detailsOpen()));  $('#menu-preview').setAttribute('aria-checked', String(!!app.preview)); $('#menu-library').setAttribute('aria-checked', String(flyoutOpen())); }
 
 // ---- flyout ----
 const flyoutOpen = () => !$('#left').hidden;

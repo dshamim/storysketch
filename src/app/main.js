@@ -43,7 +43,7 @@ function onKey(e) {
   else if ((k === 't' || k === 'T') && !ctrl) setTool(app.tool === 'text' ? null : 'text')
   else if ((k === 'v' || k === 'V') && !ctrl && !e.altKey) setTool(null) // V = Select (the hand tool is on the touch tool bar; H already flips)
   else if (!ctrl && !e.altKey && DRAW_KEYS[k.toLowerCase()]) { const t = e.shiftKey && k.toLowerCase() === 'a' ? 'double' : DRAW_KEYS[k.toLowerCase()]; setTool(app.tool === t ? null : t); } // R box, O circle, Y triangle, L line, A arrow, Shift+A double arrow
-  else if (k === 'Enter' && app.sel.length === 1 && hasWords(itemById(app.sel[0]))) { e.preventDefault(); startEdit(app.sel[0]); }
+  else if ((k === 'Enter' || k === 'F2') && app.sel.length === 1 && hasWords(itemById(app.sel[0]))) { e.preventDefault(); startEdit(app.sel[0]); }
   else if (k === '/') { e.preventDefault(); showFlyout(); $('#lsearch').focus(); }
   else if (k === 'PageUp') { e.preventDefault(); goPage(app.page - 1); }
   else if (k === 'PageDown') { e.preventDefault(); goPage(app.page + 1); }

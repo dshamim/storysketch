@@ -23,7 +23,7 @@ function renderLibrary() {
   // characters installed as plugins but not in this book yet
   const have = new Set(app.P.cast.map((c) => c.id));
   const lib = CP.characters.filter((c) => !have.has(c.id) && matches('tab-cast', c.name, c.hair, c.body));
-  $('#lib-section').innerHTML = (lib.length ? `<h4>Library <small class="muted">(not in this book yet — click to add)</small></h4><div class="grid">` + lib.map((c) => { const n = STORE.normalizeCast(U.clone(c)); return `<button class="tile" data-add-lib="${c.id}" title="Add ${U.esc(c.name)} to this book and page">${figureThumb(n)}<span>${U.esc(c.name)}</span></button>`; }).join('') + '</div>' : '') +
+  $('#lib-section').innerHTML = (lib.length ? `<h3 class="sh">Library <small class="muted">(not in this book yet — click to add)</small></h3><div class="grid">` + lib.map((c) => { const n = STORE.normalizeCast(U.clone(c)); return `<button class="tile" data-add-lib="${c.id}" title="Add ${U.esc(c.name)} to this book and page">${figureThumb(n)}<span>${U.esc(c.name)}</span></button>`; }).join('') + '</div>' : '') +
     (!cast.length && !lib.length ? noMatch('tab-cast') : '');
   let props = '';
   const searching = !!(app.filters['tab-props'] || '').trim();
@@ -32,7 +32,7 @@ function renderLibrary() {
     for (const cat of propCats(pack)) {
       const list = PROPS.filter((d) => d.pack === pack && d.cat === cat && d.id !== 'numbers' && matches('tab-props', d.name, d.id, d.cat, d.pack)); if (!list.length) continue;
       n += list.length;
-      inner += `<h4>${U.esc(cat)}</h4><div class="grid">` + list.map((d) => {
+      inner += `<h3 class="sh">${U.esc(cat)}</h3><div class="grid">` + list.map((d) => {
         const fake = { id: 'thumb-' + d.id, kind: d.id, ...propDefaults(d) };
         return `<button class="tile" data-add-prop="${d.id}" title="Add ${U.esc(d.name)} (${U.esc(pack)} › ${U.esc(cat)})">${RENDER.thumb(propPrims(fake))}<span>${U.esc(d.name)}</span></button>`;
       }).join('') + '</div>';
@@ -113,12 +113,12 @@ function movePage(i, d) {
 function renderLayers() {
   const items = pg().items; const sg = selGroup();
   const row = (it, inGroup) => {
-    const own = ownerOf(it) || it; const sel = app.sel.includes(own.id);
+    const own = ownerOf(it) || it; const sel = app.sel.includes(own.id); const nm = U.esc(itemName(it)); // every icon button says WHICH layer it is for
     return `<div class="layer ${sel && !sg ? 'sel' : ''} ${sel && sg ? 'gsel' : ''} ${it.type === 'limbs' ? 'sub' : ''} ${inGroup ? 'ingrp' : ''} ${own.locked ? 'islocked' : ''}" data-layer="${it.id}">
-      <button data-vis="${it.id}" title="Show / hide">${it.hidden ? '◌' : '●'}</button>
-      <button data-lock="${it.id}" title="${own.locked ? 'Locked — click to unlock' : 'Lock (stops it being selected or moved on the page)'}">${own.locked ? '🔒' : '·'}</button>
-      <span class="ln">${U.esc(itemName(it))}</span>
-      <button data-z="up" data-zid="${it.id}" title="${inGroup ? 'Forward (inside the group)' : 'Bring forward'}">▲</button><button data-z="down" data-zid="${it.id}" title="${inGroup ? 'Backward (inside the group)' : 'Send backward'}">▼</button></div>`;
+      <button data-vis="${it.id}" title="Show / hide" aria-label="${it.hidden ? 'Show' : 'Hide'} ${nm}">${it.hidden ? '◌' : '●'}</button>
+      <button data-lock="${it.id}" title="${own.locked ? 'Locked — click to unlock' : 'Lock (stops it being selected or moved on the page)'}" aria-label="${own.locked ? 'Unlock' : 'Lock'} ${nm}">${own.locked ? '🔒' : '·'}</button>
+      <button type="button" class="ln" aria-current="${sel}">${nm}</button>
+      <button data-z="up" data-zid="${it.id}" title="${inGroup ? 'Forward (inside the group)' : 'Bring forward'}" aria-label="Bring ${nm} forward">▲</button><button data-z="down" data-zid="${it.id}" title="${inGroup ? 'Backward (inside the group)' : 'Send backward'}" aria-label="Send ${nm} backward">▼</button></div>`;
   };
   const out = [];
   for (const u of zUnits(items).reverse()) {
@@ -127,10 +127,10 @@ function renderLayers() {
     if (!rows.length) continue;
     const m = groupMembers(g); const hid = m.every((i) => i.hidden), lk = m.every((i) => i.locked);
     out.push(`<div class="layer grp ${sg === g ? 'sel' : ''}" data-group="${g}">
-      <button data-gvis="${g}" title="Show / hide the group">${hid ? '◌' : '●'}</button>
-      <button data-glock="${g}" title="${lk ? 'Unlock the group' : 'Lock the whole group'}">${lk ? '🔒' : '·'}</button>
-      <span class="ln">▣ ${U.esc(groupName(g))} <small class="muted">${m.length} items</small></span>
-      <button data-gz="up" data-gid="${g}" title="Bring the group forward">▲</button><button data-gz="down" data-gid="${g}" title="Send the group backward">▼</button></div>`);
+      <button data-gvis="${g}" title="Show / hide the group" aria-label="${hid ? 'Show' : 'Hide'} the group ${U.esc(groupName(g))}">${hid ? '◌' : '●'}</button>
+      <button data-glock="${g}" title="${lk ? 'Unlock the group' : 'Lock the whole group'}" aria-label="${lk ? 'Unlock' : 'Lock'} the group ${U.esc(groupName(g))}">${lk ? '🔒' : '·'}</button>
+      <button type="button" class="ln" aria-current="${sg === g}">▣ ${U.esc(groupName(g))} <small class="muted">${m.length} items</small></button>
+      <button data-gz="up" data-gid="${g}" title="Bring the group forward" aria-label="Bring the group ${U.esc(groupName(g))} forward">▲</button><button data-gz="down" data-gid="${g}" title="Send the group backward" aria-label="Send the group ${U.esc(groupName(g))} backward">▼</button></div>`);
     out.push(...rows.map((it) => row(it, true)));
   }
   $('#layers').innerHTML = !items.length ? '<p class="muted">Nothing on this page yet. Add characters or props from the left.</p>' : !out.length ? noMatch('tab-layers') : out.join('');

@@ -71,15 +71,15 @@
     </section>
     <section class="tabpane" id="tab-shapes" role="tabpanel" aria-labelledby="rail-shapes" hidden>
       <p class="muted small"><span class="hint-mouse">Click one to add it to the page. Or press its key (shown when you point at it), then drag on the page to draw it. Hold <b>Shift</b> for a perfect square or circle, or to keep a line straight. Double-click a shape to type inside it.</span><span class="hint-touch">Tap one to add it to the page, then drag its round and square handles to size it. Tap <b>Select</b> when you are done. Double-tap a shape to type inside it. A line you draw that is nearly level, or at 45 degrees, snaps straight.</span></p>
-      <h4>Shapes</h4>
+      <h3 class="sh">Shapes</h3>
       <div class="grid" id="shape-grid"></div>
-      <h4>Lines and arrows</h4>
+      <h3 class="sh">Lines and arrows</h3>
       <div class="grid" id="line-grid"></div>
     </section>
     <section class="tabpane" id="tab-text" role="tabpanel" aria-labelledby="rail-text" hidden>
       <div class="row"><button class="ui-btn sm" id="add-textbox" aria-pressed="false" data-kbd="T"><span data-icon="text"></span>Add a text box</button></div>
       <p class="muted small">Click on the page to type, or drag to draw a box that wraps. Click a style below to add it to the page. Double-click text on the page to edit it.</p>
-      <h4>Styles</h4>
+      <h3 class="sh">Styles</h3>
       <div class="grid" id="text-presets"></div>
     </section>
     <section class="tabpane" id="tab-layers" role="tabpanel" aria-labelledby="rail-layers" hidden>
@@ -93,7 +93,7 @@
       <div id="plug-warn"></div>
       <div class="row"><button class="ui-btn sm" id="plug-rescan"><span data-icon="refresh"></span>Refresh add-ons</button></div>
       <p class="muted small" id="plug-status" role="status"></p>
-      <h4>Everything loaded</h4>
+      <h3 class="sh">Everything loaded</h3>
       <div id="plug-list"></div>
       <details class="plug-how"><summary>Add your own</summary>
         <p class="muted small">Copy an existing file in <code>plugins/&lt;type&gt;/</code>, change its <code>id</code> and name, then <b>Refresh add-ons</b>. Full guide: <code>plugins/README.md</code>.</p>
@@ -104,7 +104,7 @@
   <button class="ui-iconbtn flyout-open" id="fly-open" data-tip="Show the library panel" aria-label="Show the library panel" hidden><span data-icon="panel-left-open"></span></button>
 
   <section id="center">
-    <div id="stage-wrap"><svg id="stage" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="stage-wrap"><svg id="stage" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="group" aria-label="The page. With a keyboard, pick things from the Layers list; Delete, the arrow keys and F2 then work on what you picked."></svg>
       <p id="empty-hint" class="empty-hint" hidden>Add a character or a prop from the left to begin.</p>
       <textarea id="text-input" wrap="off" aria-label="Text" autocomplete="off" autocapitalize="sentences" enterkeyhint="enter" spellcheck="false" tabindex="-1"></textarea>
       <button class="ui-btn primary" id="edit-done" type="button" hidden>Done typing</button>
@@ -127,7 +127,7 @@
         <div id="d-preview"></div>
         <div class="d-bar"><select id="d-pose" aria-label="Pose to preview"></select><label class="chk"><input type="checkbox" id="d-crayon"> styled</label></div>
       </div>
-      <h4>Characters</h4>
+      <h3 class="sh">Characters</h3>
       <div class="d-cast" id="d-cast"></div>
       <select id="d-templates" aria-label="Start a new character from a look"></select>
       <div class="dform" id="d-form"></div>
@@ -260,7 +260,7 @@
       <label><input type="radio" name="what" value="layers"> Every layer as its own file</label>
     </fieldset>
     <fieldset><legend>Look</legend>
-      <span class="ui-select"><select name="look" id="ex-look"></select><span data-icon="chevron-down"></span></span>
+      <span class="ui-select"><select name="look" id="ex-look" aria-label="Look"></select><span data-icon="chevron-down"></span></span>
     </fieldset>
     <fieldset><legend>Background</legend>
       <label><input type="radio" name="bg" value="none" checked> Transparent</label>

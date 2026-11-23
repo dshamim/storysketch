@@ -19,13 +19,13 @@ const propVals = (it) => ({ ...propDefaults(PROP_BY_ID[it.kind]).params, ...(it.
 const sameControl = (a, b) => a.key === b.key && a.type === b.type && JSON.stringify(a.options || null) === JSON.stringify(b.options || null);
 function commonPanel(items) {
   const ed = movable(items); if (!ed.length) return '';
-  let h = `<h4>Change all ${ed.length} together</h4>` + (ed.length < items.length ? '<p class="muted small">Locked items are left as they are.</p>' : '');
+  let h = `<h3 class="sh">Change all ${ed.length} together</h3>` + (ed.length < items.length ? '<p class="muted small">Locked items are left as they are.</p>' : '');
   h += mixedField({ type: 'select', label: 'Colour', options: MODE_OPTS }, 'data-mk="mode"', ed.map((i) => i.mode || 'auto'));
   h += mixedField({ type: 'range', label: 'Size (makes them all the same)', min: 0.15, max: 4, step: 0.01 }, 'data-mk="s"', ed.map((i) => +(+i.s).toFixed(2)));
   const figs = ed.filter((i) => i.type === 'figure' && castById(i.cast));
   const props = ed.filter((i) => i.type === 'prop' && PROP_BY_ID[i.kind]);
   if (figs.length) {
-    if (figs.length < ed.length) h += `<h4>The ${figs.length} character${figs.length === 1 ? '' : 's'}</h4>`;
+    if (figs.length < ed.length) h += `<h3 class="sh">The ${figs.length} character${figs.length === 1 ? '' : 's'}</h3>`;
     h += mixedField({ type: 'select', label: 'Expression', options: FIG.expressions(castById(figs[0].cast)) }, 'data-mk="expr"', figs.map((i) => i.expr));
     if (figs.every((i) => FIG.rigOf(castById(i.cast)).supports?.face)) h += mixedField({ type: 'select', label: 'Eyes look', options: { '-1': 'Left', 0: 'Centre', 1: 'Right' } }, 'data-mk="look"', figs.map((i) => String(i.look || 0)));
     const c = castById(figs[0].cast);
@@ -33,7 +33,7 @@ function commonPanel(items) {
   }
   if (props.length) {
     const defs = props.map((i) => PROP_BY_ID[i.kind]); const sameKind = defs.every((d) => d === defs[0]); const vals = props.map(propVals);
-    h += `<h4>${sameKind ? `${U.esc(defs[0].name)} ×${props.length}` : `The ${props.length} prop${props.length === 1 ? '' : 's'}`}</h4>`;
+    h += `<h3 class="sh">${sameKind ? `${U.esc(defs[0].name)} ×${props.length}` : `The ${props.length} prop${props.length === 1 ? '' : 's'}`}</h3>`;
     // options every selected prop has (same name and kind of control)
     const shared = (defs[0].params || []).filter((pr) => defs.every((d) => (d.params || []).some((q) => sameControl(q, pr))) && vals.some((v) => whenOk(pr, v)));
     h += shared.map((pr) => mixedField(pr, `data-mparam="${pr.key}"`, vals.map((v) => v[pr.key] ?? pr.def))).join('');
@@ -121,9 +121,9 @@ function multiDetails(all, tab) {
   const head = sg ? field(`Group name <small class="muted">· ${app.sel.length} items</small>`, `<input type="text" data-gname="${sg}" value="${U.esc(groupName(sg))}">`) + `<div class="row"><button data-act="ungroup" title="Ctrl+Shift+G">Ungroup</button><button data-act="lock" title="Ctrl+Shift+L">${lk ? '🔓 Unlock group' : '🔒 Lock group'}</button><button data-act="zoomsel" title="Zoom in on the group">🔍 Zoom to</button></div>`
     : `<div class="row"><button data-act="group" class="primary" title="Ctrl+G — then one click picks them all up">▣ Group</button>${all.some((i) => i.group) ? '<button data-act="ungroup" title="Ctrl+Shift+G">Ungroup</button>' : ''}<button data-act="lock" title="Ctrl+Shift+L">${lk ? '🔓 Unlock' : '🔒 Lock'}</button><button data-act="zoomsel">🔍 Zoom to</button></div>`;
   return head + (lk ? '<p class="warn">🔒 Locked — these can\'t be moved, changed or deleted until unlocked.</p>' : '') +
-    `<h4>Line up</h4>${alignRow('align', 'Line up with each other')}${distRow()}${alignRow('align-page', 'Line up with the page')}` +
-    `<h4>Order</h4>${orderRow()}` +
-    `<h4>Actions</h4><div class="row"><button data-act="dup">Duplicate</button><button data-act="del" class="danger">Delete</button><button data-act="flipall">⇆ Flip each</button></div><div class="row"><button data-act="copy" title="Ctrl+C">Copy</button><button data-act="cut" title="Ctrl+X">Cut</button>${copyToField(true)}</div>` +
+    `<h3 class="sh">Line up</h3>${alignRow('align', 'Line up with each other')}${distRow()}${alignRow('align-page', 'Line up with the page')}` +
+    `<h3 class="sh">Order</h3>${orderRow()}` +
+    `<h3 class="sh">Actions</h3><div class="row"><button data-act="dup">Duplicate</button><button data-act="del" class="danger">Delete</button><button data-act="flipall">⇆ Flip each</button></div><div class="row"><button data-act="copy" title="Ctrl+C">Copy</button><button data-act="cut" title="Ctrl+X">Cut</button>${copyToField(true)}</div>` +
     '<p class="muted">Drag any of them to move the group. Purple corner = resize the group, purple circle = rotate it (Shift snaps to 15°).<br>Export → "Selection" saves these together as one PNG.</p>';
 }
 
@@ -154,7 +154,7 @@ function textLook(it) {
     field('Letter colours', `<select data-text="colors">${opts({ one: 'All one colour', lines: 'Each line different', rainbow: 'Rainbow' }, t.colors)}</select>`) +
     `<label class="chk tog"><input type="checkbox" data-text="w" data-auto ${t.w ? '' : 'checked'}> Fit the box to the text</label>` +
     (t.w ? field(`Box width <output>${t.w}</output>`, `<input type="range" min="60" max="1000" step="1" data-text="w" value="${Math.min(1000, t.w)}">`) : '<p class="muted small">Drag the side handles on the page to make a box that wraps.</p>') +
-    `<h4>Overall colour</h4>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
+    `<h3 class="sh">Overall colour</h3>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
 }
 function figureLook(it) {
   const c = castById(it.cast);
@@ -166,11 +166,11 @@ function figureLook(it) {
 }
 function poseDetails(it) {
   const c = castById(it.cast); const rig = FIG.rigOf(c);
-  return `<h4>Poses</h4><div class="poses">${posesFor(c).map((p) => `<button class="tile sm" data-pose="${p.id}" title="${U.esc(p.name)}">${figureThumb(c, p.id, false, p.expr)}<span>${U.esc(p.name)}</span></button>`).join('')}</div>` +
+  return `<h3 class="sh">Poses</h3><div class="poses">${posesFor(c).map((p) => `<button class="tile sm" data-pose="${p.id}" title="${U.esc(p.name)}">${figureThumb(c, p.id, false, p.expr)}<span>${U.esc(p.name)}</span></button>`).join('')}</div>` +
     `<div class="row"><button data-act="mirror">⇋ Mirror pose</button>${rig.supports?.feet ? `<button data-act="feet">Feet: ${it.pose.feet || 'out'}</button>` : ''}${rig.supports?.hair ? `<button data-act="hairflip" title="Mirror only the hair (ponytail, parting, curls) — the pose stays the same">⇆ Hair side</button>` : ''}${FIG.sidedAccessories(c).length ? `<button data-act="capeflip" title="Mirror only the cape or other one-sided add-ons">⇆ ${U.esc(FIG.sidedAccessories(c).map((a) => a.name || a.id).join(' / '))}</button>` : ''}</div>` +
-    `<h4>When dragging a hand or foot</h4><div class="row seg"><button data-act="mode-reach" class="${app.handMode === 'reach' ? 'on' : ''}" title="The hand goes where you drag; the elbow follows">Move whole arm</button><button data-act="mode-rotate" class="${app.handMode === 'rotate' ? 'on' : ''}" title="Only the lower arm or leg turns around the elbow or knee">Turn lower arm</button></div>` +
+    `<h3 class="sh">When dragging a hand or foot</h3><div class="row seg"><button data-act="mode-reach" class="${app.handMode === 'reach' ? 'on' : ''}" title="The hand goes where you drag; the elbow follows">Move whole arm</button><button data-act="mode-rotate" class="${app.handMode === 'rotate' ? 'on' : ''}" title="Only the lower arm or leg turns around the elbow or knee">Turn lower arm</button></div>` +
     `<div class="row"><span class="muted small">Flip elbow / knee:</span>${FIG.limbs(c).map((L) => `<button data-flip="${L.id}">${U.esc(L.joint)}</button>`).join('')}</div>` +
-    `<h4>Put arms / legs in front</h4><p class="muted">Tick to put them on their own layer <i>above</i> the character — e.g. hands on top of a drum or book while the body stays behind it.</p><div class="checks">` +
+    `<h3 class="sh">Put arms / legs in front</h3><p class="muted">Tick to put them on their own layer <i>above</i> the character — e.g. hands on top of a drum or book while the body stays behind it.</p><div class="checks">` +
     FIG.limbs(c).map((L) => `<label><input type="checkbox" data-detach="${L.id}" ${it.detach?.[L.id] ? 'checked' : ''}> ${U.esc(L.label)}</label>`).join('') + '</div>';
 }
 function propLook(it) {
@@ -184,31 +184,31 @@ function propLook(it) {
     return field(pr.label, `<input type="text" value="${U.esc(v)}" data-param="${key}">`);
   };
   const own = (def.params || []).filter((pr) => whenOk(pr, P));
-  if (own.length) h += `<h4>Options</h4>` + own.map((pr) => optionField(pr, pr.key, P[pr.key] ?? pr.def)).join('');
+  if (own.length) h += `<h3 class="sh">Options</h3>` + own.map((pr) => optionField(pr, pr.key, P[pr.key] ?? pr.def)).join('');
   // slots: pick any installed add-on of the right kind (pictures, flowers, charts…)
   for (const sl of def.slots || []) {
     if (!whenOk(sl, P)) continue;
     const cur = P[sl.key]; const list = CP.addonsOfKind(sl.kind);
     const tile = (id, name, svg) => `<button class="tile sm ${String(cur) === id || (id === 'none' && EMPTY_SLOT.has(cur)) ? 'on' : ''}" data-slot="${sl.key}" data-addon="${id}" title="${U.esc(name)}">${svg}<span>${U.esc(name)}</span></button>`;
-    h += `<h4>${U.esc(sl.label || sl.key)}</h4><div class="slotpick">` + tile('none', 'None', '<svg viewBox="0 0 100 70"><rect x="4" y="4" width="92" height="62" fill="none" stroke="#ccc" stroke-dasharray="5 4"/></svg>') + list.map((ad) => tile(ad.id, ad.name || ad.id, addonThumb(ad))).join('') + '</div>';
+    h += `<h3 class="sh">${U.esc(sl.label || sl.key)}</h3><div class="slotpick">` + tile('none', 'None', '<svg viewBox="0 0 100 70"><rect x="4" y="4" width="92" height="62" fill="none" stroke="#ccc" stroke-dasharray="5 4"/></svg>') + list.map((ad) => tile(ad.id, ad.name || ad.id, addonThumb(ad))).join('') + '</div>';
     if (!EMPTY_SLOT.has(cur) && !CP.addons[cur]) h += `<p class="warn">⚠ Add-on "${U.esc(cur)}" is not installed.</p>`;
     const ad = CP.addons[cur]; if (ad && ad.params) { const vals = addonParams(ad, sl.key, P); h += ad.params.filter((pr) => whenOk(pr, vals)).map((pr) => optionField(pr, `${sl.key}.${pr.key}`, vals[pr.key])).join(''); }
     if (!list.length) h += `<p class="muted small">No "${U.esc(sl.kind)}" add-ons installed — add some to plugins/addons.</p>`;
   }
-  h += `<h4>Colours</h4><div class="colors">${Object.keys(def.colors).map((k) => `<label>${k}<input type="color" value="${it.colors?.[k] || def.colors[k]}" data-color="${k}"></label>`).join('')}<button data-act="resetcol">Reset</button></div>`;
-  h += `<h4>Overall colour</h4>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
+  h += `<h3 class="sh">Colours</h3><div class="colors">${Object.keys(def.colors).map((k) => `<label>${k}<input type="color" value="${it.colors?.[k] || def.colors[k]}" data-color="${k}"></label>`).join('')}<button data-act="resetcol">Reset</button></div>`;
+  h += `<h3 class="sh">Overall colour</h3>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
   return h;
 }
 function arrangeDetails(it) {
   let h = '';
   if (it.group) h += `<p class="muted small">Part of <b>▣ ${U.esc(groupName(it.group))}</b> — you picked just this one.</p><div class="row"><button data-act="selgroup">Select the whole group</button><button data-act="leavegroup">Take out of group</button></div>`;
-  h += `<h4>Size and turn</h4>`;
+  h += `<h3 class="sh">Size and turn</h3>`;
   h += field(`${it.type === 'text' ? 'Scale' : 'Size'} <output>${(+it.s).toFixed(2)}</output>`, `<input type="range" min="0.15" max="4" step="0.01" value="${it.s}" data-k="s">`);
   h += field(`Rotate <output>${it.rot || 0}°</output>`, `<input type="range" min="-180" max="180" step="1" value="${it.rot || 0}" data-k="rot">`);
   h += `<div class="row"><button data-act="flip">⇆ Flip</button><button data-act="size1">Standard size (1.00)</button></div>`;
-  h += `<h4>Order</h4>${orderRow()}`;
-  h += `<h4>Line up</h4>${alignRow('align-page', 'Line up with the page')}`;
-  h += `<h4>Actions</h4><div class="row"><button data-act="dup">Duplicate</button><button data-act="lock" title="Ctrl+Shift+L — stops it being selected or moved on the page">🔒 Lock</button><button data-act="zoomsel" title="Zoom in on it">🔍 Zoom to</button><button data-act="del" class="danger">Delete</button></div>`;
+  h += `<h3 class="sh">Order</h3>${orderRow()}`;
+  h += `<h3 class="sh">Line up</h3>${alignRow('align-page', 'Line up with the page')}`;
+  h += `<h3 class="sh">Actions</h3><div class="row"><button data-act="dup">Duplicate</button><button data-act="lock" title="Ctrl+Shift+L — stops it being selected or moved on the page">🔒 Lock</button><button data-act="zoomsel" title="Zoom in on it">🔍 Zoom to</button><button data-act="del" class="danger">Delete</button></div>`;
   h += `<div class="row"><button data-act="copy" title="Ctrl+C">Copy</button><button data-act="cut" title="Ctrl+X">Cut</button>${copyToField(false)}</div>`;
   return h;
 }

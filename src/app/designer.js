@@ -58,8 +58,8 @@ function renderDesigner() {
   $('#d-form').innerHTML =
     field('Name', `<input type="text" data-d="name" value="${U.esc(c.name)}">`) +
     field('Main colour', `<span class="cf"><input type="color" data-d="color" value="${c.color}"><span class="sw">${SWATCHES.map((s) => `<button style="background:${s}" data-swatch="${s}" title="${s}"></button>`).join('')}</span></span>`) +
-    (FIG.rigs().length > 1 ? `<h4 id="d-type-h">Character type</h4><div class="typepick" role="radiogroup" aria-labelledby="d-type-h">${FIG.rigs().map((r) => `<button type="button" role="radio" aria-checked="${r.id === rig.id}" class="tile typetile ${r.id === rig.id ? 'on' : ''}" data-dtype="${r.id}">${typeThumb(c, r)}<span>${U.esc(r.name)}</span></button>`).join('')}</div>` : '') +
-    `<h4>Body</h4>` +
+    (FIG.rigs().length > 1 ? `<h3 class="sh" id="d-type-h">Character type</h3><div class="typepick" role="radiogroup" aria-labelledby="d-type-h">${FIG.rigs().map((r) => `<button type="button" role="radio" aria-checked="${r.id === rig.id}" class="tile typetile ${r.id === rig.id ? 'on' : ''}" data-dtype="${r.id}">${typeThumb(c, r)}<span>${U.esc(r.name)}</span></button>`).join('')}</div>` : '') +
+    `<h3 class="sh">Body</h3>` +
     field('Build', `<select data-d="build">${opts(rig.buildNames || { [c.build]: c.build }, c.build)}</select>`) +
     field(`Height <output>${(+c.height).toFixed(2)}</output>`, `<input type="range" min="0.7" max="1.4" step="0.01" data-d="height" value="${c.height}">`) +
     field(`Line weight <output>${(+c.weight).toFixed(2)}</output>`, `<input type="range" min="0.6" max="1.8" step="0.05" data-d="weight" value="${c.weight}">`) +
@@ -71,12 +71,12 @@ function renderDesigner() {
     `<label class="chk"><input type="checkbox" data-dchk="hatchBody" ${c.hatchBody !== false ? 'checked' : ''}> Light shading on clothes</label>`
     ) : '') +
     (sup.hair ? (
-    `<h4>Hair</h4>` +
+    `<h3 class="sh">Hair</h3>` +
     field('Hair style', `<select data-d="hair">${opts(named(CP.hair, c.hair), c.hair)}</select>`) +
     colorField('hairColor', 'Hair colour') +
     `<label class="chk"><input type="checkbox" data-dchk="hairFlip" ${c.hairFlip ? 'checked' : ''}> Hair on the other side (default for this character)</label>`
     ) : '') +
-    `<h4>Accessories</h4><div class="accs">${accRows}</div>` +
+    `<h3 class="sh">Accessories</h3><div class="accs">${accRows}</div>` +
     (sup.face ? `<label class="chk"><input type="checkbox" data-dchk="nose" ${c.nose !== false ? 'checked' : ''}> Nose</label>` : '') +
     field('Face tint', `<span class="cf"><input type="color" data-d="faceTint" value="${c.faceTint || '#c68642'}"><label class="same"><input type="checkbox" data-dnone="faceTint" ${c.faceTint ? '' : 'checked'}> none</label></span>`) +
     field('Default pose', `<select data-d="defaultPose">${opts(Object.fromEntries(posesFor(c).map((p) => [p.id, p.name])), c.defaultPose)}</select>`) +

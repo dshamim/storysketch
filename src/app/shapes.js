@@ -119,10 +119,10 @@ function shapeLook(it) {
     field('Line style', `<select data-shape="dash">${opts(SHP.DASHES, t.dash)}</select>`) +
     (t.shape === 'box' ? rangeField('Rounded corners', 'radius', t.radius, 0, 100) : '') +
     rangeField('See-through', 'opacity', t.opacity, 0.1, 1, 0.05) +
-    `<h4>Size</h4>` + rangeField('Width', 'w', t.w, 12, 1000) + rangeField('Height', 'h', t.h, 12, 1000) +
-    `<h4>Words inside</h4>` + field('Words', `<textarea rows="2" data-shape="text" placeholder="Double-click the shape to type in it">${U.esc(t.text)}</textarea>`) +
+    `<h3 class="sh">Size</h3>` + rangeField('Width', 'w', t.w, 12, 1000) + rangeField('Height', 'h', t.h, 12, 1000) +
+    `<h3 class="sh">Words inside</h3>` + field('Words', `<textarea rows="2" data-shape="text" placeholder="Double-click the shape to type in it">${U.esc(t.text)}</textarea>`) +
     swatchField('Word colour', 'textColor', t.textColor) + rangeField('Word size', 'textSize', t.textSize, 12, 200) +
-    `<h4>Overall colour</h4>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
+    `<h3 class="sh">Overall colour</h3>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
 }
 function lineLook(it) {
   const t = SHP.normLine(it); const ends = { none: 'Nothing', arrow: 'Arrowhead' };
@@ -131,7 +131,7 @@ function lineLook(it) {
     field('Start of the line', `<select data-shape="start">${opts(ends, t.start)}</select>`) + field('End of the line', `<select data-shape="end">${opts(ends, t.end)}</select>`) +
     rangeField('See-through', 'opacity', t.opacity, 0.1, 1, 0.05) +
     `<p class="muted small">Drag the round handle at either end to change its length and direction. Hold Shift to keep it straight.</p>` +
-    `<h4>Overall colour</h4>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
+    `<h3 class="sh">Overall colour</h3>` + field('Colour', `<select data-k="mode">${opts(MODE_OPTS, it.mode || 'auto')}</select>`);
 }
 
 function initShapes() {

@@ -51,7 +51,7 @@ Furniture and small things are **human scale**: draw them in proportion to the 2
 | Window | sill about 150 up, about 120 high |
 | House (whole) | at most **800 wide x 620 high** |
 | School building | at most **940 wide x 560 high** |
-| School bus | **760 long x 360 high**, door opening about 280 high |
+| School bus | **760 long x 360 high**, door opening about 260 high |
 | Slide, climbing frame | platform about 220 high, whole thing at most 340 high |
 | Swing frame | about 330 high, seat 80 from the ground |
 | Tree | 450 to 650 high |
@@ -62,7 +62,7 @@ Do **not** shrink a building so that a person looks right next to it. Keep the n
 ## 3. Origin
 - **Floor props** (anything that stands on the ground): the origin is the **bottom centre**. The lowest point is at **y = 0** (within 12) and the middle is at **x = 0**. The checker enforces this.
 - **Floating props** (sun, cloud, balloon, kite, bird): put `floating: true` on the prop and centre it on (0, 0).
-- **Page-wide scenery** (ground, sky, hills, walls) may be up to 1000 wide. Make them stretchable with `width` / `height` `range` params **and give them a `place` hint**, so that one click on the tile puts them in the right place: `place: { x: 0.5, y: 0.8, rank: 10, fit: { width: 1, height: 0.8 } }`. `x` and `y` are fractions of the page (where the origin goes), `fit` is the fraction of the page the `width` / `height` settings should fill, and `rank` is how far back it sits (lower is further back; sky 10, wall 15, hills 20, ground 30). The checker requires a `place` hint for anything over 800 wide.
+- **Page-wide scenery** (ground, sky, hills, walls) may be up to 1000 wide. Make them stretchable with `width` / `height` `range` params **and give them a `place` hint**, so that one click on the tile puts them in the right place: `place: { x: 0.5, y: 0.8, rank: 10, fit: { width: 1, height: 0.8 } }`. `x` and `y` are fractions of the page (where the origin goes), `fit` is the fraction of the page the `width` / `height` settings should fill, and `rank` is how far back it sits (lower is further back; sky 10, wall 15, hills 20, ground 30). The checker requires a `place` hint for anything over 800 wide, except buildings.
 
 ## 4. Point of view
 Draw objects from the **front, with a slight look-down**: a table top is a thin slanted parallelogram, a stool top is a flat ellipse (see the classroom table and stool). **No vanishing-point perspective, no isometric.** Buildings and vehicles are drawn from the side or front, flat.

@@ -5,6 +5,11 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
+## Unreleased — the School kit
+- **20 School props** (pack "School props"): school building (flag-free front with clock gable, doors open or shut, lights on or off), school gate, school bus (door open, lights on), bus stop with shelter, zebra crossing, crossing-patrol sign, flagpole, hand bell; lockers (2 to 6 doors, one open), classroom door, assembly stage with curtain and microphone, canteen table with benches, lunch tray; football goal, ball (football, basketball, tennis), running track, trophy; backpack and lunchbox.
+- **New sample project "A day at school"** (5 pages): the bus and bus stop, the school front, the corridor, the canteen with the stage, and sports day.
+- Not built because the Home kit already has them: a wall clock (use **Home props > Wall clock**).
+
 ## Unreleased — the Home kit
 - **26 Home props** (pack "Home props"): house, front door, garden gate, letterbox; sofa (2 or 3 seats), armchair, coffee table, TV on a cabinet, wall clock (set the hour and minutes), fireplace; dining table with chairs, fridge, cooker, sink and cupboard, kettle, plates and cup; bed, bunk bed, cot, bedside table with lamp, toy box, teddy bear, slippers; bath, basin and mirror; child's bicycle. Each has story states (door open, lights on, fire lit, tap running, pot on the cooker, water and bubbles in the bath…) and search words.
 - **Scale:** every seat is 80 high (a child or adult in the Sit pose fits on any of them), counters and the dining table 128, the bed mattress 80.

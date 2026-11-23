@@ -54,7 +54,7 @@ test('new projects are one blank page by default', () => {
   assert.equal(STORE.fresh('project:does-not-exist').pages.length, 1, 'unknown sample falls back to one blank page');
 });
 test('the sample projects are all there', () => {
-  assert.equal(JSON.stringify(CP.projects.map((p) => p.id).sort()), JSON.stringify(['sample-airport', 'sample-animals', 'sample-chalkboard', 'sample-classroom', 'sample-home']));
+  assert.equal(JSON.stringify(CP.projects.map((p) => p.id).sort()), JSON.stringify(['sample-airport', 'sample-animals', 'sample-chalkboard', 'sample-classroom', 'sample-home', 'sample-school']));
   for (const sp of CP.projects) { assert.ok(sp.name && sp.description, sp.id); assert.ok(sp.pages.length >= 1); }
 });
 test('samples: every item in the file becomes a real item (nothing silently dropped), with a unique id', () => {

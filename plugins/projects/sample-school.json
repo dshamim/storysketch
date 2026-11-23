@@ -1,0 +1,445 @@
+{
+ "api": 1,
+ "version": "1.0.0",
+ "id": "sample-school",
+ "name": "Sample \u2014 A day at school (5 pages)",
+ "description": "From the school bus to the playground: the bus stop and crossing, the school building, the corridor, the canteen and the sports field. Shows the School props, the scenery pieces and people with backpacks. Crayon style.",
+ "settings": {
+  "style": "crayon"
+ },
+ "cast": [
+  "teacher",
+  "lily",
+  "leo",
+  "sam",
+  "mia",
+  "ahmed"
+ ],
+ "pages": [
+  {
+   "name": "The school bus",
+   "notes": "The bus is 760 long and 360 high, with its door about 260 high. Open the door and switch the lights on in Details; press H to turn the bus around. (The bus is drawn at 85 percent here so the bus stop fits beside it.)",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "day",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750,
+     "params": {
+      "kind": "road",
+      "depth": 150
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "school-busstop",
+     "x": 150,
+     "y": 640
+    },
+    {
+     "type": "prop",
+     "kind": "school-bus",
+     "x": 650,
+     "y": 700,
+     "params": {
+      "open": true
+     },
+     "s": 0.85
+    },
+    {
+     "type": "prop",
+     "kind": "school-crossing",
+     "x": 330,
+     "y": 745
+    },
+    {
+     "type": "prop",
+     "kind": "school-backpack",
+     "x": 95,
+     "y": 690
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 170,
+     "floor": 690,
+     "pose": "wave"
+    },
+    {
+     "type": "figure",
+     "cast": "leo",
+     "x": 235,
+     "floor": 690,
+     "pose": "stand"
+    },
+    {
+     "type": "figure",
+     "cast": "teacher",
+     "x": 300,
+     "floor": 690,
+     "pose": "stand"
+    }
+   ]
+  },
+  {
+   "name": "The school",
+   "notes": "The school door is 340 high, like the house door, so people fit through it. Doors, lights and the clock in the gable are switches in Details. The school is drawn at 90 percent on this page.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "day",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750
+    },
+    {
+     "type": "prop",
+     "kind": "school-building",
+     "x": 500,
+     "y": 670,
+     "s": 0.9
+    },
+    {
+     "type": "prop",
+     "kind": "school-flagpole",
+     "x": 890,
+     "y": 700
+    },
+    {
+     "type": "prop",
+     "kind": "school-bell",
+     "x": 330,
+     "y": 735
+    },
+    {
+     "type": "figure",
+     "cast": "teacher",
+     "x": 300,
+     "floor": 700,
+     "pose": "wave"
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 600,
+     "floor": 725,
+     "pose": "cheer"
+    },
+    {
+     "type": "figure",
+     "cast": "mia",
+     "x": 680,
+     "floor": 730,
+     "pose": "stand"
+    },
+    {
+     "type": "figure",
+     "cast": "sam",
+     "x": 760,
+     "floor": 735,
+     "pose": "stand"
+    }
+   ]
+  },
+  {
+   "name": "Corridor",
+   "notes": "Lockers, a classroom door and a school bell. One locker door stands open; change how many doors in Details.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-wall",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "paper": "stripes",
+      "window": false,
+      "door": false,
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750,
+     "params": {
+      "kind": "floor",
+      "depth": 150
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "school-lockers",
+     "x": 230,
+     "y": 700,
+     "params": {
+      "count": 5
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "school-door",
+     "x": 560,
+     "y": 700
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-window",
+     "x": 800,
+     "y": 300,
+     "params": {
+      "curtains": false,
+      "view": "tree"
+     }
+    },
+    {
+     "type": "figure",
+     "cast": "ahmed",
+     "x": 440,
+     "floor": 700,
+     "pose": "stand"
+    },
+    {
+     "type": "figure",
+     "cast": "mia",
+     "x": 680,
+     "floor": 700,
+     "pose": "stand",
+     "flip": true
+    },
+    {
+     "type": "prop",
+     "kind": "school-backpack",
+     "x": 95,
+     "y": 700
+    }
+   ]
+  },
+  {
+   "name": "Canteen",
+   "notes": "Tables are 128 high and bench seats 80, the same as at home, so everyone fits. The trays and lunchboxes sit on the table: place them at 128 above the floor.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-wall",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "paper": "plain",
+      "window": false,
+      "door": false,
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750,
+     "params": {
+      "kind": "floor",
+      "depth": 150
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-window",
+     "x": 250,
+     "y": 300,
+     "params": {
+      "curtains": false,
+      "view": "sun"
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-clouds",
+     "x": 700,
+     "y": 200,
+     "params": {
+      "count": 1
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "school-canteen-table",
+     "x": 360,
+     "y": 700
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 270,
+     "floor": 700,
+     "pose": "sittable"
+    },
+    {
+     "type": "figure",
+     "cast": "leo",
+     "x": 450,
+     "floor": 700,
+     "pose": "sittable",
+     "flip": true
+    },
+    {
+     "type": "prop",
+     "kind": "school-tray",
+     "x": 290,
+     "y": 572
+    },
+    {
+     "type": "prop",
+     "kind": "school-lunchbox",
+     "x": 430,
+     "y": 572,
+     "params": {
+      "open": true
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "school-stage",
+     "x": 760,
+     "y": 700,
+     "s": 0.9
+    },
+    {
+     "type": "figure",
+     "cast": "teacher",
+     "x": 810,
+     "floor": 700,
+     "pose": "stand"
+    }
+   ]
+  },
+  {
+   "name": "Sports day",
+   "notes": "A goal, a ball, a running track and a trophy. Change the ball between football, basketball and tennis in Details.",
+   "items": [
+    {
+     "type": "prop",
+     "kind": "scenery-sky",
+     "x": 500,
+     "y": 600,
+     "params": {
+      "time": "day",
+      "width": 1000,
+      "height": 600
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-hills",
+     "x": 500,
+     "y": 600
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-ground",
+     "x": 500,
+     "y": 750,
+     "params": {
+      "kind": "grass",
+      "depth": 150
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "school-goal",
+     "x": 190,
+     "y": 690
+    },
+    {
+     "type": "prop",
+     "kind": "school-ball",
+     "x": 330,
+     "y": 725,
+     "params": {
+      "kind": "football"
+     }
+    },
+    {
+     "type": "prop",
+     "kind": "school-track",
+     "x": 640,
+     "y": 745,
+     "params": {
+      "width": 700,
+      "lanes": 3
+     }
+    },
+    {
+     "type": "figure",
+     "cast": "leo",
+     "x": 330,
+     "floor": 690,
+     "pose": "run"
+    },
+    {
+     "type": "figure",
+     "cast": "lily",
+     "x": 540,
+     "floor": 700,
+     "pose": "run"
+    },
+    {
+     "type": "figure",
+     "cast": "sam",
+     "x": 660,
+     "floor": 705,
+     "pose": "cheer"
+    },
+    {
+     "type": "prop",
+     "kind": "school-trophy",
+     "x": 900,
+     "y": 690
+    },
+    {
+     "type": "prop",
+     "kind": "scenery-clouds",
+     "x": 500,
+     "y": 160,
+     "params": {
+      "count": 2
+     }
+    }
+   ]
+  }
+ ]
+}

@@ -191,3 +191,11 @@ form.pad { padding: 18px 20px; max-width: 520px; }
 #add-textbox[aria-pressed="true"] { background: var(--ui-accent-weak); border-color: var(--ui-accent); color: var(--ui-accent-weak-text); }
 .rb-size { display: inline-flex; align-items: center; gap: 2px; }
 .rb-color { width: 36px; height: 32px; padding: 2px; border: 1px solid var(--ui-border-input); border-radius: var(--ui-r-sm); background: var(--ui-surface); cursor: pointer; }
+
+/* shapes, lines and arrows */
+#stage.tool-draw, #stage.tool-draw * { cursor: crosshair !important; }
+#stage .h-end { cursor: move; }
+#stage .h-n, #stage .h-s { cursor: ns-resize; } #stage .h-e, #stage .h-w { cursor: ew-resize; }
+#stage .h-nw, #stage .h-se { cursor: nwse-resize; } #stage .h-ne, #stage .h-sw { cursor: nesw-resize; }
+.shape-tile svg { height: 56px; }
+.shape-tile[aria-pressed="true"] { background: var(--ui-accent-weak); border-color: var(--ui-accent); color: var(--ui-accent-weak-text); }

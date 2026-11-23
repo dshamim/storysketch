@@ -51,6 +51,7 @@
     <nav class="ui-rail" id="rail" role="tablist" aria-orientation="vertical" aria-label="Library" data-ui-ready="1">
       <button class="ui-rail-btn" role="tab" id="rail-cast" data-tab="tab-cast" aria-selected="true"><span data-icon="characters"></span>Characters</button>
       <button class="ui-rail-btn" role="tab" id="rail-props" data-tab="tab-props" aria-selected="false"><span data-icon="props"></span>Props</button>
+      <button class="ui-rail-btn" role="tab" id="rail-shapes" data-tab="tab-shapes" aria-selected="false"><span data-icon="shapes"></span>Shapes</button>
       <button class="ui-rail-btn" role="tab" id="rail-text" data-tab="tab-text" aria-selected="false"><span data-icon="text"></span>Text</button>
       <button class="ui-rail-btn" role="tab" id="rail-layers" data-tab="tab-layers" aria-selected="false"><span data-icon="layers"></span>Layers</button>
     </nav>
@@ -67,6 +68,13 @@
       <p class="muted small">Click a character to add it to the page.</p>
       <div class="grid" id="cast-grid"></div>
       <div id="lib-section"></div>
+    </section>
+    <section class="tabpane" id="tab-shapes" role="tabpanel" aria-labelledby="rail-shapes" hidden>
+      <p class="muted small">Click one to add it to the page. Or press its key (shown when you point at it), then drag on the page to draw it. Hold <b>Shift</b> for a perfect square or circle, or to keep a line straight. Double-click a shape to type inside it.</p>
+      <h4>Shapes</h4>
+      <div class="grid" id="shape-grid"></div>
+      <h4>Lines and arrows</h4>
+      <div class="grid" id="line-grid"></div>
     </section>
     <section class="tabpane" id="tab-text" role="tabpanel" aria-labelledby="rail-text" hidden>
       <div class="row"><button class="ui-btn sm" id="add-textbox" aria-pressed="false" data-kbd="T"><span data-icon="text"></span>Add a text box</button></div>
@@ -346,6 +354,7 @@
 <script src="src/app/library.js"></script>
 <script src="src/app/arrange.js"></script>
 <script src="src/app/texttool.js"></script>
+<script src="src/app/shapes.js"></script>
 <script src="src/app/ribbon.js"></script>
 <script src="src/app/inspector.js"></script>
 <script src="src/app/designer.js"></script>

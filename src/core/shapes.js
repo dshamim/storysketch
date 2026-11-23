@@ -13,7 +13,7 @@ const SHP = (() => {
   const LINE_DEFAULTS = { pts: [[-110, 0], [110, 0]], stroke: '#2a2a2a', width: 5, dash: 'none', start: 'none', end: 'arrow', opacity: 1 };
   const LIMITS = { w: [12, 4000], h: [12, 4000], width: [0, 40], radius: [0, 200], opacity: [0.1, 1], textSize: [8, 400] };
   const MIN = 12; // smallest side of a shape / length of a line
-  const FILLS = { none: 'No fill', colour: 'Colour', hatch: 'Shading lines', solid: 'Solid (hides what is behind)' };
+  const FILLS = { none: 'No fill', colour: 'Colour', hatch: 'Shading lines', solid: 'Solid' };
   const DASHES = { none: 'Solid line', dashed: 'Dashed', dotted: 'Dotted' };
   const normShape = (it) => ({ ...SHAPE_DEFAULTS, ...it });
   const normLine = (it) => ({ ...LINE_DEFAULTS, ...it });

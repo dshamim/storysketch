@@ -5,7 +5,15 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
-## Unreleased — text (revamp phase 4)
+## Unreleased — shapes and arrows (revamp phase 4b)
+- **Shapes tab** in the rail: **Box, Circle, Triangle** and **Line, Arrow, Double arrow**. Click a tile to add one to the page, or use the quick keys **R** (box), **O** (circle), **Y** (triangle), **L** (line), **A** (arrow), **Shift+A** (double arrow), then **drag** on the page to draw it. A plain click drops a default size. **Shift** gives a perfect square or circle, or keeps a line on 15 degree steps. **Esc** cancels. One undo step per drawing.
+- **Handles that fit the thing.** A shape has eight resize handles (sides and corners; the opposite side stays put; Shift on a corner keeps the proportions) and the round turn handle. A line has two round end handles. Both still move, scale, rotate, flip, group, lock, line up, copy and undo like any other object.
+- **Look.** Ribbon: fill, fill colour, outline colour, thickness, line style (solid, dashed, dotted). Details ▸ Look adds colour swatches, rounded corners (box), see-through, width and height, arrowheads for lines. Fills: none, colour, shading lines, solid (hides what is behind).
+- **Words inside a shape.** Double-click a shape (or press Enter) and type; the words stay centred, turn with the shape and are drawn in the current style.
+- **Every style.** Crayon, marker, ink, chalk and clean all draw shapes, dashes and arrowheads; exports look the same as the page and the same project always exports the same pixels.
+- Not included: the freehand pencil, curved or bent arrows, other arrowhead shapes (the head is a "V").
+
+## Earlier — text (revamp phase 4)
 - **Text tool.** Press **T** (or rail ▸ **Text** ▸ *Add a text box*), then **click** on the page to type or **drag** a box that wraps. The Text panel also has one-click styles: **Title, Heading, Body text, Caption, Number line**. Esc cancels the tool; it is one-shot.
 - **Edit in place.** Double-click a text (or press Enter on it) and type. You see the real drawing with a caret and a highlighted selection, so what you edit is what you get; click or drag in the text to move the caret or select letters, Up / Down move by drawn line, Esc or Ctrl+Enter finish. A text left empty disappears, and a whole edit is a single undo step.
 - **A normal object.** Text moves, **scales, rotates (round handle, or type degrees in the ribbon), flips**, groups, locks, lines up, copies, undoes and exports like a character or prop. Rotation turns the whole wrapped block and it stays editable. Drag the **side handles** to change the width: it re-wraps and the top corner stays put.

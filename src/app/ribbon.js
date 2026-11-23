@@ -32,6 +32,8 @@ function ribbonFor(sel) {
   if (own.locked) return '<span class="ui-badge warning">Locked</span>' + rbBtn('unlock', 'unlock', 'Unlock', 'Ctrl+Shift+L') + rbSep + position;
   if (it.type === 'limbs') return `<span class="ui-muted">Front arms and legs of ${U.esc(itemName(ownerOf(it) || it))}</span>` + rbSep + position;
   if (it.type === 'text') return textRibbon(it) + rbSep + position + rbRotate(it);
+  if (it.type === 'shape') return shapeRibbon(it) + rbSep + position + rbRotate(it);
+  if (it.type === 'line') return lineRibbon(it) + rbSep + position + rbRotate(it);
   const mode = rbSelect('data-k="mode"', 'Colour', opts(MODE_OPTS, it.mode || 'auto'));
   if (it.type === 'figure') {
     const c = castById(it.cast); if (!c) return '<span class="ui-muted">Missing character</span>' + rbSep + position;

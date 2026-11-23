@@ -40,7 +40,8 @@ function onKey(e) {
   else if (k === 'h' || k === 'H') { for (const it of movable(app.sel.map(itemById))) it.flip = !it.flip; renderStage(); commit(); }
   else if (k === 'Escape') { if (app.tool) setTool(null); else select([]); }
   else if ((k === 't' || k === 'T') && !ctrl) setTool(app.tool === 'text' ? null : 'text')
-  else if (k === 'Enter' && app.sel.length === 1 && isText(itemById(app.sel[0]))) { e.preventDefault(); startEdit(app.sel[0]); }
+  else if (!ctrl && !e.altKey && DRAW_KEYS[k.toLowerCase()]) { const t = e.shiftKey && k.toLowerCase() === 'a' ? 'double' : DRAW_KEYS[k.toLowerCase()]; setTool(app.tool === t ? null : t); } // R box, O circle, Y triangle, L line, A arrow, Shift+A double arrow
+  else if (k === 'Enter' && app.sel.length === 1 && hasWords(itemById(app.sel[0]))) { e.preventDefault(); startEdit(app.sel[0]); }
   else if (k === '/') { e.preventDefault(); showFlyout(); $('#lsearch').focus(); }
   else if (k === 'PageUp') { e.preventDefault(); goPage(app.page - 1); }
   else if (k === 'PageDown') { e.preventDefault(); goPage(app.page + 1); }
@@ -50,7 +51,7 @@ function onKey(e) {
 function init() {
   let firstRun = true; try { firstRun = !localStorage.getItem('storysketch/project'); } catch (e) { /* ignore */ }
   app.P = STORE.load(); STORE.snapshot(app.P);
-  initShell(); initText();
+  initShell(); initText(); initShapes();
   $('#defs-holder').innerHTML = `<defs>${RENDER.defs()}</defs>`;
   renderStyleControls();
   const stage = $('#stage');

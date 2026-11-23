@@ -25,6 +25,8 @@ function onDown(e) {
     if (isText(hit) && !hit.locked) { setTool(null); select([hit.id]); startEdit(hit.id, { caret: TXT.indexAt(TXT.layout(hit), ...toLocal(hit, P0)) }); return; }
     app.drag = { kind: 'textbox', P0, moved: false }; $('#stage').setPointerCapture(e.pointerId); return;
   }
+  // Shape / line tool (R O Y L A): drag to draw; a plain click drops a default-sized one
+  if (isDrawTool(app.tool) && !app.space) { app.drag = startDraw(toPage(e), e); $('#stage').setPointerCapture(e.pointerId); return; }
   const P = toPage(e); const h = e.target.closest('[data-h]');
   const add = e.shiftKey || e.ctrlKey || e.metaKey;
   // Alt+click cycles through stacked items (but Alt on a pose dot still means its usual thing)
@@ -49,6 +51,7 @@ function onDown(e) {
       const L = TXT.layout(it); const dir = kind === 'tw-r' ? 1 : -1; const flip = it.flip ? -1 : 1; const a = U.rad(it.rot || 0);
       app.drag.A = toPageXY(it, [dir > 0 ? L.x0 : L.x0 + L.W, L.y0]); app.drag.axis = [Math.cos(a) * flip * dir, Math.sin(a) * flip * dir];
     }
+    if (kind.startsWith('sh-') || kind.startsWith('le-')) startShapeHandle(app.drag, it, kind);
     if (kind.startsWith('ik:')) { const c = castById(it.cast); const J = FIG.joints(c, it.pose); app.drag.bend = FIG.bendOf(c, J, kind.slice(3)); }
   } else {
     const g = e.target.closest('#items [data-id]');
@@ -74,6 +77,7 @@ function onMove(e) {
   const d = app.drag; if (!d) return;
   if (d.kind === 'pan') { app.view.cx = d.v0[0] - (e.clientX - d.c0[0]) / d.k; app.view.cy = d.v0[1] - (e.clientY - d.c0[1]) / d.k; applyView(); return; }
   const P = toPage(e); d.moved = true;
+  if (d.kind === 'draw') { drawMove(d, P, e); return; }
   if (d.kind === 'textsel') { const i = textCaretAt(e); const ta = textField(); ta.setSelectionRange(Math.min(d.from, i), Math.max(d.from, i), i < d.from ? 'backward' : 'forward'); renderOverlay(); return; }
   if (d.kind === 'textbox') {
     const r = { x: Math.min(P[0], d.P0[0]), y: Math.min(P[1], d.P0[1]), w: Math.abs(P[0] - d.P0[0]), h: Math.abs(P[1] - d.P0[1]) };
@@ -105,6 +109,7 @@ function onMove(e) {
   }
   else if (d.kind === 'scale') { const it = d.it; const r0 = U.len([d.P0[0] - it.x, d.P0[1] - it.y]), r1 = U.len([P[0] - it.x, P[1] - it.y]); it.s = U.clamp(+(d.s0 * r1 / Math.max(r0, 1)).toFixed(3), 0.1, 8); }
   else if (d.kind === 'rot') { const it = d.it; const box = localBBox(it); const c = toPageXY(it, [(box.x0 + box.x1) / 2, (box.y0 + box.y1) / 2]); let a = d.rot0 + U.angleOf(U.sub(P, c)) - U.angleOf(U.sub(d.P0, c)); if (e.shiftKey) a = Math.round(a / 15) * 15; it.rot = Math.round(U.normA(a)); }
+  else if (d.kind.startsWith('sh-') || d.kind.startsWith('le-')) dragShapeHandle(d, P, e);
   else {
     const it = d.it; const c = castById(it.cast); const L = toLocal(it, P);
     const rotate = (app.handMode === 'rotate') !== e.shiftKey; // Shift temporarily switches mode
@@ -117,6 +122,7 @@ function onUp() {
   if (app.guides) { app.guides = null; renderOverlay(); }
   if (d.kind === 'pan') { $('#stage').classList.remove('panning'); return; }
   if (d.kind === 'textsel') return;
+  if (d.kind === 'draw') { drawEnd(d); return; }
   if (d.kind === 'textbox') {
     $('#marquee')?.setAttribute('visibility', 'hidden'); const P = d.P1 || d.P0; setTool(null);
     const r = d.last || { x: d.P0[0], y: d.P0[1], w: 0 }; addTextBox(r.x, r.y, r.w > 24 ? Math.round(r.w) : 0); return;
@@ -128,7 +134,7 @@ function onUp() {
     const now = Date.now(); const it = itemById(d.hit);
     if (it?.group && app.lastClick?.id === d.hit && now - app.lastClick.t < 450) { app.lastClick = null; select([d.hit]); return; }
     // double-click anything else = open its details
-    if (!it?.group && app.lastClick?.id === d.hit && now - app.lastClick.t < 450) { app.lastClick = null; if (isText(it)) startEdit(it.id, { caret: TXT.indexAt(TXT.layout(it), ...toLocal(it, d.P0)) }); else showDetails(); return; }
+    if (!it?.group && app.lastClick?.id === d.hit && now - app.lastClick.t < 450) { app.lastClick = null; if (isText(it)) startEdit(it.id, { caret: TXT.indexAt(TXT.layout(it), ...toLocal(it, d.P0)) }); else if (isShape(it)) startEdit(it.id); else showDetails(); return; }
     app.lastClick = { id: d.hit, t: now };
   }
 }

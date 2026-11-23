@@ -1,6 +1,6 @@
 # StorySketch — UI revamp plan
 
-**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) and Phase 3 (ribbon, mini bar, Details panel, arrange, snapping) and Phase 4 (text tool) are done; next is Phase 4b (shapes and arrows). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
+**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) and Phase 3 (ribbon, mini bar, Details panel, arrange, snapping) and Phase 4 (text tool) and Phase 4b (shapes and arrows) are done; next is Phase 5 (dialogs become panels). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
 Goal: an interface that is as simple as **Canva's**: clear logical groups, graphical icons, controls shown only when relevant, a first-class **text tool**
 and a small set of **shape / arrow / pencil** tools.
 
@@ -318,3 +318,18 @@ Decisions and limits:
 - **One undo step per edit**: history snapshots are paused while a text is being edited and taken when editing ends; a new text that stays empty leaves no trace.
 - Clicking a ribbon or Details control while typing ends the edit (the formatting applies to the whole text; there is no per-letter formatting).
 - Not done: drag a style from the Text panel onto the page (click adds it), text inside speech bubbles (the bubble props still use their own text option), a highlight / opacity option, a Font picker.
+
+## 15. Phase 4b notes (shapes, lines and arrows)
+Built: `src/core/shapes.js` (SHP: outlines, dashes, arrowheads, resize maths, drawing), `src/app/shapes.js` (tool, handles, ribbon and Details), a Shapes tab, hit areas in `model.js`, unit tests (`tests/unit/shapes.test.mjs`) and browser tests (`tests/e2e/shapes.test.mjs`).
+
+Decisions and differences from the plan:
+- **Lines keep local points plus x, y, s, rot, flip** (not page-absolute points), so a line moves, scales, turns and flips with the same code as everything else. `SHP.setEnds` rewrites the two points so the line always lies along its own x axis, with its angle in `rot`.
+- **Words in a shape are `shape.text`** (with `textSize`, `textColor`), not a separate grouped text item. One object means one undo step, one layer and no way to pull the words apart by accident. The words are laid out by the text engine and centred on the shape; circles and triangles use a narrower inner width.
+- **A tile click adds the shape at once; the quick keys arm the draw tool.** The tiles show the pressed key on pointing, but a click does not arm anything (the plan said both would arm).
+- **Dashes are geometry**: the outline is cut into short pieces, so every style (and the export) draws dashes without special cases. Dotted uses tiny pieces with round ends.
+- **Arrowheads are an open "V"** (30 degree wings) sized from the thickness and limited to 45 percent of the line length.
+- **Opacity is per item** (the `opacity` attribute on the item's group), not per stroke, because styles ignore `op` on primitives.
+- **An unfilled box is a frame**: clicks inside it reach what is behind. A filled one is solid.
+- **An empty shape is never deleted** (only empty text items are). Double-click or Enter starts typing.
+- **Pencil (freehand) skipped** by decision: it needs smoothing and a different hit area and is not needed for the first release.
+- Known small limits: double-click on a shape inside a group does not start typing (Enter does); Alt-click cycling through overlapping items uses the outer box; pressing keys quickly stacks several toasts.

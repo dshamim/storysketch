@@ -49,12 +49,14 @@ function tidyGroups(page = pg()) {
 
 function itemPrims(it) {
   if (it.type === 'text') return TXT.prims(it);
+  if (it.type === 'shape' || it.type === 'line') return SHP.prims(it);
   if (it.type === 'figure') { const c = castById(it.cast); return c ? FIG.prims(c, it, 'main') : []; }
   if (it.type === 'limbs') { const o = itemById(it.of); const c = o && castById(o.cast); return c ? FIG.prims(c, o, 'limbs') : []; }
   return propPrims(it);
 }
 function xform(it) { const t = ownerOf(it) || it; return `translate(${t.x} ${t.y}) rotate(${t.rot || 0}) scale(${(t.flip ? -1 : 1) * t.s} ${t.s})`; }
 function itemName(it) {
+  if (it.type === 'shape' || it.type === 'line') return SHP.name(it);
   if (it.type === 'text') { const t = String(it.text || '').replace(/\s+/g, ' ').trim(); return t ? `“${t.length > 28 ? t.slice(0, 27) + '…' : t}”` : '(empty text)'; }
   if (it.type === 'figure') return castById(it.cast)?.name || '(missing character)';
   if (it.type === 'limbs') { const o = itemById(it.of); return `${o ? castById(o.cast)?.name : '?'} · front limbs`; }
@@ -66,14 +68,28 @@ const curStyle = () => { const id = app.P.settings.style; return RENDER.styles[i
 // ---- poses belong to a rig (a four-legged character has its own presets) ----
 const posesFor = (c) => FIG.posesFor(c);
 const poseOf = (c, id) => { const ps = posesFor(c); return ps.find((p) => p.id === id) || ps.find((p) => p.id === c.defaultPose) || ps[0]; };
-// hit = on the editing canvas: text also gets an invisible box, so a click between the letters still picks it up
+// the invisible parts a click can land on: text gets its box (so a click between the letters still picks it up), a line a wide band along it,
+// a shape its outline (and its inside when filled; an empty box is a frame, so clicks inside it reach what is behind)
+function hitArea(it) {
+  const clear = 'fill="#000" fill-opacity="0"'; const rect = (b, dy = 0) => `<rect x="${b.x0}" y="${b.y0 + dy}" width="${b.w}" height="${b.h}" ${clear}/>`;
+  if (it.type === 'text') return rect(TXT.box(it));
+  if (it.type === 'line') { const [a, b] = SHP.normLine(it).pts; return `<path d="M${a[0]} ${a[1]}L${b[0]} ${b[1]}" fill="none" stroke="#000" stroke-opacity="0" stroke-width="${Math.max(24, (+it.width || 5) + 16) / it.s}" stroke-linecap="round"/>`; }
+  if (it.type !== 'shape') return '';
+  const t = SHP.normShape(it); const o = SHP.outline(t); const d = RENDER.dOf({ pts: o.pts, closed: true, smooth: o.smooth });
+  const band = `stroke="#000" stroke-opacity="0" stroke-width="${Math.max(24, t.width + 16) / it.s}" stroke-linejoin="round"`;
+  let out = t.fill === 'none' ? `<path d="${d}" fill="none" ${band}/>` : `<path d="${d}" ${clear} ${band}/>`;
+  if (t.fill === 'none' && String(t.text).trim()) { const v = SHP.textView(t); out += rect(TXT.box(v.item), v.dy); }
+  return out;
+}
+// hit = on the editing canvas
 function itemSVG(it, style, idp, hit) {
   const owner = ownerOf(it) || it;
   const ctx = { mode: owner.mode || 'auto', paper: app.P.settings.paper, seed: it.type === 'limbs' ? it.of + ':limbs' : it.id, idp, n: 0, style: style || null };
   const prims = itemPrims(it);
   const cls = owner.locked ? ' class="locked"' : '';
-  const area = hit && it.type === 'text' ? (() => { const b = TXT.box(it); return `<rect x="${b.x0}" y="${b.y0}" width="${b.w}" height="${b.h}" fill="#000" fill-opacity="0"/>`; })() : '';
-  return `<g data-id="${it.id}"${cls} transform="${xform(it)}">${area}${RENDER.render(prims, ctx)}</g>`;
+  const area = hit ? hitArea(it) : '';
+  const op = (it.type === 'shape' || it.type === 'line') && it.opacity < 1 ? ` opacity="${Math.max(0.1, +it.opacity)}"` : ''; // a whole-item setting, so every style and the export agree
+  return `<g data-id="${it.id}"${cls}${op} transform="${xform(it)}">${area}${RENDER.render(prims, ctx)}</g>`;
 }
 function toLocal(it, P) {
   const d = [P[0] - it.x, P[1] - it.y]; const a = U.rad(-(it.rot || 0));
@@ -85,9 +101,10 @@ function toPageXY(it, L) {
   return [it.x + x * Math.cos(a) - y * Math.sin(a), it.y + x * Math.sin(a) + y * Math.cos(a)];
 }
 // the box around an item in its own units: the layout box for text, otherwise the outline of its drawing
-const itemBox = (it) => (it.type === 'text' ? TXT.box(it) : RENDER.primsBBox(itemPrims(it)));
+const itemBox = (it) => (it.type === 'text' ? TXT.box(it) : it.type === 'shape' || it.type === 'line' ? SHP.box(it) : RENDER.primsBBox(itemPrims(it)));
 function localBBox(it) {
   if (it.type === 'text') return TXT.box(it);
+  if (it.type === 'shape' || it.type === 'line') return SHP.box(it);
   let prims = itemPrims(it);
   if (it.type === 'figure') { const c = castById(it.cast); if (c) prims = prims.concat(FIG.prims(c, it, 'limbs')); }
   return RENDER.primsBBox(prims);

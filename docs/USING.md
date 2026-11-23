@@ -4,7 +4,7 @@
 
 ## The screen
 - **Top bar**: File, Edit, View, Help menus; project name and save status; Undo / Redo; **Export**.
-- **Left rail**: **Characters**, **Props**, **Text**, **Layers**, **Add-ons**. Click a tab to open its panel; click it again (or the arrow) to fold the panel away. `/` jumps to search.
+- **Left rail**: **Characters**, **Props**, **Shapes**, **Text**, **Layers**, **Add-ons**. Click a tab to open its panel; click it again (or the arrow) to fold the panel away. `/` jumps to search.
 - **Ribbon** (under the top bar): the controls for whatever is selected. With nothing selected it shows the page settings (style, page colour, page size, styled view).
 - **Page strip** (bottom): a thumbnail per page, **+** to add one, **⋯** for rename, duplicate, move and delete, **Notes** for the page name and notes. Page Up / Page Down change page.
 - **Details panel** (right, hidden until you want it): **Details** in the ribbon, or double-click something. Tabs follow the selection: *Look*, *Pose*, *Arrange*.
@@ -14,6 +14,7 @@
    - Shift-drag a hand or foot turns just the lower arm or leg. Double-press an elbow or knee to bend it the other way.
    - Animals have their own poses (Stand, Walk, Run, Sit, Lie down, Beg, Bark, Sniff, Happy).
 2. **Text**: press **T** (or rail ▸ Text ▸ *Add a text box*), then **click** on the page to type, or **drag** a box that wraps. Or click **Title / Heading / Body text / Caption / Number line** in the Text panel. **Double-click** text (or press Enter on it) to edit it; Esc or Ctrl+Enter finishes. Text is a normal item: move it, scale it (corner handle), **rotate** it (round handle, or type degrees in the ribbon), flip, group, lock, line up, copy. Drag the side handles to change the width and re-wrap. The ribbon has size, bold, underline, colour, alignment and spacing; Details ▸ Look has the rest (colours per letter or per line, box width).
+2b. **Shapes and arrows**: rail ▸ **Shapes**, then click a tile to add it, or press **R** box, **O** circle, **Y** triangle, **L** line, **A** arrow, **Shift+A** double arrow and **drag** on the page. Hold **Shift** for a perfect square / circle or a straight line. Drag the side and corner handles to resize (a line has a round handle at each end). Double-click a shape to type inside it. Fill, colours, thickness and dashed / dotted are in the ribbon; more in Details ▸ Look.
 3. **Move precisely**: things snap to the page and to each other while you drag, with pink guide lines; hold **Alt** to move freely (View ▸ Snapping turns it off). **Position** in the ribbon has layer order and *line up with the page*; with several things selected, **Line up** and **Space evenly** appear.
 4. **Layering**: `[` / `]` (Shift = to back / front), or the Layers panel. For hands on top of a drum: select the character, then Details ▸ Pose ▸ *Put arms / legs in front*.
 5. **Select several** with Ctrl/Shift-click or by dragging a box. **Group** Ctrl+G (Ctrl+Shift+G ungroups). **Lock** Ctrl+Shift+L. **Zoom**: Ctrl + wheel or the − / + buttons; Space-drag to pan; Ctrl+0 fits the page. **Alt+click** steps through everything stacked under the pointer.

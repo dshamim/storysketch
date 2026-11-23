@@ -19,9 +19,11 @@ function addTextBox(left, top, w = 0) {
 }
 function setTool(tool) {
   app.tool = tool || null;
-  $('#stage').classList.toggle('tool-text', app.tool === 'text');
+  $('#stage').classList.toggle('tool-text', app.tool === 'text'); $('#stage').classList.toggle('tool-draw', isDrawTool(app.tool));
   const b = $('#add-textbox'); if (b) b.setAttribute('aria-pressed', String(app.tool === 'text'));
+  for (const t of $$('[data-shape-add]')) t.setAttribute('aria-pressed', String(t.dataset.shapeAdd === app.tool));
   if (app.tool === 'text') toast('Click on the page to type, or drag to draw a box. Esc to cancel.');
+  else if (isDrawTool(app.tool)) toast(`Drag on the page to draw a ${(SHP.KINDS[app.tool] || SHP.LINES[app.tool]).name.toLowerCase()}, or just click to drop one. Esc to cancel.`);
 }
 
 // ---- properties ----
@@ -59,7 +61,7 @@ function onTextClick(b) {
 // ---- editing in place ----
 const textField = () => $('#text-input');
 function startEdit(id, { all = false, caret = null, fresh = false } = {}) {
-  const it = itemById(id); if (!isText(it) || it.locked) return;
+  const it = itemById(id); if (!hasWords(it) || it.locked) return;
   if (app.edit && app.edit.id !== id) endEdit();
   const ta = textField(); ta.value = it.text || ''; app.edit = { id, fresh };
   if (!(app.sel.length === 1 && app.sel[0] === id)) select([id]);
@@ -70,21 +72,21 @@ function startEdit(id, { all = false, caret = null, fresh = false } = {}) {
 function endEdit() {
   if (!app.edit) return; const { id, fresh } = app.edit; app.edit = null; textField().blur();
   const it = itemById(id);
-  if (it && !String(it.text).trim()) { pg().items = pg().items.filter((i) => i.id !== id); tidyGroups(); app.sel = app.sel.filter((s) => s !== id); renderStage(); renderLayers(); renderInspector(); if (!fresh) commit(); return; }
+  if (it && isText(it) && !String(it.text).trim()) { pg().items = pg().items.filter((i) => i.id !== id); tidyGroups(); app.sel = app.sel.filter((s) => s !== id); renderStage(); renderLayers(); renderInspector(); if (!fresh) commit(); return; }
   flushCommit(); commit(); renderOverlay(); renderInspector();
 }
 // a click or drag inside the text being edited moves the caret / selects letters
 function textCaretAt(e) {
-  const it = itemById(app.edit.id); const L = toLocal(it, toPage(e)); return TXT.indexAt(TXT.layout(it), L[0], L[1]);
+  const it = itemById(app.edit.id); const L = toLocal(it, toPage(e)); const v = editView(it); return TXT.indexAt(TXT.layout(v.item), L[0], L[1] - v.dy);
 }
 function overTextBeingEdited(e) {
   if (!app.edit) return false; const it = itemById(app.edit.id); if (!it) return false;
-  const L = toLocal(it, toPage(e)); const b = TXT.box(it); const pad = 10 / (zoom() * it.s);
+  const L = toLocal(it, toPage(e)); const b = isShape(it) ? SHP.box(it) : TXT.box(it); const pad = 10 / (zoom() * it.s);
   return L[0] >= b.x0 - pad && L[0] <= b.x1 + pad && L[1] >= b.y0 - pad && L[1] <= b.y1 + pad;
 }
 // the caret and the selection, drawn in the text's own coordinates (inside the item's transform)
 function textEditOverlay(it, k) {
-  const L = TXT.layout(it); const ta = textField(); const a = ta.selectionStart, b = ta.selectionEnd; let s = '';
+  const v = editView(it); const L = TXT.layout(v.item); const ta = textField(); const a = ta.selectionStart, b = ta.selectionEnd; let s = '';
   if (a !== b) {
     for (const l of L.lines) {
       const from = Math.max(a, l.i0), to = Math.min(b, l.i1); if (to <= from && !(a <= l.i1 && b > l.i1 && l.i0 === l.i1)) continue;
@@ -92,7 +94,7 @@ function textEditOverlay(it, k) {
       s += `<rect x="${x0}" y="${l.y}" width="${Math.max(x1 - x0, 2 * k)}" height="${L.size * 1.25}" fill="#5b3df5" fill-opacity="0.28" pointer-events="none"/>`;
     }
   } else { const c = TXT.caret(L, b); s += `<line class="caret" x1="${c.x}" y1="${c.y0}" x2="${c.x}" y2="${c.y1}" stroke="#5b3df5" stroke-width="${3 * k}" pointer-events="none"/>`; }
-  return s;
+  return v.dy ? `<g transform="translate(0 ${v.dy})">${s}</g>` : s;
 }
 
 function initText() {
@@ -100,7 +102,7 @@ function initText() {
   const refresh = () => { if (app.edit) renderOverlay(); };
   ta.addEventListener('input', () => {
     const it = itemById(app.edit?.id); if (!it) return;
-    pinAnchor(it, () => { it.text = ta.value; }); scheduleRender(); commit(false); renderOverlay(); renderLayers(); if (detailsOpen()) renderDetails();
+    if (isText(it)) pinAnchor(it, () => { it.text = ta.value; }); else it.text = ta.value; scheduleRender(); commit(false); renderOverlay(); renderLayers(); if (detailsOpen()) renderDetails();
   });
   ta.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); endEdit(); return; }

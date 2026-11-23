@@ -16,8 +16,9 @@ const url = `http://localhost:${server.address().port}/index.html`;
 let browser; try { browser = chromium && await chromium.launch({ args: ['--no-sandbox', '--font-render-hinting=none'] }); } catch { /* no browser */ }
 const skip = !browser ? 'no Chromium available' : !baselinesApply() ? `baselines were made on another platform (this is ${platform()}); regenerate with UPDATE_BASELINES=1` : false;
 
-async function open(setup) {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 });
+async function open(setup, ctxOpts = null) {
+  const ctx = ctxOpts ? await browser.newContext({ ...ctxOpts, deviceScaleFactor: 1 }) : null;
+  const page = ctx ? await ctx.newPage() : await browser.newPage({ viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 }); page._ctx = ctx;
   const errs = []; page.on('pageerror', (e) => errs.push(e.message));
   await page.goto(url); await page.waitForFunction(() => typeof app !== 'undefined' && app.P); await page.evaluate(() => hideStart()); // the first-run start screen is tested in shell.test.mjs await page.addStyleTag({ content: STILL });
   // item ids seed the hand-drawn wobble, so they must be the same on every run
@@ -58,6 +59,24 @@ const STATES = {
   'tab-addons': `${classroom} select([]); document.querySelector('#rail-addons').click();`,
   'start-screen': `${classroom} select([]); showStart(true);`,
 };
+// tablets: finger-sized controls, the tool bar, the bottom tab bar and sheets (fingers = hasTouch, which makes the page choose touch mode by itself)
+const TABLET_SIDEWAYS = { viewport: { width: 1180, height: 820 }, hasTouch: true }, TABLET_UPRIGHT = { viewport: { width: 820, height: 1180 }, hasTouch: true }, TABLET_SMALL = { viewport: { width: 1024, height: 768 }, hasTouch: true };
+const teacher = `select([pg().items.find((i) => i.cast === 'teacher').id]);`;
+const TOUCH_STATES = {
+  'touch-sideways-selected': [TABLET_SIDEWAYS, `${classroom} ${teacher}`],
+  'touch-sideways-shapes': [TABLET_SIDEWAYS, `${classroom} select([]); setTab('tab-shapes'); showFlyout();`],
+  'touch-upright': [TABLET_UPRIGHT, `${classroom} select([]);`],
+  'touch-upright-selected': [TABLET_UPRIGHT, `${classroom} ${teacher}`],
+  'touch-upright-library-sheet': [TABLET_UPRIGHT, `${classroom} ${teacher} setTab('tab-cast'); showFlyout();`],
+  'touch-upright-designer-sheet': [TABLET_UPRIGHT, `${classroom} ${teacher} openDesigner('teacher');`],
+  'touch-small-details-slideover': [TABLET_SMALL, `${classroom} ${teacher} showDetails();`],
+};
+for (const [name, [ctxOpts, setup]] of Object.entries(TOUCH_STATES)) {
+  test(`visual: ${name}`, { skip }, async () => {
+    const { page, errs } = await open(setup, ctxOpts); const r = await compare(page, name); await page._ctx.close();
+    assert.deepEqual(errs, []); assert.ok(!r.missing, `no baseline for ${name} (run with UPDATE_BASELINES=1)`); assert.ok(r.ok, `${name}: ${(r.ratio * 100).toFixed(3)}% of pixels differ (see tests/e2e/__actual__/${name}.png)`);
+  });
+}
 for (const [name, setup] of Object.entries(STATES)) {
   test(`visual: ${name}`, { skip }, async () => {
     const { page, errs } = await open(setup);

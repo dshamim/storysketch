@@ -58,6 +58,7 @@ function init() {
   renderStyleControls();
   const stage = $('#stage');
   stage.addEventListener('pointerdown', onPointerDown); stage.addEventListener('pointermove', onPointerMove); stage.addEventListener('pointerup', onPointerUp); stage.addEventListener('pointercancel', onPointerCancel);
+  $('#edit-done').addEventListener('click', endEdit); // no Esc key on a tablet
   stage.addEventListener('contextmenu', (e) => e.preventDefault()); // a long-press must not open the browser's own menu
   stage.addEventListener('wheel', onWheel, { passive: false }); // not passive, so Ctrl+wheel zooms the page instead of Chrome
   stage.addEventListener('mousedown', (e) => { if (e.button === 1) e.preventDefault(); }); // no auto-scroll on middle-drag

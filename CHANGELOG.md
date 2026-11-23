@@ -5,7 +5,17 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
-## Unreleased — designer and add-ons as panels (revamp phase 5)
+## Unreleased — touch and tablets (revamp phase 6)
+- **Touch mode.** With a finger as the main pointer (a tablet) every control is at least 44 px, swatches and layer rows are finger-sized, and the handles on the page are drawn larger with an invisible 44 px grab area behind each one. **View ▸ Touch-friendly sizes** switches it on or off by hand (handy on a touch laptop) and remembers the choice.
+- **Gestures.** Pinch to zoom, two fingers to pan; a second finger landing in the middle of a drag cancels that drag cleanly (nothing is changed or marked unsaved); a wobbly tap is still a tap; **long-press** on something selects it and opens its More menu; **palm rejection**: touches are ignored while a pen is down. One finger pans with the **Hand** tool.
+- **Tool bar** (touch only, floats at the bottom of the page): **Select, Hand, Text, Shapes, Several** (taps add to the selection; a finger has no Shift key). **V** now selects.
+- **Finger drawing.** A line that is nearly level (or at 45 degrees) snaps straight, and a shape that is nearly square becomes square, because there is no Shift key on a tablet.
+- **Tablet layouts.** Up to 1100 px wide: Details slides over the page and the library starts folded away. Up to 900 px (a tablet held upright): the rail becomes a **bottom tab bar**, the library and Details become **bottom sheets** (one at a time, the page stays visible above), and the ribbon scrolls sideways with Details always in reach. The page no longer scrolls or pulls to refresh.
+- **Typing on a tablet.** The page area follows the visible height, the text you are typing is panned into view above the on-screen keyboard, and **Done typing** replaces Esc.
+- **Fixed:** typing started with a tap was cancelled by the browser's late mouse event; the hint pop-ups could sit over (and catch taps meant for) the bottom bars. They now ignore touches and float at the top in touch mode.
+- Not included: the pencil (so no pencil on the tool bar; a pen is just a pointer with palm rejection), Alt free-move and Alt-click cycling (no touch version), iPad Safari (not tested).
+
+## Earlier — designer and add-ons as panels (revamp phase 5)
 - **The Character designer is a side panel**, not a pop-up. It opens in the Details column with a live preview and a pose picker on top (they stay in view while you scroll), the cast as a small strip, then Name, Main colour, **Character type**, Body, Clothes, Hair, Accessories and Face. Open it with **Edit character** in the ribbon (new), Details ▸ Look ▸ *Edit this character…*, or **New character** in the Characters panel (it now really makes a new character and has its name ready to type). **Done**, the panel's X or **Esc** close it and Details return to how they were.
 - **The page stays live while you design.** Pick another figure on the page and the designer switches to its character; Undo / Redo work (every change is one step, not one big step at the end); Delete, the arrow keys, the tool keys and Ctrl+X / C / V / D / G do nothing to the page while you are in the designer (Undo and Redo still work).
 - **Character type is a picker**: "Person (stick figure)" or "Four-legged animal" as two tiles, each drawn as your character. Changing it still resets placed figures to the standing pose, and one Undo puts everything back.

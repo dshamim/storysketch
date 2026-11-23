@@ -38,8 +38,8 @@ const dragHandle = async (page, cdp, sel, dx, dy) => { const [x, y] = await cent
 const screenOf = (page, x, y) => page.evaluate(([x, y]) => { const m = document.querySelector('#stage').getScreenCTM(); return [x * m.a + m.e, y * m.d + m.f]; }, [x, y]);
 const items = (page) => page.evaluate(() => JSON.parse(JSON.stringify(pg().items)));
 
-test('first-run task with a finger only (tablet, landscape): open a sample, add and pose a character, add and turn a text label, draw an arrow, switch to marker, export a PNG', { skip }, async () => {
-  const { page, cdp, errs, context } = await openTouch(LANDSCAPE, { start: true });
+async function firstRunTask(viewport) {
+  const { page, cdp, errs, context } = await openTouch(viewport, { start: true });
   // 1. the start screen: tap a sample
   assert.equal(await page.locator('#start').isVisible(), true); await tap(page, '#start-cards [data-start="project:sample-classroom"]');
   assert.equal(await page.locator('#start').isVisible(), false, 'the sample opened'); const n0 = (await items(page)).length; assert.ok(n0 > 3);
@@ -64,7 +64,9 @@ test('first-run task with a finger only (tablet, landscape): open a sample, add 
   await tap(page, '#open-export'); await tap(page, '#ask-row'); const [dl] = await Promise.all([page.waitForEvent('download'), tap(page, '#do-export')]);
   assert.match(dl.suggestedFilename(), /\.png$/);
   assert.deepEqual(errs, []); await context.close();
-});
+}
+test('first-run task with a finger only (tablet held sideways): open a sample, add and pose a character, add and turn a text label, draw an arrow, switch to marker, export a PNG', { skip }, () => firstRunTask(LANDSCAPE));
+test('the same first-run task with a finger only on a tablet held upright (bottom tab bar and sheets)', { skip }, () => firstRunTask(PORTRAIT));
 
 // every control a finger has to hit, measured on screen (a hidden check box is measured by its label)
 const SMALL = (page, scope) => page.evaluate((scope) => {
@@ -149,9 +151,9 @@ test('a second finger lands mid-drag: the drag is undone, not committed, and the
   const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); const before = JSON.stringify(await items(page)); const [x, y] = await tableSpot(page); await page.evaluate(() => setDirty(false));
   await touchEvt(cdp, 'touchStart', [[x, y, 1]]); for (let i = 1; i <= 5; i++) await touchEvt(cdp, 'touchMove', [[x + 14 * i, y + 4 * i, 1]]);
   assert.notEqual(JSON.stringify(await items(page)), before, 'the table follows the finger'); assert.equal(await page.evaluate(() => !!app.drag), true);
-  await touchEvt(cdp, 'touchStart', [[x + 70, y + 20, 1], [560, 650, 2]]); await page.waitForTimeout(60);
+  await touchEvt(cdp, 'touchStart', [[x + 70, y + 20, 1], [520, 160, 2]]); await page.waitForTimeout(60);
   await same(page, before); assert.equal(await page.evaluate(() => !!app.drag), false, 'the half-made drag is gone');
-  for (let i = 1; i <= 4; i++) await touchEvt(cdp, 'touchMove', [[x + 70 + 5 * i, y + 20, 1], [560 + 30 * i, 650, 2]]); // the second finger moves: only zoom / pan, nothing is dragged
+  for (let i = 1; i <= 4; i++) await touchEvt(cdp, 'touchMove', [[x + 70 + 5 * i, y + 20, 1], [520 + 30 * i, 160, 2]]); // the second finger moves: only zoom / pan, nothing is dragged
   await touchEvt(cdp, 'touchEnd', []); await page.waitForTimeout(100); await same(page, before);
   assert.equal(await page.evaluate(() => app.dirty), false, 'nothing was committed: the project is not marked unsaved');
   assert.deepEqual(errs, []); await context.close();
@@ -212,6 +214,105 @@ test('finger drawing: a line that is nearly level / 45 degrees snaps, a shape th
   const l1 = await draw('line', [200, 8]); assert.equal(l1.rot, 0, 'within 4 degrees of level: level'); const l2 = await draw('line', [150, 150]); assert.equal(Math.round(l2.rot), 45, '45 degrees'); const l3 = await draw('line', [200, 40]); assert.notEqual(Math.round(l3.rot), 0, 'a clearly slanted line stays slanted');
   const b1 = await draw('box', [200, 208]); assert.equal(b1.w, b1.h, 'nearly square becomes square'); const b2 = await draw('box', [200, 120]); assert.notEqual(b2.w, b2.h);
   assert.deepEqual(errs, []); await context.close();
+});
+
+// ---- layout ----
+const rect = (page, sel) => page.evaluate((sel) => { const r = document.querySelector(sel).getBoundingClientRect(); return { x: r.x, y: r.y, w: r.width, h: r.height, b: r.bottom, r: r.right }; }, sel);
+const noSideways = (page) => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth && document.body.scrollWidth <= document.documentElement.clientWidth);
+
+test('a tablet held upright: tab bar at the bottom, the library and Details are bottom sheets (one at a time), the page stays visible above, the ribbon scrolls sideways', { skip }, async () => {
+  const { page, context, errs } = await openTouch(PORTRAIT); await page.evaluate(CLASSROOM); await page.evaluate(() => select([])); const vh = 1180;
+  const tab = await rect(page, '.railwrap'); assert.ok(Math.abs(tab.b - vh) < 1 && tab.w === 820 && tab.h >= 60, 'the rail is a tab bar along the bottom: ' + JSON.stringify(tab));
+  assert.equal(await page.evaluate(() => document.querySelector('#left').hidden), true, 'the library starts folded away'); assert.equal(await noSideways(page), true, 'no sideways scrolling');
+  // tap a tab: a sheet comes up above the tab bar; the page is still fully visible above it
+  await tap(page, '#rail-cast'); const sh = await rect(page, '#left'); assert.ok(sh.w === 820 && Math.abs(sh.b - (vh - tab.h)) < 2 && sh.h > 300, 'the library is a sheet above the tab bar: ' + JSON.stringify(sh));
+  const st = await rect(page, '#stage-wrap'); assert.ok(st.b <= sh.y + 1, 'the page area ends where the sheet starts'); assert.ok(st.h > 300, 'and is still big enough to work in');
+  assert.equal(await page.evaluate(() => document.querySelector('#workspace').classList.contains('sheet-open')), true);
+  // Details opens as a sheet too, and takes the library's place
+  await tap(page, '#cast-grid [data-add-cast="ahmed"]'); await page.waitForTimeout(100); await tap(page, '#details-toggle');
+  assert.equal(await page.evaluate(() => [document.querySelector('#left').hidden, document.querySelector('#right').hidden]).then((a) => a.join()), 'true,false', 'only one sheet is open'); const dt = await rect(page, '#right'); assert.ok(dt.w === 820 && Math.abs(dt.b - (vh - tab.h)) < 2);
+  // closing it gives the whole page back
+  await tap(page, '#details-close'); assert.equal(await page.evaluate(() => document.querySelector('#workspace').classList.contains('sheet-open')), false); assert.ok((await rect(page, '#stage-wrap')).h > st.h + 200, 'the page area grows back');
+  // the ribbon scrolls sideways instead of wrapping or overflowing the page, and its menus open inside the screen
+  const rb = await page.evaluate(() => { const r = document.querySelector('#ribbon'); return [r.scrollWidth, r.clientWidth, getComputedStyle(r).overflowX]; }); assert.ok(rb[0] > rb[1] && rb[2] === 'auto', 'the ribbon scrolls: ' + rb);
+  await tap(page, '#ribbon-sel [data-rb="pose"]'); const pp = await rect(page, '#pop-pose'); assert.ok(pp.x >= 0 && pp.r <= 820 && pp.y >= 0 && pp.b <= vh, 'the pose menu is inside the screen: ' + JSON.stringify(pp));
+  await tap(page, '#pop-pose [data-pose="wave"]'); assert.equal(await noSideways(page), true);
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('the designer works as a bottom sheet: its preview stays on top while the form scrolls, Done closes the sheet', { skip }, async () => {
+  const { page, context, errs } = await openTouch(PORTRAIT); await page.evaluate(CLASSROOM); await page.evaluate(() => select([pg().items.find((i) => i.cast === 'teacher').id]));
+  await tap(page, '#ribbon-sel [data-act="design"]'); assert.equal(await page.locator('#designer').isVisible(), true); const sh = await rect(page, '#right'); assert.ok(sh.w === 820 && sh.h > 300);
+  const pv0 = await rect(page, '#d-preview'); await page.evaluate(() => { document.querySelector('#right').scrollTop = 400; }); await page.waitForTimeout(100); const pv1 = await rect(page, '#d-preview');
+  assert.ok(pv1.y >= sh.y - 1 && pv1.b <= sh.b && pv1.h > 100, 'the preview stays in view (pinned at the top of the sheet) while the form scrolls: ' + pv0.y + ' -> ' + pv1.y);
+  await tap(page, '#d-close'); assert.equal(await page.evaluate(() => document.querySelector('#workspace').classList.contains('sheet-open')), false, 'the sheet closes with the designer');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('a tablet at 1024 px: the library starts folded away, Details slides over the page without squeezing it; and it all fits', { skip }, async () => {
+  const { page, context, errs } = await openTouch({ viewport: { width: 1024, height: 768 }, hasTouch: true }); await page.evaluate(CLASSROOM); await page.evaluate(() => select([pg().items.find((i) => i.cast === 'teacher').id]));
+  assert.equal(await page.evaluate(() => document.querySelector('#left').hidden), true, 'folded away at first'); const w0 = (await rect(page, '#center')).w;
+  await tap(page, '#details-toggle'); const dt = await rect(page, '#right'); assert.ok(dt.x > 600 && dt.r >= 1023, 'Details is on the right'); assert.equal((await rect(page, '#center')).w, w0, 'and does not squeeze the page');
+  await tap(page, '#details-close'); await tap(page, '#rail-cast'); const lf = await rect(page, '#left'); assert.ok(lf.w >= 250 && lf.w <= 270, 'a narrower library: ' + lf.w); assert.equal(await noSideways(page), true);
+  assert.deepEqual(errs, []); await context.close();
+  // the choice is not remembered from a narrow window: a wide window later still starts with the library open
+  const wide = await openTouch(LANDSCAPE); assert.equal(await wide.page.evaluate(() => document.querySelector('#left').hidden), false, 'a wide window starts with the library open'); await wide.context.close();
+});
+
+test('turning the tablet: upright folds the panels into sheets, sideways brings the library back', { skip }, async () => {
+  const { page, context, errs } = await openTouch(LANDSCAPE); await page.evaluate(CLASSROOM);
+  assert.equal(await page.evaluate(() => !document.querySelector('#left').hidden), true); await page.setViewportSize({ width: 820, height: 1180 }); await page.waitForTimeout(200);
+  assert.equal(await page.evaluate(() => document.querySelector('#left').hidden), true, 'folded away upright'); assert.equal((await rect(page, '.railwrap')).w, 820, 'the rail is a tab bar');
+  await tap(page, '#rail-props'); assert.equal(await page.evaluate(() => !document.querySelector('#left').hidden), true); await page.setViewportSize({ width: 1180, height: 820 }); await page.waitForTimeout(200);
+  assert.equal(await page.evaluate(() => !document.querySelector('#left').hidden), true, 'back to a side library'); assert.ok((await rect(page, '.railwrap')).w < 100, 'and a side rail'); assert.equal(await noSideways(page), true);
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('the tool bar (touch only): Select, Hand, Text, Shapes, Several do what they say, and show which is on', { skip }, async () => {
+  const mouse = await browser.newPage({ viewport: { width: 1180, height: 820 } }); await mouse.goto(url); await mouse.waitForFunction(() => typeof app !== 'undefined' && app.P); assert.equal(await mouse.locator('#toolbar').isVisible(), false, 'a mouse does not get it'); await mouse.close();
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); await page.evaluate(() => select([])); const pressed = () => page.evaluate(() => [...document.querySelectorAll('#toolbar [aria-pressed="true"]')].map((b) => b.dataset.tool).join());
+  assert.equal(await page.locator('#toolbar').isVisible(), true); assert.equal(await pressed(), 'select');
+  await tap(page, '#toolbar [data-tool="hand"]'); assert.equal(await pressed(), 'hand'); assert.equal(await page.evaluate(() => app.tool), 'hand'); await page.evaluate(() => zoomTo(2.5)); const v0 = await view(page); await dragTouch(cdp, [600, 400], [500, 340]); await page.waitForTimeout(500);
+  assert.ok((await view(page)).cx > v0.cx + 10, 'one finger pans with the hand tool'); await tap(page, '#toolbar [data-tool="select"]'); assert.equal(await pressed(), 'select'); assert.equal(await page.evaluate(() => app.tool), null);
+  await tap(page, '#toolbar [data-tool="text"]'); assert.equal(await pressed(), 'text'); assert.equal(await page.evaluate(() => app.tool), 'text'); await tap(page, '#toolbar [data-tool="text"]'); assert.equal(await page.evaluate(() => app.tool), null, 'tap again to put it away');
+  await page.evaluate(() => zoomTo(1)); await tap(page, '#toolbar [data-tool="shapes"]'); assert.equal(await page.evaluate(() => app.tab), 'tab-shapes'); assert.equal(await page.locator('#tab-shapes').isVisible(), true); assert.equal(await pressed(), 'shapes'); await tap(page, '#toolbar [data-tool="shapes"]'); assert.equal(await page.evaluate(() => document.querySelector('#left').hidden), true, 'tap again folds it');
+  await tap(page, '#toolbar [data-tool="several"]'); assert.equal(await pressed(), 'several'); const [x, y, id] = await tableSpot(page); await tapAt(page, x, y);
+  const t = await page.evaluate(() => { const it = pg().items.find((i) => i.cast === 'teacher'); const b = document.querySelector(`#items [data-id="${it.id}"]`).getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2 - 60]; }); await tapAt(page, t[0], t[1]);
+  assert.ok((await page.evaluate(() => app.sel.length)) >= 2, 'taps add to the selection'); await tap(page, '#toolbar [data-tool="select"]'); assert.equal(await page.evaluate(() => app.addMode), false, 'Select turns it off');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('touch sizes in portrait: the tab bar, tool bar and every open sheet have 44 px controls; a toast never covers the bars', { skip }, async () => {
+  const { page, context, errs } = await openTouch(PORTRAIT); await page.evaluate(CLASSROOM); const bad = [];
+  for (const scope of ['#topbar', '.railwrap', '#toolbar', '#filmbar']) bad.push(...await SMALL(page, scope));
+  for (const tab of ['cast', 'props', 'shapes', 'text', 'layers', 'addons']) { await showTab(page, tab); await page.waitForTimeout(80); bad.push(...await SMALL(page, '#left')); }
+  await tap(page, '#cast-grid [data-add-cast="ahmed"]').catch(() => {}); await showTab(page, 'cast'); await tap(page, '#cast-grid [data-add-cast="ahmed"]'); await page.waitForTimeout(100); bad.push(...await SMALL(page, '#ribbon'), ...await SMALL(page, '#minibar'));
+  await tap(page, '#details-toggle'); bad.push(...await SMALL(page, '#right'));
+  assert.deepEqual([...new Set(bad)], [], 'controls smaller than 44 px');
+  await page.evaluate(() => toast('A hint that must not catch taps')); const tb = await rect(page, '.ui-toast'); const ba = await rect(page, '.railwrap'); assert.ok(tb.b < ba.y, 'the toast is above the tab bar'); assert.equal(await page.evaluate(([x, y]) => getComputedStyle(document.elementFromPoint(x, y) || document.body).pointerEvents !== 'none' || !document.elementFromPoint(x, y).closest('.ui-toast'), [tb.x + tb.w / 2, tb.y + tb.h / 2]), true, 'taps go through it');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+// ---- typing with the on-screen keyboard ----
+// A real keyboard can not be emulated in headless Chrome. Making the window shorter is the stand-in: that is what the page sees when a keyboard rises (the visible height shrinks).
+test('typing on a tablet: the text being typed is brought into view, stays above a (stand-in) keyboard, and Done typing replaces Esc', { skip }, async () => {
+  const { page, context, errs } = await openTouch(PORTRAIT); await page.evaluate(() => { app.P = STORE.fresh('blank'); renderAll(); });
+  const id = await page.evaluate(() => { const it = TXT.make({ text: 'Typing down here', size: 60, w: 400 }, 700, 680); addItem(it); return it.id; });
+  await page.evaluate(() => { zoomTo(2); app.view.cx = 300; app.view.cy = 200; applyView(); renderOverlay(); }); // zoomed in on the top left: the text is far off screen
+  const inView = () => page.evaluate((id) => { const a = document.querySelector('#stage').getBoundingClientRect(); const r = document.querySelector(`#items [data-id="${id}"]`).getBoundingClientRect(); return r.top >= a.top - 1 && r.bottom <= a.bottom + 1 && r.left >= a.left - 1 && r.right <= a.right + 1; }, id);
+  assert.equal(await inView(), false, 'it starts out of sight'); assert.equal(await page.locator('#edit-done').isVisible(), false);
+  await page.evaluate((id) => startEdit(id), id); await page.waitForTimeout(150);
+  assert.equal(await inView(), true, 'starting to type brings the text into view'); assert.equal(await page.locator('#edit-done').isVisible(), true, 'a Done button shows while typing');
+  await page.keyboard.type('!'); // the keyboard rises: the visible height shrinks by about half
+  await page.setViewportSize({ width: 820, height: 640 }); await page.waitForTimeout(300);
+  assert.equal(await inView(), true, 'the text is still in view above the keyboard'); const tb = await rect(page, '.railwrap'); assert.ok(tb.b <= 640 + 1, 'the tab bar sits above the keyboard: ' + tb.b);
+  assert.equal(await page.evaluate(() => Math.abs(document.body.getBoundingClientRect().height - visualViewport.height) < 2), true, 'the page is as tall as the visible height');
+  await tap(page, '#edit-done'); assert.equal(await page.evaluate(() => !!app.edit), false, 'Done typing ends the typing'); assert.equal(await page.locator('#edit-done').isVisible(), false); assert.match((await items(page))[0].text, /!$/, 'what was typed is kept');
+  await page.setViewportSize({ width: 820, height: 1180 }); await page.waitForTimeout(250); assert.equal(await page.evaluate(() => Math.abs(document.body.getBoundingClientRect().height - innerHeight) < 2), true, 'and the page grows back when the keyboard goes');
+  assert.deepEqual(errs, []); await context.close();
+  // a mouse user never sees the Done button
+  const mp = await browser.newPage({ viewport: { width: 1180, height: 820 } }); await mp.goto(url); await mp.waitForFunction(() => typeof app !== 'undefined' && app.P); await mp.evaluate(() => { hideStart(); app.P = STORE.fresh('blank'); const it = TXT.make({ text: 'Hi' }, 500, 300); addItem(it); startEdit(it.id); });
+  assert.equal(await mp.locator('#edit-done').isVisible(), false); await mp.close();
 });
 
 test.after(async () => { if (browser) await browser.close(); server.close(); });

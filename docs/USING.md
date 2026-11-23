@@ -9,6 +9,14 @@
 - **Page strip** (bottom): a thumbnail per page, **+** to add one, **⋯** for rename, duplicate, move and delete, **Notes** for the page name and notes. Page Up / Page Down change page.
 - **Details panel** (right, hidden until you want it): **Details** in the ribbon, or double-click something. Tabs follow the selection: *Look*, *Pose*, *Arrange*.
 
+## On a tablet
+- Everything works with a finger. The controls get bigger by themselves on a touch screen (or switch it on in **View ▸ Touch-friendly sizes**).
+- **Tool bar** at the bottom of the page: **Select**, **Hand** (drag the page around), **Text**, **Shapes** (opens the shapes) and **Several** (tap things to add them to the selection).
+- **Two fingers** zoom and move the page. **Long-press** something to select it and open its menu.
+- Held upright, the rail is a tab bar along the bottom and the Characters, Props, … panels and Details come up from it as sheets. Tap the same tab again, or the arrow, to put the sheet away.
+- Handles are bigger; grab them near the dot, it does not have to be exact. When you draw a line that is nearly level or at 45 degrees it snaps straight, and a nearly square shape becomes square.
+- While you type, tap **Done typing** (top of the page) to finish.
+
 ## Doing things
 1. **Add** characters and props from the left panel (click one). **Pose**: drag the dots on a selected character — orange = hands, feet, paws, tail tip; blue = elbows, knees; green = lean, head, neck. Or pick a picture in the ribbon's **Pose** menu.
    - Shift-drag a hand or foot turns just the lower arm or leg. Double-press an elbow or knee to bend it the other way.

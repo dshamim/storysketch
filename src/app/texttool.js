@@ -22,6 +22,7 @@ function setTool(tool) {
   $('#stage').classList.toggle('tool-text', app.tool === 'text'); $('#stage').classList.toggle('tool-draw', isDrawTool(app.tool)); $('#stage').classList.toggle('tool-hand', app.tool === 'hand');
   const b = $('#add-textbox'); if (b) b.setAttribute('aria-pressed', String(app.tool === 'text'));
   for (const t of $$('[data-shape-add]')) t.setAttribute('aria-pressed', String(t.dataset.shapeAdd === app.tool));
+  syncToolbar();
   if (app.tool === 'text') toast('Click on the page to type, or drag to draw a box. Esc to cancel.');
   else if (isDrawTool(app.tool)) toast(`Drag on the page to draw a ${(SHP.KINDS[app.tool] || SHP.LINES[app.tool]).name.toLowerCase()}, or just click to drop one. Esc to cancel.`);
 }
@@ -67,10 +68,10 @@ function startEdit(id, { all = false, caret = null, fresh = false } = {}) {
   if (!(app.sel.length === 1 && app.sel[0] === id)) select([id]);
   ta.focus({ preventScroll: true });
   const n = ta.value.length; if (all) ta.setSelectionRange(0, n); else { const c = caret == null ? n : Math.max(0, Math.min(n, caret)); ta.setSelectionRange(c, c); }
-  renderOverlay(); renderInspector();
+  renderOverlay(); renderInspector(); syncEditDone(); requestAnimationFrame(ensureEditVisible);
 }
 function endEdit() {
-  if (!app.edit) return; const { id, fresh } = app.edit; app.edit = null; textField().blur();
+  if (!app.edit) return; const { id, fresh } = app.edit; app.edit = null; textField().blur(); syncEditDone();
   const it = itemById(id);
   if (it && isText(it) && !String(it.text).trim()) { pg().items = pg().items.filter((i) => i.id !== id); tidyGroups(); app.sel = app.sel.filter((s) => s !== id); renderStage(); renderLayers(); renderInspector(); if (!fresh) commit(); return; }
   flushCommit(); commit(); renderOverlay(); renderInspector();

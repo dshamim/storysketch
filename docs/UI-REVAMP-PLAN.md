@@ -1,6 +1,6 @@
 # StorySketch — UI revamp plan
 
-**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) and Phase 3 (ribbon, mini bar, Details panel, arrange, snapping) and Phase 4 (text tool) and Phase 4b (shapes and arrows) and Phase 5 (dialogs become panels) are done; next is Phase 6 (touch and tablet). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
+**Status:** in progress. Phase 0 (safety net + `app.js` split), Phase 1 (foundations: tokens, icons, components, `docs/ui-kit.html`) and Phase 2 (shell) and Phase 3 (ribbon, mini bar, Details panel, arrange, snapping) and Phase 4 (text tool) and Phase 4b (shapes and arrows) and Phase 5 (dialogs become panels) and Phase 6 (touch and tablet, tested by emulation only) are done; next is Phase 7 (polish: Ctrl+K, shortcut sheet, accessibility). Written 2026-11-21 against v0.21.0 and updated with the owner's decisions (below).
 Goal: an interface that is as simple as **Canva's**: clear logical groups, graphical icons, controls shown only when relevant, a first-class **text tool**
 and a small set of **shape / arrow / pencil** tools.
 
@@ -350,3 +350,23 @@ Decisions and differences from the plan:
 - **Keys in the designer:** only Undo / Redo (Ctrl+Z, Ctrl+Y) get through; Ctrl+X / C / V / D / G, Delete, arrows and tool keys are ignored while focus is inside the panel (a test presses them all).
 - **The corner card** can sit over part of the page (bottom right); Esc does not close it yet, use its Close button.
 - **Not done:** a per-character pencil on the Characters panel tiles; the designer is still the old form controls restyled lightly (the full look of the Details panel is a phase 7 polish item).
+
+## 17. Phase 6 notes (touch and tablet)
+Built: `src/app/touch.js` (touch mode, handle halos, pointer wrappers: ownership, pinch, long-press, palm rejection, cancel; breakpoints and sheets; the tool bar; keyboard-aware typing), tablet CSS at the end of `app.css`, `tests/e2e/touch.test.mjs` (20 tests) and 7 tablet screenshot baselines.
+
+What the emulation can and cannot show (no tablet is available): headless Chrome with `hasTouch` reports a coarse pointer, delivers taps and multi-finger CDP touches as touch pointer events, and delivers pen events. It cannot open a real on-screen keyboard (a shorter window is the stand-in), cannot open native `<select>` menus by touch (Playwright's `selectOption` is used for those two, in the first-run task: Style) and sends no `click` for a tap that comes within about 0.4 s of a drag (the tests pace themselves; real fingers do not have this problem). **Unverified: iPad Safari and a real Windows touch laptop (plan Q-f).**
+
+Decisions and differences from the plan:
+- **Touch mode is a class, not a media query** (`html.touch`): automatic with `(pointer: coarse)`, plus **View ▸ Touch-friendly sizes** (remembered) for touch laptops, where the main pointer is still the mouse. Layout breakpoints (1100 and 900 px) are width queries, so a narrow desktop window gets them too.
+- **Gestures depend on the kind of pointer, not on the mode**: a touch laptop with the sizes switched off still pinches.
+- **Drags belong to the pointer that started them** (`pid`). A second finger cancels the first finger's drag and reverts it from the last snapshot (`STORE.revert`, after `flushCommit`), leaving no undo step and no "unsaved" mark; `pointercancel` does the same instead of committing. 6 px of slop keeps a wobbly tap a tap.
+- **A finger-down on the page cancels the browser's "compatibility" mouse events** and moves the focus off any field itself; without that, the late mouse-down stole the focus from a text box we had just started and it was deleted again as empty.
+- **Handles:** the visible handle is drawn 1.35 times larger by CSS; an invisible 44 px halo (same `data-h`, marked `data-halo`) is added behind each one after the overlay is drawn.
+- **Long-press** reuses the mini bar's More menu. **Palm rejection** is time based: touches are ignored while a pen is down and for 0.6 s after.
+- **Pencil was skipped in 4b**, so the tool bar has Select, Hand, Text, Shapes and a **Several** toggle (the missing Shift key). A pen is just a pointer.
+- **Hand tool:** no key (H already flips); it is on the touch tool bar, and Space-drag still works. **V** selects.
+- **No Shift on a tablet:** lines within 4 degrees of a 45 degree step snap, shapes within 6 percent of square become square (touch pointers only). Resize with proportions has no touch version.
+- **Sheets:** only one is open at a time; the page area is made shorter (not covered) while one is open. Their open / closed state is not remembered from a narrow window, so a wide window later starts normally.
+- **Toasts** ignore touches (they used to catch them) and float near the top in touch mode.
+- **Typing:** `interactive-widget=resizes-content` in the viewport tag, plus the app height follows `visualViewport` (iOS), the typed text is panned into view, and **Done typing** replaces Esc.
+- **Limits:** Alt free-move and Alt-click cycling have no touch version; no hover tooltips on touch (labels are visible instead); the ribbon scrolls sideways in portrait, so some controls need a swipe; a sheet can cover part of the page you zoomed into; the phone layout (< 700 px) is the portrait tablet layout, not a simplified one; the Text, Add-ons and Designer panels were only lightly restyled for sheets.

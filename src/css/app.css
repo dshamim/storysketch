@@ -222,10 +222,48 @@ html.touch .rb-color { width: 48px; height: 44px; }
 html.touch .layer { min-height: 48px; } html.touch .layer button { min-width: 44px; min-height: 44px; font-size: 14px; }
 html.touch #right summary, html.touch #left summary { min-height: 44px; display: flex; align-items: center; }
 html.touch .ui-menu [role=menuitem], html.touch .ui-menu [role=menuitemcheckbox] { min-height: 48px; }
-html.touch #overlay [data-h]:not([data-halo]) { transform-box: fill-box; transform-origin: center; transform: scale(1.6); } /* the handle you see; the 44 px halo behind it is what you grab */
+html.touch #overlay [data-h]:not([data-halo]) { transform-box: fill-box; transform-origin: center; transform: scale(1.35); } /* the handle you see; the 44 px halo behind it is what you grab */
 
 /* ---- touch: the page itself never scrolls or pulls to refresh; no grey tap flash; the hand tool ---- */
 html.touch, html.touch body { overscroll-behavior: none; }
 html.touch * { -webkit-tap-highlight-color: transparent; }
 html.touch #stage-wrap, html.touch #stage { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 #stage.tool-hand { cursor: grab; } #stage.tool-hand.panning { cursor: grabbing; }
+
+/* ---- the touch tool bar ---- */
+.tool-pill { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 7; display: none; gap: 2px; padding: 4px; background: var(--ui-surface); border: 1px solid var(--ui-border); border-radius: 999px; box-shadow: var(--ui-sh-2, 0 4px 14px rgba(0,0,0,.15)); }
+html.touch .tool-pill { display: flex; }
+.tool-pill button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; min-width: 64px; min-height: 52px; padding: 4px 8px; border: 0; border-radius: 26px; background: transparent; color: var(--ui-text-muted); font: inherit; font-size: 12px; cursor: pointer; }
+.tool-pill button[aria-pressed="true"] { background: var(--ui-accent-weak); color: var(--ui-accent-weak-text); }
+html.touch #stage-wrap { padding-bottom: 76px; } /* the page fits above the tool bar */
+@supports (height: 100dvh) { body { height: var(--app-h, 100dvh); } } /* the visible height, so a tablet's address bar or on-screen keyboard does not hide the bottom */
+
+/* ---- narrow windows (up to 1100 px, e.g. a tablet held sideways at 1024): Details slides over the page, the library is narrower ---- */
+@media (max-width: 1100px) {
+  #workspace { --fly: 264px; --det: 0px; }
+  #right { position: absolute; top: 0; right: 0; bottom: 0; width: min(360px, 92vw); z-index: 20; box-shadow: -8px 0 24px rgba(0,0,0,.14); }
+}
+
+/* ---- a tablet held upright (up to 900 px): the rail is a bottom tab bar, the library and Details are bottom sheets, the ribbon scrolls sideways ---- */
+@media (max-width: 900px) {
+  body { padding-bottom: 64px; box-sizing: border-box; }
+  #workspace { --sheet-h: min(46vh, 440px); grid-template-columns: minmax(0, 1fr); }
+  #center { grid-column: 1; }
+  .railwrap { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; width: auto; height: 64px; flex-direction: row; border-right: 0; border-top: 1px solid var(--ui-border); overflow: hidden; }
+  .railwrap .ui-rail { flex-direction: row; width: 100%; height: 100%; padding: 0 var(--ui-s-2); gap: 0; border: 0; align-items: stretch; }
+  .railwrap .ui-rail-btn { flex: 1; min-height: 0; min-width: 0; padding: 4px 2px; font-size: 11px; }
+  #left, #right { position: fixed; left: 0; right: 0; bottom: 64px; top: auto; width: auto; height: var(--sheet-h); z-index: 30; grid-column: auto; border: 0; border-top: 1px solid var(--ui-border); border-radius: 16px 16px 0 0; box-shadow: 0 -8px 24px rgba(0,0,0,.14); }
+  #left::before, #right::before { content: ""; display: block; width: 40px; height: 4px; margin: 6px auto 0; border-radius: 2px; background: var(--ui-border); position: sticky; top: 0; }
+  #workspace.sheet-open #center { margin-bottom: var(--sheet-h); }
+  #fly-open { display: none; }
+  #ribbon { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; } #ribbon::-webkit-scrollbar { display: none; }
+  #file-name { display: none; } #save-state { white-space: nowrap; }
+  #ribbon .rb-group { flex: none; } #ribbon .grow { display: none; }
+  #ribbon #details-toggle { flex: none; position: sticky; right: 0; z-index: 2; background: var(--ui-surface); box-shadow: -10px 0 8px var(--ui-surface); } /* Details stays in reach while the rest of the ribbon scrolls */
+}
+
+/* ---- touch: a toast must never sit over (or catch taps meant for) the tool bar or the tab bar, so it floats near the top of the page ---- */
+html.touch .ui-toasts { bottom: auto; top: 112px; }
+.hint-touch { display: none; } html.touch .hint-touch { display: inline; } html.touch .hint-mouse { display: none; }
+@media (max-width: 900px) { #d-preview { height: 104px; } }
+#edit-done { position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 8; box-shadow: var(--ui-sh-2, 0 4px 14px rgba(0,0,0,.2)); }

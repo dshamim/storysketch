@@ -61,7 +61,8 @@ function initShell() {
   $('#rail').addEventListener('ui-change', (e) => setTab(e.detail.el.dataset.tab));
   $('#rail').addEventListener('click', (e) => { if (e.target.closest('[data-tab]')) (wasOpen ? hideFlyout() : showFlyout()); });
   $('#fly-close').onclick = hideFlyout; $('#fly-open').onclick = showFlyout;
-  try { if (localStorage.getItem(FLY_KEY) === 'closed') hideFlyout(); } catch (e) { /* ignore */ }
+  try { const f = localStorage.getItem(FLY_KEY); if (f === 'closed') hideFlyout(false); else if (!f && narrowWindow()) hideFlyout(false); } catch (e) { /* ignore */ }
+  if (sheetLayout()) hideFlyout(false); // a bottom sheet starts folded away
   setTab(app.tab);
   // details panel (right)
   $('#details-toggle').onclick = () => (detailsOpen() ? hideDetails() : showDetails());
@@ -71,7 +72,7 @@ function initShell() {
     const tabs = $$('#inspector [role=tab]'); const i = tabs.indexOf(t); e.preventDefault();
     const n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : e.key === 'Home' ? 0 : tabs.length - 1; tabs[(n + tabs.length) % tabs.length].click();
   });
-  try { if (localStorage.getItem(DET_KEY) === 'open') showDetails(); else hideDetails(); } catch (e) { hideDetails(); }
+  try { if (localStorage.getItem(DET_KEY) === 'open' && !sheetLayout()) showDetails(false); else hideDetails(false); } catch (e) { hideDetails(false); }
 
   // filmstrip + notes drawer
   $('#film').addEventListener('click', (e) => {
@@ -104,13 +105,13 @@ function syncViewMenu() { $('#menu-touch')?.setAttribute('aria-checked', String(
 
 // ---- flyout ----
 const flyoutOpen = () => !$('#left').hidden;
-function showFlyout() { $('#left').hidden = false; $('#fly-open').hidden = true; $('#workspace').classList.remove('fly-closed'); try { localStorage.setItem(FLY_KEY, 'open'); } catch (e) { /* ignore */ } requestAnimationFrame(renderOverlay); }
-function hideFlyout() { $('#left').hidden = true; $('#fly-open').hidden = false; $('#workspace').classList.add('fly-closed'); try { localStorage.setItem(FLY_KEY, 'closed'); } catch (e) { /* ignore */ } requestAnimationFrame(renderOverlay); }
+function showFlyout(persist = !sheetLayout()) { if (sheetLayout() && detailsOpen()) hideDetails(false); $('#left').hidden = false; $('#fly-open').hidden = true; $('#workspace').classList.remove('fly-closed'); if (persist) try { localStorage.setItem(FLY_KEY, 'open'); } catch (e) { /* ignore */ } syncSheets(); requestAnimationFrame(renderOverlay); }
+function hideFlyout(persist = !sheetLayout()) { $('#left').hidden = true; $('#fly-open').hidden = false; $('#workspace').classList.add('fly-closed'); if (persist) try { localStorage.setItem(FLY_KEY, 'closed'); } catch (e) { /* ignore */ } syncSheets(); requestAnimationFrame(renderOverlay); }
 
 // ---- details panel ----
 const detailsOpen = () => !$('#right').hidden;
-function showDetails() { $('#right').hidden = false; $('#workspace').classList.remove('details-closed'); $('#details-toggle').setAttribute('aria-pressed', 'true'); try { localStorage.setItem(DET_KEY, 'open'); } catch (e) { /* ignore */ } renderDetails(); requestAnimationFrame(renderOverlay); }
-function hideDetails() { if (app.designer) return closeDesigner(); $('#right').hidden = true; $('#workspace').classList.add('details-closed'); $('#details-toggle').setAttribute('aria-pressed', 'false'); try { localStorage.setItem(DET_KEY, 'closed'); } catch (e) { /* ignore */ } requestAnimationFrame(renderOverlay); }
+function showDetails(persist = !sheetLayout()) { if (sheetLayout() && flyoutOpen()) hideFlyout(false); $('#right').hidden = false; $('#workspace').classList.remove('details-closed'); $('#details-toggle').setAttribute('aria-pressed', 'true'); if (persist) try { localStorage.setItem(DET_KEY, 'open'); } catch (e) { /* ignore */ } renderDetails(); syncSheets(); requestAnimationFrame(renderOverlay); }
+function hideDetails(persist = !sheetLayout()) { if (app.designer) return closeDesigner(); $('#right').hidden = true; $('#workspace').classList.add('details-closed'); $('#details-toggle').setAttribute('aria-pressed', 'false'); if (persist) try { localStorage.setItem(DET_KEY, 'closed'); } catch (e) { /* ignore */ } syncSheets(); requestAnimationFrame(renderOverlay); }
 
 // ---- filmstrip ----
 // A page's thumbnail is drawn in clean lines with its own id prefix (so gradient / clip ids never clash with the canvas).

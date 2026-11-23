@@ -58,6 +58,7 @@ function setTab(tab) {
   $('#fly-title').textContent = title;
   const box = $('#lsearch'); box.placeholder = ph; box.value = app.filters[tab] || ''; box.hidden = tab === 'tab-text' || tab === 'tab-shapes' || tab === 'tab-addons';
   if (tab === 'tab-addons') renderPlugins();
+  syncToolbar();
 }
 function onSearch() {
   app.filters[app.tab] = $('#lsearch').value;

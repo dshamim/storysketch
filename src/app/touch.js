@@ -8,7 +8,7 @@ function touchPref() { try { return localStorage.getItem(TOUCH_KEY) || 'auto'; }
 const touchUI = () => document.documentElement.classList.contains('touch');
 function applyTouch() {
   const p = touchPref(); const on = p === 'on' || (p === 'auto' && coarseQuery.matches);
-  const was = touchUI(); document.documentElement.classList.toggle('touch', on);
+  const was = touchUI(); document.documentElement.classList.toggle('touch', on); if (was !== on && typeof onViewport === 'function') onViewport();
   const m = $('#menu-touch'); if (m) m.setAttribute('aria-checked', String(on));
   if (was !== on && app.P) { renderOverlay(); positionMiniBar(); }
 }
@@ -35,9 +35,60 @@ function addHalos(ov) {
   const direct = [...ov.children].filter((el) => el.dataset && el.dataset.h && !el.dataset.halo); // the handles of a multi-selection sit directly in the overlay
   if (direct.length) { const first = direct[0]; for (const el of direct) ov.insertBefore(makeHalo(el, 1 / zoom()), first); }
 }
+// ---------- layout: narrow windows and tablets ----------
+//  up to 1100 px wide: Details slides over the page and the library starts folded away;
+//  up to 900 px wide (a tablet held upright): the rail becomes a bottom tab bar and the library and Details are bottom sheets (only one open at a time).
+const narrowQuery = window.matchMedia ? window.matchMedia('(max-width: 1100px)') : { matches: false };
+const sheetQuery = window.matchMedia ? window.matchMedia('(max-width: 900px)') : { matches: false };
+const narrowWindow = () => narrowQuery.matches;
+const sheetLayout = () => sheetQuery.matches;
+function syncSheets() { const w = $('#workspace'); if (w) w.classList.toggle('sheet-open', sheetLayout() && (flyoutOpen() || detailsOpen())); }
+function onLayoutChange() {
+  if (sheetLayout()) { if (flyoutOpen()) hideFlyout(false); if (detailsOpen()) hideDetails(false); }
+  else { let f = null; try { f = localStorage.getItem(FLY_KEY); } catch (e) { /* ignore */ } if (f !== 'closed' && !(narrowWindow() && !f) && !flyoutOpen()) showFlyout(false); }
+  syncSheets(); requestAnimationFrame(() => { renderOverlay(); positionMiniBar(); });
+}
+
+// ---------- the tool bar (touch mode): Select, Hand, Text, Shapes, Several ----------
+function syncToolbar() {
+  const bar = $('#toolbar'); if (!bar) return;
+  const shapes = isDrawTool(app.tool) || (flyoutOpen() && app.tab === 'tab-shapes');
+  const on = { select: !app.tool && !app.addMode && !shapes, hand: app.tool === 'hand', text: app.tool === 'text', shapes, several: !!app.addMode };
+  for (const b of $$('[data-tool]', bar)) b.setAttribute('aria-pressed', String(!!on[b.dataset.tool]));
+}
+function onToolbar(e) {
+  const b = e.target.closest('[data-tool]'); if (!b) return; const k = b.dataset.tool;
+  if (k === 'select') { setTool(null); app.addMode = false; }
+  else if (k === 'hand') setTool(app.tool === 'hand' ? null : 'hand');
+  else if (k === 'text') setTool(app.tool === 'text' ? null : 'text');
+  else if (k === 'several') { app.addMode = !app.addMode; toast(app.addMode ? 'Tap things to add them to the selection. Tap Select to stop.' : 'Selecting one thing at a time again'); }
+  else if (k === 'shapes') { if (flyoutOpen() && app.tab === 'tab-shapes') hideFlyout(); else { setTab('tab-shapes'); showFlyout(); } }
+  syncToolbar();
+}
+// ---------- typing with an on-screen keyboard ----------
+// The keyboard covers the bottom of the screen. The page area is sized to the VISIBLE height (so the tab bar and tool bar stay above the keyboard),
+// and the text being typed is panned into view whenever it would be hidden. A "Done typing" button replaces Esc.
+function syncEditDone() { const b = $('#edit-done'); if (b) b.hidden = !(app.edit && touchUI()); }
+function ensureEditVisible() {
+  if (!app.edit) return; const it = itemById(app.edit.id); const g = it && document.querySelector(`#items [data-id="${it.id}"]`); if (!g) return;
+  const area = $('#stage').getBoundingClientRect(); const r = g.getBoundingClientRect(); const pad = 16; const top = area.top + pad + (touchUI() ? 40 : 0), bottom = area.bottom - pad;
+  let dy = 0, dx = 0;
+  if (r.bottom > bottom) dy = Math.min(r.bottom - bottom, r.top - top); else if (r.top < top) dy = r.top - top; // a tall text: its top wins
+  if (r.right > area.right - pad) dx = Math.min(r.right - (area.right - pad), r.left - (area.left + pad)); else if (r.left < area.left + pad) dx = r.left - (area.left + pad);
+  if (!dx && !dy) return;
+  app.view.cx += dx / zoom(); app.view.cy += dy / zoom(); applyView(); renderOverlay();
+}
+function onViewport() {
+  const vv = window.visualViewport; const root = document.documentElement;
+  if (vv && touchUI()) root.style.setProperty('--app-h', vv.height + 'px'); else root.style.removeProperty('--app-h');
+  requestAnimationFrame(() => { renderOverlay(); positionMiniBar(); ensureEditVisible(); });
+}
 function initTouch() {
+  if (window.visualViewport) { window.visualViewport.addEventListener('resize', onViewport); window.visualViewport.addEventListener('scroll', onViewport); }
   if (coarseQuery.addEventListener) coarseQuery.addEventListener('change', applyTouch);
-  applyTouch();
+  if (sheetQuery.addEventListener) sheetQuery.addEventListener('change', onLayoutChange);
+  if (narrowQuery.addEventListener) narrowQuery.addEventListener('change', onLayoutChange);
+  applyTouch(); const bar = $('#toolbar'); if (bar) bar.addEventListener('click', onToolbar);
 }
 
 // ---------- gestures ----------

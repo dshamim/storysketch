@@ -159,6 +159,6 @@
 .ui-dialog-b { padding: var(--ui-s-5); }
 .ui-dialog-f { display: flex; justify-content: flex-end; gap: var(--ui-s-2); padding: var(--ui-s-3) var(--ui-s-5); border-top: 1px solid var(--ui-border); background: var(--ui-surface-2); border-radius: 0 0 var(--ui-r-lg) var(--ui-r-lg); }
 .ui-toasts { position: fixed; left: 50%; bottom: var(--ui-s-6); transform: translateX(-50%); z-index: var(--ui-z-toast); display: flex; flex-direction: column; align-items: center; gap: var(--ui-s-2); pointer-events: none; }
-.ui-toast { display: inline-flex; align-items: center; gap: var(--ui-s-2); padding: var(--ui-s-3) var(--ui-s-4); border-radius: var(--ui-r-md); background: var(--ui-tooltip-bg); color: #fff; font-family: var(--ui-font); font-size: var(--ui-fs-md); box-shadow: var(--ui-sh-2); pointer-events: auto; animation: ui-toast-in var(--ui-dur) var(--ui-ease); }
+.ui-toast { display: inline-flex; align-items: center; gap: var(--ui-s-2); padding: var(--ui-s-3) var(--ui-s-4); border-radius: var(--ui-r-md); background: var(--ui-tooltip-bg); color: #fff; font-family: var(--ui-font); font-size: var(--ui-fs-md); box-shadow: var(--ui-sh-2); pointer-events: none; animation: ui-toast-in var(--ui-dur) var(--ui-ease); }
 .ui-toast.success .ui-i { color: #7be0b5; } .ui-toast.error .ui-i { color: #ff9a92; }
 @keyframes ui-toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }

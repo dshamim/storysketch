@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
 <title>StorySketch</title>
 <link rel="stylesheet" href="src/ui/tokens.css">
 <link rel="stylesheet" href="src/ui/components.css">
@@ -70,7 +70,7 @@
       <div id="lib-section"></div>
     </section>
     <section class="tabpane" id="tab-shapes" role="tabpanel" aria-labelledby="rail-shapes" hidden>
-      <p class="muted small">Click one to add it to the page. Or press its key (shown when you point at it), then drag on the page to draw it. Hold <b>Shift</b> for a perfect square or circle, or to keep a line straight. Double-click a shape to type inside it.</p>
+      <p class="muted small"><span class="hint-mouse">Click one to add it to the page. Or press its key (shown when you point at it), then drag on the page to draw it. Hold <b>Shift</b> for a perfect square or circle, or to keep a line straight. Double-click a shape to type inside it.</span><span class="hint-touch">Tap one to add it to the page, then drag its round and square handles to size it. Tap <b>Select</b> when you are done. Double-tap a shape to type inside it. A line you draw that is nearly level, or at 45 degrees, snaps straight.</span></p>
       <h4>Shapes</h4>
       <div class="grid" id="shape-grid"></div>
       <h4>Lines and arrows</h4>
@@ -83,7 +83,7 @@
       <div class="grid" id="text-presets"></div>
     </section>
     <section class="tabpane" id="tab-layers" role="tabpanel" aria-labelledby="rail-layers" hidden>
-      <p class="muted small">Top of the list = front. Click to select (Ctrl/Shift-click for several) — handy for picking something buried under other things. ▣ = a group. 🔒 = locked: it can't be clicked or moved on the page; click 🔒 here to unlock.</p>
+      <p class="muted small">Top of the list = front. <span class="hint-mouse">Click to select (Ctrl/Shift-click for several)</span><span class="hint-touch">Tap to select (use <b>Several</b> in the tool bar to pick more than one)</span> — handy for picking something buried under other things. ▣ = a group. 🔒 = locked: it can't be clicked or moved on the page; click 🔒 here to unlock.</p>
       <div id="layers"></div>
     </section>
     <section class="tabpane" id="tab-props" role="tabpanel" aria-labelledby="rail-props" hidden><div id="prop-list"></div></section>
@@ -106,8 +106,16 @@
   <section id="center">
     <div id="stage-wrap"><svg id="stage" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet"></svg>
       <p id="empty-hint" class="empty-hint" hidden>Add a character or a prop from the left to begin.</p>
-      <textarea id="text-input" wrap="off" aria-label="Text" autocomplete="off" autocapitalize="sentences" spellcheck="false" tabindex="-1"></textarea>
-      <div class="ui-minibar" id="minibar" role="toolbar" aria-label="Selection" hidden></div></div>
+      <textarea id="text-input" wrap="off" aria-label="Text" autocomplete="off" autocapitalize="sentences" enterkeyhint="enter" spellcheck="false" tabindex="-1"></textarea>
+      <button class="ui-btn primary" id="edit-done" type="button" hidden>Done typing</button>
+      <div class="ui-minibar" id="minibar" role="toolbar" aria-label="Selection" hidden></div>
+      <div class="tool-pill" id="toolbar" role="toolbar" aria-label="Tools">
+        <button type="button" data-tool="select" aria-pressed="true"><span data-icon="select"></span>Select</button>
+        <button type="button" data-tool="hand" aria-pressed="false"><span data-icon="hand"></span>Hand</button>
+        <button type="button" data-tool="text" aria-pressed="false"><span data-icon="text"></span>Text</button>
+        <button type="button" data-tool="shapes" aria-pressed="false"><span data-icon="shapes"></span>Shapes</button>
+        <button type="button" data-tool="several" aria-pressed="false"><span data-icon="group"></span>Several</button>
+      </div></div>
   </section>
 
   <aside id="right" aria-label="Details" hidden>

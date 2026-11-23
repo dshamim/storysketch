@@ -29,6 +29,8 @@ test('line widths, shape counts and forbidden names are enforced', () => {
   fails(variant("const d = { stroke: 'line', w: 3 };", "const d = { stroke: 'line', w: 30 };"), /line width 30/);
   fails(variant("const d = { stroke: 'line', w: 3 };", "const d = { stroke: 'line', w: 3 }; for (let i = 0; i < 100; i++) p.line([[0, -i], [5, -i]], d);"), /shapes with/);
   fails(variant("const d = { stroke: 'line', w: 3 };", "const d = { stroke: 'line', w: 3 }; fetch('x');"), /"fetch"/);
+  fails(variant("const d = { stroke: 'line', w: 3 };", "const d = { stroke: 'line', w: 3 }; window.alert(1);"), /"window"/);
+  assert.equal(variant("const d = { stroke: 'line', w: 3 };", "const d = { stroke: 'line', w: 3 }; const q = P.window || P.document;").status, 0, 'properties with those names are fine');
 });
 test('a param without a default and a slot with nothing to hold are caught; the word "window" in a comment is fine', () => {
   fails(variant("{ key: 'cushion', label: 'Cushion', type: 'toggle', def: false }", "{ key: 'cushion', label: 'Cushion', type: 'toggle' }"), /no def/);

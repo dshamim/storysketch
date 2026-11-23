@@ -249,6 +249,15 @@ CP.setManifest({
    "path": "props/classroom/wardrobe.js"
   },
   {
+   "path": "props/home/house.js"
+  },
+  {
+   "path": "props/scenery/backdrops.js"
+  },
+  {
+   "path": "props/scenery/pieces.js"
+  },
+  {
    "path": "poses/animals.json",
    "text": "{\n \"api\": 1, \"version\": \"1.0.0\", \"rig\": \"quadruped\",\n \"items\": [\n  {\"id\": \"stand\", \"name\": \"Stand\"},\n  {\"id\": \"walk\", \"name\": \"Walk\", \"neck\": -50, \"head\": 0, \"tail\": [195, 20], \"frontNear\": [118, -24], \"frontFar\": [68, 10], \"backNear\": [52, 48], \"backFar\": [96, 20]},\n  {\"id\": \"run\", \"name\": \"Run\", \"spine\": -10, \"neck\": -32, \"head\": 12, \"tail\": [185, 10], \"frontNear\": [38, 14], \"frontFar\": [54, 8], \"backNear\": [138, -28], \"backFar\": [122, -16], \"expr\": \"panting\"},\n  {\"id\": \"sit\", \"name\": \"Sit\", \"spine\": -52, \"neck\": -42, \"head\": 2, \"tail\": [162, -10], \"frontNear\": [92, 0], \"frontFar\": [86, 0], \"backNear\": [6, 104], \"backFar\": [14, 96]},\n  {\"id\": \"lie\", \"name\": \"Lie down\", \"spine\": -3, \"neck\": -22, \"head\": 8, \"tail\": [178, 6], \"frontNear\": [14, -6], \"frontFar\": [22, -8], \"backNear\": [20, 104], \"backFar\": [28, 98], \"expr\": \"sleepy\"},\n  {\"id\": \"beg\", \"name\": \"Beg (sit up)\", \"spine\": -74, \"neck\": -58, \"head\": 18, \"tail\": [158, -8], \"frontNear\": [30, 100], \"frontFar\": [42, 96], \"backNear\": [6, 104], \"backFar\": [14, 96], \"expr\": \"happy\"},\n  {\"id\": \"bark\", \"name\": \"Bark / roar\", \"neck\": -78, \"head\": -28, \"tail\": [210, 30], \"expr\": \"surprised\"},\n  {\"id\": \"sniff\", \"name\": \"Sniff the ground\", \"neck\": 22, \"head\": 68, \"tail\": [200, 20]},\n  {\"id\": \"wag\", \"name\": \"Happy (tail up)\", \"neck\": -62, \"head\": -4, \"tail\": [250, 40], \"expr\": \"panting\"}\n ]\n}\n"
   },

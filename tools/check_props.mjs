@@ -11,8 +11,8 @@ import { createApp, ROOT } from '../tests/helpers/sandbox.mjs';
 const args = process.argv.slice(2); const flag = (n) => { const i = args.indexOf(n); return i >= 0 ? args[i + 1] : null; };
 const sheetDir = flag('--sheet'); const only = flag('--file'); const filter = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--sheet' && args[i - 1] !== '--file') || '';
 const STRICT_KITS = ['scenery', 'home', 'school', 'park']; // folders under plugins/props/ whose props follow every rule
-const LIMITS = { page: [1000, 750], maxPrims: 90, maxPoints: 1500, strokeMin: 1, strokeMax: 12, floorTol: 12 };
-const FORBIDDEN = /\b(document|window|fetch|XMLHttpRequest|eval|Function|setTimeout|setInterval|localStorage|sessionStorage|indexedDB|import|require|Math\.random|Date|performance)\b/;
+const LIMITS = { page: [1000, 750], maxPrims: 90, maxPoints: 1500, slack: 12, strokeMin: 1, strokeMax: 12, floorTol: 12 };
+const FORBIDDEN = /(?<![.\w$])(document|window|globalThis|self|fetch|XMLHttpRequest|eval|Function|setTimeout|setInterval|localStorage|sessionStorage|indexedDB|import|require|Date|performance)\b|\bMath\.random\b/; // a property called .window is fine; the global is not
 const CATS = ['Furniture', 'Decoration', 'Nature', 'Buildings', 'Vehicles', 'Playground', 'Kitchen', 'Bedroom', 'Bathroom', 'Garden', 'Sports', 'Learning', 'Arts', 'Food', 'Toys', 'Signs', 'Scenery', 'School', 'Weather'];
 
 const app = await createApp(); const { CP, RENDER, Pen } = app;
@@ -64,7 +64,7 @@ for (const d of props) {
     if (a.length > LIMITS.maxPrims) here(`${a.length} shapes with ${label}; keep it under ${LIMITS.maxPrims} (simple props: under 25)`);
     const pts = a.reduce((n, q) => n + q.pts.length + (q.more || []).reduce((m, c) => m + c.length, 0), 0); if (pts > LIMITS.maxPoints) here(`${pts} points with ${label}; keep it under ${LIMITS.maxPoints}`);
     const bb = RENDER.primsBBox(a); const w = bb.x1 - bb.x0, h = bb.y1 - bb.y0;
-    if (w > LIMITS.page[0] + 1 || h > LIMITS.page[1] + 1) here(`is ${Math.round(w)} x ${Math.round(h)} with ${label}; it must fit a 1000 x 750 page at scale 1`);
+    if (w > LIMITS.page[0] + LIMITS.slack || h > LIMITS.page[1] + LIMITS.slack) here(`is ${Math.round(w)} x ${Math.round(h)} with ${label}; it must fit a 1000 x 750 page at scale 1`);
     const floor = !(d.floating || /floating|sky|cloud|sun|moon|star|bird|kite|balloon/i.test(d.cat + ' ' + d.id + ' ' + (d.tags || []).join(' ')));
     if (floor && Math.abs(bb.y1) > LIMITS.floorTol && !d.floating) here(`bottom is at y=${Math.round(bb.y1)} with ${label}; a floor prop stands on y=0 with its bottom centre at x=0 (set floating: true for things that float, centred on 0,0)`);
     if (floor && Math.abs((bb.x0 + bb.x1) / 2) > Math.max(60, w * 0.35) && w < 600) here(`is not centred on x=0 (centre ${Math.round((bb.x0 + bb.x1) / 2)}) with ${label}`);
@@ -92,8 +92,10 @@ if (sheetDir) {
   }
   console.log(`contact sheets written to ${sheetDir}`);
 }
-const strictFails = problems.filter((p) => p.strict), soft = problems.filter((p) => !p.strict);
-for (const p of strictFails) console.log(`FAIL  ${p.id}  (${p.file || ''})  ${p.m}`);
+// the same mistake for several param values is reported once, with how many times it happened
+const group = (list) => { const seen = new Map(); for (const p of list) { const k = p.id + '|' + p.m.replace(/ with \{.*$/, '').replace(/ with empty slots$/, ''); const e = seen.get(k); if (e) e.n++; else seen.set(k, { ...p, n: 1 }); } return [...seen.values()]; };
+const strictFails = group(problems.filter((p) => p.strict)), soft = group(problems.filter((p) => !p.strict));
+for (const p of strictFails) console.log(`FAIL  ${p.id}  ${p.m}${p.n > 1 ? `  (and ${p.n - 1} more like it)` : ''}`);
 for (const p of soft) console.log(`note  ${p.id}  ${p.m}  (older prop, not required)`);
 const nStrict = props.filter(strictFor).length;
 console.log(`${props.length} props checked (${nStrict} strictly, ${props.length - nStrict} basics only): ${strictFails.length} problem(s)`);

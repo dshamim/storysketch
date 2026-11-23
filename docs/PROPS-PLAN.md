@@ -1,6 +1,6 @@
 # Plan: props for stories
 
-**Status:** step 0 done (scale rules, checker, style guide); no props drawn yet. Written 2026-11-23.
+**Status:** step 0 done (scale rules, checker, style guide). Step 1 (shared pieces: ground, sky, hills, room wall, fence, stepping stones, clouds, window) and the first Home prop (the house) are drawn; the rest of Home is next. Written 2026-11-23.
 
 ## Why
 Today the tool ships **73 props: 15 for an airport and 58 for a classroom** (26 of those are art supplies). A story needs places. The first round gives stories a **home, a school (building and bus) and a park**, generic and not tied to any country.
@@ -13,7 +13,7 @@ All rules are in [`PROP-STYLE-GUIDE.md`](PROP-STYLE-GUIDE.md) and are checked by
 | Step | What | Done when |
 |---|---|---|
 | **0. Rules and checker** | scale sheet, style guide, `tools/check_props.mjs`, `tags` searchable in the Props tab and Ctrl+K | **done** (this commit) |
-| **1. Shared pieces** | the few pieces all three kits need: ground (grass, path, road, floor), sky (day, dusk, night), hills, a wall with a window and a door | checker clean; contact sheet approved |
+| **1. Shared pieces** | the few pieces all three kits need: ground (grass, path, road, floor), sky (day, dusk, night), hills, a wall with a window and a door | **drawn**; checker clean; contact sheet and a day and a night scene reviewed by the owner |
 | **2. Home** | see below | checker clean; contact sheet approved; a sample project "Home" built only from the kit |
 | **3. School and bus** | see below | same, sample project "School day" |
 | **4. Park** | see below | same, sample project "Park" |

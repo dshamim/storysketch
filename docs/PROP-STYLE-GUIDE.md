@@ -67,6 +67,8 @@ Draw objects from the **front, with a slight look-down**: a table top is a thin 
 - **Objects use calm outline colours:** wood `#8a5a33`, grey metal and stone `#6f6f6f`. Use a hue from the shared palette (`CP.helpers.PAL`: `#e53935 #fb8c00 #fbc02d #43a047 #1e88e5 #8e24aa #d81b60 #00897b`) for toys, signs and accents, not for whole pieces of furniture.
 - **Solid surfaces need `fill: 'paper'`.** It paints the page colour, so a thing in front hides what is behind it. Without it, layered props show through each other.
 - **Shade with hatching, not with solid colour.** `hatch: 'slotname'` with `hg` (gap, 6 to 7), `halpha` (0.35 to 0.5) and `ha` (angle, default -40). Keep solid colour fills small (a cushion, a flag).
+- **Never use a big solid dark fill** (a night sky, a dark wall): in chalk it turns into grey dust. Use dense hatching instead (`hatch: 'night', hg: 5, halpha: 0.8` on a `paper` fill). Dark colours (very dark browns, navy) are drawn chalk-white on a dark page, so keep them mid-tone if they must stay visible there.
+- **Backdrops** (sky, ground, hills, wall) are page-wide: users send them to the back and lock them. Draw them up to 1000 wide and let `width` / `height` range params shrink them.
 - Do not use black or white as a colour; people can switch the page to chalk-on-dark and light colours or very dark colours must still read. Test it in the chalk sheet.
 
 ## 7. How much detail

@@ -5,6 +5,12 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
+## Unreleased — first props of the new kits
+- **Scenery (8 props, pack "Scenery"):** ground (grass, sandy path, road, wooden floor), sky (day, sunset, night), hills, room wall (plain, stripes or dots; window and door), picket fence, stepping stones, clouds, and a window that can show any picture.
+- **Home: the house** (`home-house`): front view with a 340-high door (an adult fits through it), open or shut door, lights on or off, chimney.
+- A new sample scene (`scene-home-day`) is in the screenshot tests.
+- **Fixed:** library thumbnails used up the same counter as item ids, so adding props changed the ids, and with them the crayon wobble, of everything added afterwards. They now have their own counter, so new props no longer move other pictures.
+
 ## Unreleased — props plan and style guide
 - **Props style guide for agents and contributors** (`docs/PROP-STYLE-GUIDE.md`): scale (child 250, adult 320 at scale 1; door 340; storybook scale for buildings, bus, playground), origin, point of view, line widths, colour slots, hatching, detail budget, states, ids with prefixes, tags, content and licence, a worked example and a checklist. `AGENTS.md` points agents to it.
 - **Plan for the first three kits** (`docs/PROPS-PLAN.md`): shared scenery pieces, Home, School (building and bus) and Park, about 70 props; generic, no local kit.

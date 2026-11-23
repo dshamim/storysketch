@@ -275,11 +275,12 @@ const RENDER = (() => {
   }
 
   // stand-alone small SVG (thumbnails, previews). `style` = a registered style id; `crayon: true` is the old spelling.
+  let thumbCount = 0;
   function thumb(prims, { style = null, crayon: cr = false, mode = 'colour', pad = 8, paper = '#ffffff', seed = 'thumb', bg = null, box = null } = {}) {
     const b = box || primsBBox(prims);
     const vb = `${f(b.x0 - pad)} ${f(b.y0 - pad)} ${f(b.w + pad * 2)} ${f(b.h + pad * 2)}`;
     const sid = style || (cr ? 'crayon' : null);
-    const ctx = { mode, paper, seed, idp: 't' + U.uid(), n: 0, style: sid };
+    const ctx = { mode, paper, seed, idp: 't' + (++thumbCount).toString(36), n: 0, style: sid }; // (its own counter: thumbnails must not use up item ids, or every new prop would change the ids, and so the look, of everything added after it)
     const body = render(prims, ctx);
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${vb}" preserveAspectRatio="xMidYMid meet">${sid ? `<defs>${defs()}</defs>` : ''}${bg ? `<rect x="${f(b.x0 - pad)}" y="${f(b.y0 - pad)}" width="${f(b.w + pad * 2)}" height="${f(b.h + pad * 2)}" fill="${bg}"/>` : ''}${body}</svg>`;
   }

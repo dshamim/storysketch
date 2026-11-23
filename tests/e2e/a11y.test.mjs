@@ -44,6 +44,7 @@ const STATES = [
   ['file menu', `select([]); document.querySelector('#btn-file').click();`],
   ['About card', `select([]); showAbout();`],
   ['a tip showing', `localStorage.setItem('storysketch/hints-mode', 'on'); select([]); showHint('handles');`],
+  ['font menu open', `addItem(TXT.make({ text: 'Hello', size: 60 }, 300, 150)); document.querySelector('[data-rb="pop-font"]').click();`],
   ['search open with results', `select([]); openPalette(); document.querySelector('#pal-input').value = 'add'; renderPalette();`],
   ['shortcut sheet', `select([]); openShortcuts();`],
 ];

@@ -9,6 +9,8 @@
   "scripts": {
     "serve": "python3 -m http.server 8765",
     "build:plugins": "python3 tools/build_plugins.py",
+    "build:fonts": "uv run --with fonttools --with skia-pathops --with uharfbuzz python -I tools/build_fonts.py",
+    "check:fonts": "uv run --with fonttools --with skia-pathops --with uharfbuzz python -I tools/build_fonts.py --check",
     "check:plugins": "python3 tools/build_plugins.py --check",
     "check:icons": "python3 tools/build_icons.py --check",
     "build:icons": "python3 tools/build_icons.py",

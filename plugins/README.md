@@ -7,6 +7,7 @@ of them as a starting point.
 ```
 plugins/
   styles/        drawing styles: crayon, marker, ink, chalk… (.js)
+  fonts/         fonts for text: letter outlines as data (.js) + the licence text (-OFL.txt); made by tools/build_fonts.py
   rigs/          skeletons: the Person rig is built in; animals etc. live here (.js)
   projects/      sample projects offered by New project (.json)
   hair/          one .js file per hair style
@@ -264,12 +265,25 @@ CP.register({ api: 1, version: '1.0.0', type: 'style', id: 'pencil', name: 'Penc
   defaultPaper: '#ffffff',                        // optional: page colour this style suggests (chalk → blackboard)
   render(prims, ctx) { … return svgString; } });
 ```
-- `prims` is the clean primitive list (`{ pts, closed, smooth, stroke, w, fill, hatch, hole, op }`; `fill: 'paper'` hides what is behind).
+- `prims` is the clean primitive list (`{ pts, closed, smooth, stroke, w, fill, hatch, hole, more, glyph, op }`; `fill: 'paper'` hides what is behind). `more` = extra outlines filled together with `pts` by the even-odd rule (the holes and dots of a font letter; use `dFill(p)` and `fill-rule="evenodd"` when `p.hole || p.more`); `glyph` = a letter of a font, which should be drawn solid enough to read.
 - `ctx` = `{ mode: 'colour'|'grey'|…, paper, seed, idp, n }`. **Same `seed` must always give the same picture**, so re-exports match.
 - Helpers on `RENDER.helpers`: `colour(c, ctx)` (applies grey mode and chalk-white on dark pages), `runs(prims, ctx, filterId, fn)`
   (paper fills stay crisp, everything else is grouped under one SVG filter), `hatchLines`, `wobblePath`, `dPoly`/`dFill`, `paperOf`.
   Read `styles/marker.js` (short) as a model.
 - `order` puts it in the style list (lower first; Crayon, the default, is 10).
+
+## Fonts — `fonts/*.js`
+A font plugin is **data only**: the outlines of the letters (y down, 1000 units to the em, baseline at 0), the step each letter takes, kerning pairs and the licence. The page never needs the font installed; it draws the outlines as shapes, so every style can finish them.
+Do not write one by hand: `npm run build:fonts` (needs `uv`) turns the pinned, hash-checked source fonts listed in `tools/fonts/sources.json` into `plugins/fonts/<id>.js`. To add a font:
+1. Check its licence. It must be the **SIL Open Font License** (or similar) **without a Reserved Font Name** (the copyright line must not say "with Reserved Font Name"), because the converted letters are a modified version.
+2. Add an entry to `tools/fonts/sources.json` (the file, its sha256 and, for a variable font, the weights to cut), run `npm run build:fonts`, then `python3 tools/build_plugins.py`.
+3. Add it to `THIRD-PARTY-NOTICES.md` and to the list in `tests/unit/fonts.test.mjs`.
+```js
+CP.register({ api: 1, version: '1.0.0', type: 'font', id: 'nunito', name: 'Nunito', kind: 'Rounded', upm: 1000,
+  licence: { name, copyright, file, source, commit, files: ['Nunito[wght].ttf <sha256>'] },
+  weights: { regular: { metrics: { cap, x, asc, desc }, kern: { 'AV': -40 }, glyphs: { 'A': [advance, 'M… Q… L… Z'] } }, bold: { … } } });
+```
+Only Basic Latin plus curly quotes, dashes, ellipsis and bullet are included (this tool is English only). A text item says `font: "<id>"`; `"hand"` is the built-in single-line handwriting, and an id that is not installed draws as `"hand"`.
 
 ## Rigs — `rigs/*.js`
 A rig is a skeleton: its dimensions, joints, posing, presets, mirroring, drag handles and drawing. The two-armed Person rig is

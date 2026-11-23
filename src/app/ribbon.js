@@ -13,7 +13,7 @@ const rbRotate = (it) => `<label class="rb rot" data-tip="Turn (degrees)">${UI.i
 function textRibbon(it) {
   const t = TXT.norm(it); const tog = (k, icon, label, on) => `<button class="ui-iconbtn" data-text-toggle="${k}" aria-pressed="${on}" data-tip="${label}" aria-label="${label}">${UI.icon(icon)}</button>`;
   const al = (v, icon, label) => `<button class="ui-iconbtn" data-text-set="align=${v}" aria-pressed="${t.align === v}" data-tip="${label}" aria-label="${label}">${UI.icon(icon)}</button>`;
-  return `<span class="rb-size"><button class="ui-iconbtn sm" data-text-step="size:-4" data-tip="Smaller" aria-label="Smaller">${UI.icon('remove')}</button><input class="ui-input num" type="number" data-text="size" min="8" max="400" step="1" value="${t.size}" aria-label="Font size"><button class="ui-iconbtn sm" data-text-step="size:4" data-tip="Bigger" aria-label="Bigger">${UI.icon('add')}</button></span>` + rbSep +
+  return rbMenuBtn('pop-font', 'text', `<span class="rb-fontname">${U.esc(fontName(t.font))}</span>`) + rbSep + `<span class="rb-size"><button class="ui-iconbtn sm" data-text-step="size:-4" data-tip="Smaller" aria-label="Smaller">${UI.icon('remove')}</button><input class="ui-input num" type="number" data-text="size" min="8" max="400" step="1" value="${t.size}" aria-label="Font size"><button class="ui-iconbtn sm" data-text-step="size:4" data-tip="Bigger" aria-label="Bigger">${UI.icon('add')}</button></span>` + rbSep +
     tog('weight', 'bold', 'Bold', t.weight === 'bold') + tog('underline', 'underline', 'Underline', !!t.underline) +
     `<label class="rb" data-tip="Text colour"><input type="color" class="rb-color" data-text="color" value="${t.color}" aria-label="Text colour"></label>` + rbSep +
     al('left', 'text-left', 'Align left') + al('center', 'text-center', 'Centre') + al('right', 'text-right', 'Align right') + rbMenuBtn('pop-spacing', 'text', 'Spacing');
@@ -60,6 +60,9 @@ function openRibbonMenu(btn) {
     const it = itemById(app.sel[0]); const c = it && castById(it.cast); if (!c) return;
     $('#pose-grid').innerHTML = posesFor(c).map((p) => `<button class="tile sm" data-pose="${p.id}" title="${U.esc(p.name)}">${figureThumb(c, p.id, false, p.expr)}<span>${U.esc(p.name)}</span></button>`).join('');
     UI.showPopover(btn, $('#pop-pose'), { placement: 'bottom-start', focus: true });
+  } else if (m === 'pop-font') {
+    const it = itemById(app.sel[0]); if (!isText(it)) return;
+    $('#font-list').innerHTML = fontListHTML(it.font); UI.showPopover(btn, $('#pop-font'), { placement: 'bottom-start', focus: true });
   } else if (m === 'pop-spacing') {
     const it = itemById(app.sel[0]); if (!isText(it)) return; const t = TXT.norm(it);
     for (const [id, k] of [['#sp-line', 'lineHeight'], ['#sp-letter', 'letterSpacing']]) { const r = $(id); r.value = t[k]; r.closest('.ui-field').querySelector('output').textContent = t[k]; }
@@ -106,6 +109,7 @@ function initRibbon() {
     onInspectorInput(e); if (detailsOpen()) renderDetails();
   });
   $('#pop-spacing').addEventListener('input', (e) => { onTextInput(e.target); if (detailsOpen()) renderDetails(); });
+  $('#pop-font').addEventListener('click', (e) => { if (e.target.closest('[data-text-set]')) { onInspectorClick(e); UI.closePopover(false); renderRibbon(); } });
   $('#pop-pose').addEventListener('click', (e) => { if (e.target.closest('[data-pose]')) { onInspectorClick(e); UI.closePopover(false); } });
   $('#menu-distribute').addEventListener('ui-open', () => setItemEnabledIn('#menu-distribute', arrangeUnits().length > 2));
   const bar = $('#minibar');

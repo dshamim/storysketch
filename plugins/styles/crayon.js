@@ -41,7 +41,7 @@
     }
     const q = pts.map(([x, y]) => [cx + x * ca - y * sa + (r() - 0.5) * 1.5, cy + x * sa + y * ca + (r() - 0.5) * 1.5]);
     const alpha = U.clamp((p.hatch.alpha ?? 0.6) * 1.25, 0.15, 1);
-    return `<clipPath id="${id}"><path d="${dFill(p)}"${p.hole ? ' clip-rule="evenodd"' : ''}/></clipPath>` +
+    return `<clipPath id="${id}"><path d="${dFill(p)}"${(p.hole || p.more) ? ' clip-rule="evenodd"' : ''}/></clipPath>` +
       `<path clip-path="url(#${id})" d="${dPoly(q, false)}" fill="none" stroke="${col}" stroke-width="${f(Math.max(1.8, gap * 0.42))}" stroke-opacity="${alpha}" stroke-linejoin="round"/>`;
   }
 
@@ -56,7 +56,7 @@
     };
     prims.forEach((p, i) => {
       const seed = U.hash(ctx.seed + ':' + i);
-      const fr = p.hole ? ' fill-rule="evenodd"' : '';
+      const fr = (p.hole || p.more) ? ' fill-rule="evenodd"' : '';
       if (p.fill === 'paper') { flush(); s += `<path d="${dFill(p)}" fill="${paperOf(ctx)}"${fr}/>`; }
       else if (p.fill) { run += `<path d="${dFill(p)}" fill="${colour(p.fill, ctx)}" fill-opacity="0.9"${fr}/>`; grow(p.pts, 12); }
       if (p.hatch) { run += crayonHatch(p, seed, ctx); grow(p.pts, 12); }

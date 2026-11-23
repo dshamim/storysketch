@@ -16,8 +16,8 @@ const CP = (() => {
   const hair = {}, clothes = {}, accessories = {}, props = {}, addons = {}, rigs = {};
   const propList = [], poses = [], templates = [], characters = [], projects = [];
   const SLOTS = ['base', 'back', 'body', 'face', 'head'];
-  const FOLDERS = { styles: 'style', rigs: 'rig', projects: 'project', hair: 'hair', clothes: 'clothes', accessories: 'accessory', addons: 'addon', props: 'prop', poses: 'pose', templates: 'template', characters: 'character' };
-  const ORDER = ['styles', 'rigs', 'projects', 'hair', 'clothes', 'accessories', 'addons', 'props', 'poses', 'templates', 'characters'];
+  const FOLDERS = { styles: 'style', fonts: 'font', rigs: 'rig', projects: 'project', hair: 'hair', clothes: 'clothes', accessories: 'accessory', addons: 'addon', props: 'prop', poses: 'pose', templates: 'template', characters: 'character' };
+  const ORDER = ['styles', 'fonts', 'rigs', 'projects', 'hair', 'clothes', 'accessories', 'addons', 'props', 'poses', 'templates', 'characters'];
   const warnings = []; const loaded = []; const reported = new Set();
   let currentFile = null; let manifest = null;
 
@@ -59,6 +59,8 @@ const CP = (() => {
         }
         // style = how the clean drawing is finished for preview/export (crayon, marker, ink, chalk…)
         case 'style': need(def, ['render', 'name']); RENDER.registerStyle(d); break;
+        // font = letter outlines as data (made by tools/build_fonts.py from an OFL font); text with `font: id` is drawn from them
+        case 'font': need(def, ['name', 'weights']); FONTS.register(d); break;
         // rig = a skeleton: dims, joints, posing, presets, handles and drawing (see src/core/rigs/biped.js)
         case 'rig': need(def, ['name', 'dims', 'joints', 'prims', 'fromPreset', 'mirror', 'handles', 'edit', 'bendOf', 'flipBend', 'limbs']); rigs[def.id] = d; break;
         // a pose belongs to one rig; the same id may exist for several rigs ("stand" for a person and for a dog)

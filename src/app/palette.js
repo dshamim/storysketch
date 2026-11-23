@@ -81,6 +81,8 @@ function paletteCommands() {
   for (const p of PROPS) add('Props', 'prop:' + p.id, 'Add prop: ' + (p.name || p.id), () => addProp(p.id), { words: (p.pack || '') + ' picture object' });
   for (const k of Object.keys(SHP.KINDS)) add('Shapes', 'shape:' + k, 'Add a ' + SHP.KINDS[k].name.toLowerCase(), () => addShape(k), { words: 'shape drop' });
   for (const k of Object.keys(SHP.LINES)) add('Shapes', 'shape:' + k, 'Add a ' + SHP.LINES[k].name.toLowerCase(), () => addShape(k), { words: 'shape line arrow drop' });
+  const txt = app.sel.length === 1 && isText(itemById(app.sel[0])) ? itemById(app.sel[0]) : null;
+  if (txt) for (const f of fontChoices()) add('Text', 'font:' + f.id, 'Font: ' + f.name, () => { setTextProp(txt, 'font', f.id); renderInspector(); renderRibbon(); }, { checked: (txt.font || 'hand') === f.id, words: 'typeface letters writing ' + (f.kind || '') });
   for (const t of TXT.PRESETS) add('Text', 'text:' + t.id, 'Add text: ' + t.name, () => addText(t), { words: 'words label' });
   for (const s of RENDER.styleList()) add('Style', 'style:' + s.id, 'Drawing style: ' + (s.name || s.id), () => { setStyle(s.id); syncStyleControls(); }, { checked: curStyle() === s.id, words: 'look' });
   for (const p of CP.projects) add('Samples', 'sample:' + p.id, 'Open sample: ' + p.name, () => startProject('project:' + p.id), { words: p.description || '' });

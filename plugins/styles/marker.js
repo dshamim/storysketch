@@ -17,9 +17,10 @@
   function render(prims, ctx) {
     return runs(prims, ctx, 'marker-edge', (p, seed) => {
       let out = '';
+      if (p.glyph) return `<path d="${dFill(p)}" fill="${colour(p.fill, ctx)}" fill-opacity="0.82" fill-rule="evenodd"/>`; // a letter of a font: even felt-tip ink, no streaks (they would blur small letters)
       if (p.fill && p.fill !== 'paper') {
         const col = colour(p.fill, ctx);
-        out += `<path d="${dFill(p)}" fill="${col}" fill-opacity="0.55"${p.hole ? ' fill-rule="evenodd"' : ''}/>`;
+        out += `<path d="${dFill(p)}" fill="${col}" fill-opacity="0.55"${(p.hole || p.more) ? ' fill-rule="evenodd"' : ''}/>`;
         // the streaks left by going back and forth with the pen: overlapping bands darken a little
         out += hatchLines(p, seed, ctx, { color: col, angle: -35 + (seed % 20), gap: 7, width: 9, alpha: 0.3, jitter: 1, vary: 0.25 });
       }

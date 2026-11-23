@@ -1,7 +1,8 @@
 // Drawing model + the renderers (clean editing view built in; crayon, marker, ink, chalk… are style plugins).
 //
 // Everything (figures and props) is described as a list of clean "primitives":
-//   { pts:[[x,y]...], closed, smooth, stroke:colour|null, w, fill:null|'paper'|colour, hatch:{color,angle,gap}|null, hole?, op? }
+//   { pts:[[x,y]...], closed, smooth, stroke:colour|null, w, fill:null|'paper'|colour, hatch:{color,angle,gap}|null, hole?, more?, glyph?, op? }
+// (`more` = extra sharp outlines filled together with `pts` by the even-odd rule: the holes and dots of a font letter; `glyph` = a letter of a font, which styles keep legible)
 // The CLEAN renderer draws them as sharp vectors (editing).
 // A STYLE (plugins/styles/*.js) turns the same primitives into a hand-drawn look (preview + export).
 // Paper fills stay crisp in every style so layering still hides what is behind.
@@ -14,6 +15,8 @@ class Pen {
     const p = { pts, closed: !!o.closed, smooth: !!o.smooth, stroke: o.stroke === false ? null : this.col(o.stroke ?? 'line'), w: o.w ?? 4.5, fill: o.fill ? this.col(o.fill) : null };
     if (o.hatch) p.hatch = { color: this.col(o.hatch), angle: o.ha ?? -40, gap: o.hg ?? 6, alpha: o.halpha };
     if (o.hole) p.hole = o.hole;
+    if (o.more) p.more = o.more;
+    if (o.glyph) p.glyph = true;
     if (o.op != null) p.op = o.op;
     this.o.push(p); return this;
   }
@@ -181,7 +184,9 @@ const RENDER = (() => {
     return d + (closed ? 'Z' : '');
   };
   const dOf = (p) => p.smooth ? dSmooth(p.pts, p.closed) : dPoly(p.pts, p.closed);
-  const dFill = (p) => dOf(p) + (p.hole ? dSmooth(p.hole, true) : '');
+  // a filled shape may have more than one outline: `hole` (one smoothed outline, drawn with the even-odd rule) or `more` (any number of sharp-cornered outlines: a letter's holes and dots)
+  const dFill = (p) => dOf(p) + (p.hole ? dSmooth(p.hole, true) : '') + (p.more ? p.more.map((c) => dPoly(c, true)).join('') : '');
+  const oddEven = (p) => !!(p.hole || p.more);
   const paperOf = (ctx) => ctx.paper || '#ffffff';
 
   // ---- clean (editing) ----
@@ -189,7 +194,7 @@ const RENDER = (() => {
     let s = '';
     for (const p of prims) {
       const op = p.op != null ? ` opacity="${p.op}"` : '';
-      const fr = p.hole ? ' fill-rule="evenodd"' : '';
+      const fr = oddEven(p) ? ' fill-rule="evenodd"' : '';
       if (p.fill) s += `<path d="${dFill(p)}" fill="${p.fill === 'paper' ? paperOf(ctx) : colour(p.fill, ctx)}"${fr}${op}/>`;
       if (p.hatch) s += `<path d="${dFill(p)}" fill="${colour(p.hatch.color, ctx)}" fill-opacity="${(p.hatch.alpha ?? 0.6) * 0.45}"${fr}/>`;
       if (p.stroke && p.w > 0) s += `<path d="${dOf(p)}" fill="none" stroke="${colour(p.stroke, ctx)}" stroke-width="${f(p.w)}" stroke-linecap="round" stroke-linejoin="round"${op}/>`;
@@ -221,7 +226,7 @@ const RENDER = (() => {
     };
     prims.forEach((p, i) => {
       const seed = U.hash(ctx.seed + ':' + i);
-      if (p.fill === 'paper') { flush(); s += `<path d="${dFill(p)}" fill="${paperOf(ctx)}"${p.hole ? ' fill-rule="evenodd"' : ''}/>`; }
+      if (p.fill === 'paper') { flush(); s += `<path d="${dFill(p)}" fill="${paperOf(ctx)}"${oddEven(p) ? ' fill-rule="evenodd"' : ''}/>`; }
       const out = fn(p, seed, i); if (out) { run += out; grow(p.pts, (p.w || 0) * 2 + 12); }
     });
     flush();
@@ -238,7 +243,7 @@ const RENDER = (() => {
       pts.push(...(flip ? [[R, y], [-R, y + gap * 0.3]] : [[-R, y], [R, y + gap * 0.3]])); flip = !flip;
     }
     const q = pts.map(([x, y]) => [cx + x * ca - y * sa + (r() - 0.5) * jit, cy + x * sa + y * ca + (r() - 0.5) * jit]);
-    return `<clipPath id="${id}"><path d="${dFill(p)}"${p.hole ? ' clip-rule="evenodd"' : ''}/></clipPath>` +
+    return `<clipPath id="${id}"><path d="${dFill(p)}"${oddEven(p) ? ' clip-rule="evenodd"' : ''}/></clipPath>` +
       `<path clip-path="url(#${id})" d="${dPoly(q, false)}" fill="none" stroke="${o.color}" stroke-width="${f(o.width ?? Math.max(1.8, gap * 0.42))}" stroke-opacity="${o.alpha ?? 0.6}" stroke-linejoin="round"/>`;
   }
   // a stroke's centre-line, densified and nudged sideways by smooth noise (the pen/brush hand-drift)
@@ -254,7 +259,7 @@ const RENDER = (() => {
     return { q, al, L: al[al.length - 1], r };
   }
   // helpers handed to style plugins
-  const helpers = { f, dPoly, dSmooth, dOf, dFill, paperOf, arcLens, colour, darkPaper, runs, hatchLines, wobblePath };
+  const helpers = { oddEven, f, dPoly, dSmooth, dOf, dFill, paperOf, arcLens, colour, darkPaper, runs, hatchLines, wobblePath };
 
   function render(prims, ctx) {
     const st = ctx.style && STYLES[ctx.style];

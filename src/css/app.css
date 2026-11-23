@@ -316,3 +316,14 @@ html.touch .hint-card { top: 64px; } /* below the Done-typing button's row */
 .tool-pill button, .ui-btn, .ui-iconbtn, .ui-rail-btn { transition: background-color var(--ui-dur, 120ms) var(--ui-ease, ease-out), transform var(--ui-dur, 120ms) var(--ui-ease, ease-out); }
 .tool-pill button:active, .ui-iconbtn:active, .ui-rail-btn:active { transform: scale(0.96); }
 #workspace.fly-closed .hint-card { top: 64px; } /* with the library folded, the button that brings it back sits top-left of the page: do not cover it */
+
+/* ---- font picker ---- */
+.font-pop { min-width: 300px; max-height: min(70vh, 460px); overflow: auto; padding: 6px; }
+.font-list { display: grid; gap: 2px; }
+.font-opt { display: grid; grid-template-columns: 1fr; gap: 0; align-items: center; text-align: left; padding: 4px 10px; min-height: 52px; border: 1px solid transparent; border-radius: var(--ui-r-md); background: transparent; color: var(--ui-text, #1f2430); cursor: pointer; }
+.font-opt:hover { background: var(--ui-surface-hover); }
+.font-opt[aria-pressed="true"] { background: var(--ui-accent-weak); border-color: var(--ui-accent, #5b3df5); }
+.font-opt svg { width: 100%; height: 30px; display: block; }
+.font-opt .font-kind { font-size: 11px; color: var(--ui-text-muted, #6b7280); }
+.rb-fontname { display: inline-block; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+html.touch .font-opt { min-height: 60px; }

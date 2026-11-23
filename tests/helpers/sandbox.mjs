@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 // same order as index.html
-export const CORE = ['version', 'legacy', 'util', 'draw', 'files', 'storage', 'registry', 'parts', 'rigs/biped', 'figure', 'presets', 'props-core', 'store', 'arrange', 'text', 'shapes'].map((n) => `src/core/${n}.js`);
+export const CORE = ['version', 'legacy', 'util', 'draw', 'fonts', 'files', 'storage', 'registry', 'parts', 'rigs/biped', 'figure', 'presets', 'props-core', 'store', 'arrange', 'text', 'shapes'].map((n) => `src/core/${n}.js`);
 
 /** @param {{core?: string[], plugins?: boolean, storage?: Record<string,string>}} opts */
 export async function createApp({ core = CORE, plugins = true, storage = {} } = {}) {

@@ -16,9 +16,10 @@
   function render(prims, ctx) {
     return runs(prims, ctx, 'chalk-dust', (p, seed) => {
       let out = '';
+      if (p.glyph) return `<path d="${dFill(p)}" fill="${colour(p.fill, ctx)}" fill-opacity="0.8" fill-rule="evenodd"/>`; // a letter of a font: dusty but readable
       if (p.fill && p.fill !== 'paper') {
         const col = colour(p.fill, ctx);
-        out += `<path d="${dFill(p)}" fill="${col}" fill-opacity="0.42"${p.hole ? ' fill-rule="evenodd"' : ''}/>`; // a smudged rub of chalk
+        out += `<path d="${dFill(p)}" fill="${col}" fill-opacity="0.42"${(p.hole || p.more) ? ' fill-rule="evenodd"' : ''}/>`; // a smudged rub of chalk
         out += hatchLines(p, seed, ctx, { color: col, angle: -50 + (seed % 25), gap: 5, width: 4.5, alpha: 0.22, jitter: 2, vary: 0.6 });
       }
       if (p.hatch) out += hatchLines(p, seed + 1, ctx, { color: colour(p.hatch.color, ctx), angle: p.hatch.angle ?? -40, gap: Math.max(4, (p.hatch.gap ?? 6) * 0.95), width: Math.max(2, (p.hatch.gap ?? 6) * 0.5), alpha: Math.min(1, (p.hatch.alpha ?? 0.6) * 0.95), jitter: 2, vary: 0.6 });

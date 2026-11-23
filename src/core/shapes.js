@@ -91,7 +91,7 @@ const SHP = (() => {
     if (it.fill === 'solid' || it.fill === 'colour') o.fill = it.fillColor; else if (it.fill === 'hatch') o.hatch = it.fillColor;
     if (o.fill || o.hatch || o.stroke) pen.path(pts, o);
     if (dashed) { const d = outline(it, true); for (const pc of dashes(d.pts, true, it.dash, w)) pen.line(pc, { stroke, w }); }
-    if (String(it.text).trim()) { const v = textView(it); for (const p of TXT.prims(v.item)) pen.o.push(v.dy ? { ...p, pts: p.pts.map(([x, y]) => [x, y + v.dy]) } : p); }
+    if (String(it.text).trim()) { const v = textView(it); for (const p of TXT.prims(v.item)) pen.o.push(v.dy ? { ...p, pts: p.pts.map(([x, y]) => [x, y + v.dy]), ...(p.more ? { more: p.more.map((c) => c.map(([x, y]) => [x, y + v.dy])) } : {}) } : p); }
     return pen.o;
   }
   function linePrims(item) {

@@ -3,8 +3,8 @@
 // ---------- project files ----------
 const suggestedName = () => STORAGE.current.name || `storysketch-${new Date().toISOString().slice(0, 10)}.json`;
 // ---- file version tracking ----
-const PLUGIN_REG = { hair: () => CP.hair, clothes: () => CP.clothes, accessory: () => CP.accessories, prop: () => CP.props, addon: () => CP.addons };
-const TYPE_NAME = { hair: 'Hair', clothes: 'Clothes', accessory: 'Accessory', prop: 'Prop', addon: 'Add-on', style: 'Style' };
+const PLUGIN_REG = { hair: () => CP.hair, clothes: () => CP.clothes, accessory: () => CP.accessories, prop: () => CP.props, addon: () => CP.addons, font: () => Object.fromEntries(FONTS.list().map((f) => [f.id, f])) };
+const TYPE_NAME = { hair: 'Hair', clothes: 'Clothes', accessory: 'Accessory', prop: 'Prop', addon: 'Add-on', style: 'Style', font: 'Font' };
 // which plugins (and versions) this book uses — recorded in every saved file
 function pluginsUsed(P) {
   const prev = new Map((P.plugins || []).map((r) => [r.type + ':' + r.id, r])); const used = new Map();
@@ -14,6 +14,7 @@ function pluginsUsed(P) {
     used.set(type + ':' + id, { type, id, name: d?.name || old?.name || id, version: d ? (d.version || '') : (old?.version || '') });
   };
   for (const c of P.cast) { add('hair', c.hair); add('clothes', c.body); for (const id of Object.keys(c.accessories || {})) add('accessory', id); }
+  for (const pgx of P.pages) for (const it of pgx.items) if (it.type === 'text' && it.font && it.font !== 'hand') add('font', it.font);
   for (const pgx of P.pages) for (const it of pgx.items) if (it.type === 'prop') {
     add('prop', it.kind); const def = CP.props[it.kind];
     for (const sl of def?.slots || []) add('addon', it.params?.[sl.key] ?? sl.def);
@@ -24,7 +25,7 @@ function pluginIssues(recorded) {
   const out = [];
   for (const r of recorded || []) {
     const reg = PLUGIN_REG[r.type]; if (!reg) continue; const d = reg()[r.id];
-    if (!d) out.push(`${TYPE_NAME[r.type]} <b>${U.esc(r.name || r.id)}</b>${r.version ? ` v${U.esc(r.version)}` : ''} — not installed (shows as a placeholder)`);
+    if (!d) out.push(`${TYPE_NAME[r.type]} <b>${U.esc(r.name || r.id)}</b>${r.version ? ` v${U.esc(r.version)}` : ''} — not installed (${r.type === 'font' ? 'its text is drawn in the hand-drawn letters instead' : 'shows as a placeholder'})`);
     else if (r.version && (d.version || '') !== r.version) out.push(`${TYPE_NAME[r.type]} <b>${U.esc(d.name || r.id)}</b> — book made with v${U.esc(r.version)}, you have v${U.esc(d.version || '?')} (may look slightly different)`);
   }
   return out;

@@ -3,7 +3,8 @@
 //   TXT.prims(item)   -> drawing primitives (so every style can draw it, and export keeps it as outlines)
 //   TXT.box(item)     -> the box around the text, in the item's own units, centred on the item's origin
 //   TXT.caret / TXT.indexAt -> between-letter positions for the editing caret and for clicking into the text
-// The letters come from the single-stroke alphabet (GLYPH in draw.js). `font` is "hand" for now; real fonts can be added behind the same property.
+// The letters come from the single-stroke alphabet (GLYPH in draw.js) when `font` is "hand", or from a font plugin's outlines (FONTS in fonts.js) when `font` is its id;
+// a font drawn from outlines gives filled letters (so every style can finish them), a character the font lacks is drawn in the handwriting letter, and an unknown font id is "hand".
 const TXT = (() => {
   const DEFAULTS = { text: '', font: 'hand', size: 48, color: '#2a2a2a', weight: 'normal', align: 'left', w: 0, lineHeight: 1.5, letterSpacing: 0, underline: false, colors: 'one' };
   const PALETTE = ['#e0402f', '#ef7d10', '#b88a00', '#2e9e44', '#2f6fd6', '#7b3fbf']; // "rainbow" / "each line"
@@ -18,6 +19,8 @@ const TXT = (() => {
   const norm = (it) => ({ ...DEFAULTS, ...it });
   const clampTo = (k, v) => { const [a, b] = LIMITS[k]; return Math.min(b, Math.max(a, +v)); };
   const BOLD = 1.7; // line weight of bold text
+  /** The font plugin that draws this item, or null for the handwriting alphabet ("hand", or a font that is not installed). */
+  const fontOf = (it) => (it.font && it.font !== 'hand' && FONTS.get(it.font)) || null;
   const lineWeight = (it) => Math.max(3, it.size * 0.09 * (it.weight === 'bold' ? BOLD : 1));
 
   /** Lay the text out. Local units; the box is centred on (0, 0). */
@@ -26,7 +29,8 @@ const TXT = (() => {
     const pitch = size * (+it.lineHeight || 1.5); const lines = []; let ps = 0; // ps = index of the paragraph's first letter in the whole text
     const str = String(it.text);
     for (const para of str.split('\n')) {
-      const wd = GLYPH.wordyOf(para); const adv = GLYPH.advances(para, size, sp, wd);
+      const font = fontOf(it); const wd = font ? false : GLYPH.wordyOf(para);
+      const adv = font ? FONTS.advances(para, font.id, it.weight, size, sp, (ch) => GLYPH.advances(ch, size, sp, false)[0]) : GLYPH.advances(para, size, sp, wd);
       const push = (a, b) => { // letters a..b of this paragraph
         const lineAdv = adv.slice(a, b); let trail = 0; for (let j = b - 1; j >= a && para[j] === ' '; j--) trail += adv[j];
         lines.push({ i0: ps + a, i1: ps + b, adv: lineAdv, w: lineAdv.reduce((n, v) => n + v, 0) - trail, wd, para: ps + para.length });
@@ -60,12 +64,20 @@ const TXT = (() => {
 
   /** Drawing primitives for the text. */
   function prims(item) {
-    const it = norm(item); const L = layout(it); const pen = new Pen({}); const w = lineWeight(it); const sp = +it.letterSpacing || 0;
+    const it = norm(item); const L = layout(it); const pen = new Pen({}); const w = lineWeight(it); const sp = +it.letterSpacing || 0; const font = fontOf(it);
     L.lines.forEach((l, k) => {
       const stroke = it.colors === 'lines' ? PALETTE[k % PALETTE.length] : it.color;
       const text = L.text.slice(l.i0, l.i1);
-      if (text.trim()) pen.text(text, l.x, l.y, L.size, { align: 'left', stroke, strokes: it.colors === 'rainbow' ? PALETTE : null, w, spacing: sp, wordy: l.wd });
-      if (it.underline && l.w > 0) pen.line([[l.x, l.y + L.size * 1.12], [l.x + l.w, l.y + L.size * 1.12]], { stroke, w: w * 0.8 });
+      if (font) { // outlines: one filled shape per letter, standing on the baseline; letters the font lacks are drawn in the handwriting alphabet
+        const base = l.y + L.size; let n = 0;
+        for (let i = 0; i < text.length; i++) {
+          const ch = text[i], nc = FONTS.norm(ch); if (nc === ' ' || nc === '') continue; const x = l.xs[i], fill = it.colors === 'rainbow' ? PALETTE[n++ % PALETTE.length] : stroke;
+          const g = FONTS.glyph(font.id, it.weight, ch, L.size, x, base);
+          if (g) pen.path(g.pts, { closed: true, stroke: false, w: 0, fill, more: g.more, glyph: true });
+          else pen.text(ch, x, l.y, L.size, { align: 'left', stroke: fill, w, spacing: 0, wordy: false });
+        }
+      } else if (text.trim()) pen.text(text, l.x, l.y, L.size, { align: 'left', stroke, strokes: it.colors === 'rainbow' ? PALETTE : null, w, spacing: sp, wordy: l.wd });
+      if (it.underline && l.w > 0) pen.line([[l.x, l.y + L.size * (font ? 1.2 : 1.12)], [l.x + l.w, l.y + L.size * (font ? 1.2 : 1.12)]], { stroke, w: font ? Math.max(2, L.size * 0.06) : w * 0.8 });
     });
     return pen.o;
   }
@@ -93,5 +105,5 @@ const TXT = (() => {
   /** A new text item from a preset (or plain options), centred on (x, y). */
   function make(opts = {}, x = 500, y = 375) { const { id, name, ...rest } = opts; return { type: 'text', x, y, s: 1, rot: 0, flip: false, mode: 'auto', ...DEFAULTS, ...rest }; }
 
-  return { DEFAULTS, PALETTE, PRESETS, LIMITS, norm, clampTo, layout, box, prims, caret, indexAt, moveLine, make, lineWeight };
+  return { DEFAULTS, PALETTE, PRESETS, LIMITS, norm, clampTo, layout, box, prims, caret, indexAt, moveLine, make, lineWeight, fontOf };
 })();

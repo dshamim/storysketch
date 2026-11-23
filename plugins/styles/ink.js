@@ -33,7 +33,8 @@
   function render(prims, ctx) {
     return runs(prims, ctx, null, (p, seed) => {
       let out = '';
-      if (p.fill && p.fill !== 'paper') out += `<path d="${dFill(p)}" fill="${colour(p.fill, ctx)}" fill-opacity="0.28"${p.hole ? ' fill-rule="evenodd"' : ''}/>`;
+      if (p.glyph) return `<path d="${dFill(p)}" fill="${inkOf(colour(p.fill, ctx), ctx)}" fill-opacity="0.94" fill-rule="evenodd"/>`; // a letter of a font: solid ink, kept legible
+      if (p.fill && p.fill !== 'paper') out += `<path d="${dFill(p)}" fill="${colour(p.fill, ctx)}" fill-opacity="0.28"${(p.hole || p.more) ? ' fill-rule="evenodd"' : ''}/>`;
       if (p.hatch) {
         const col = inkOf(colour(p.hatch.color, ctx), ctx), a = p.hatch.alpha ?? 0.6, gap = Math.max(3.2, (p.hatch.gap ?? 6) * 0.8);
         out += hatchLines(p, seed, ctx, { color: col, angle: p.hatch.angle ?? -40, gap, width: 0.9, alpha: Math.min(1, a * 1.15), jitter: 0.8, vary: 0.25 });

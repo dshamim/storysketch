@@ -14,6 +14,21 @@ CP.setManifest({
    "path": "styles/marker.js"
   },
   {
+   "path": "fonts/caveat-brush.js"
+  },
+  {
+   "path": "fonts/comic-neue.js"
+  },
+  {
+   "path": "fonts/crimson-pro.js"
+  },
+  {
+   "path": "fonts/nunito.js"
+  },
+  {
+   "path": "fonts/patrick-hand.js"
+  },
+  {
    "path": "rigs/quadruped.js"
   },
   {

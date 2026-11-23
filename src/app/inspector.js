@@ -144,7 +144,9 @@ function oneDetails(it, tab) {
 }
 function textLook(it) {
   const t = TXT.norm(it); const seg = (k, v, icon, label) => `<button class="ui-iconbtn" data-text-set="${k}=${v}" aria-pressed="${t[k] === v}" data-tip="${label}" aria-label="${label}">${ico(icon)}</button>`;
+  const fonts = Object.fromEntries(fontChoices().map((f) => [f.id, f.name])); if (t.font && !fonts[t.font]) fonts[t.font] = `${t.font} (not installed)`;
   return field('Text', `<textarea rows="3" data-text="text">${U.esc(t.text)}</textarea>`) +
+    field('Font', `<select data-text="font">${opts(fonts, t.font || 'hand')}</select>`) +
     field('Colour', `<span class="cf"><input type="color" data-text="color" value="${t.color}"><span class="sw">${SWATCHES.map((c) => `<button style="background:${c}" data-text-color="${c}" title="${c}" aria-label="${c}"></button>`).join('')}</span></span>`) +
     field(`Size <output>${t.size}</output>`, `<input type="range" min="12" max="200" step="1" data-text="size" value="${Math.min(200, t.size)}">`) +
     `<div class="checks"><label><input type="checkbox" data-text="weight" ${t.weight === 'bold' ? 'checked' : ''}> Bold</label><label><input type="checkbox" data-text="underline" ${t.underline ? 'checked' : ''}> Underline</label></div>` +

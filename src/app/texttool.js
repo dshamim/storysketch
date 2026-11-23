@@ -32,6 +32,13 @@ function setTool(tool) {
 function anchorPage(it) { const L = TXT.layout(it); return toPageXY(it, [it.align === 'right' ? L.x0 + L.W : it.align === 'center' ? 0 : L.x0, L.y0]); }
 function pinAnchor(it, change) { const a = anchorPage(it); change(); const b = anchorPage(it); it.x = Math.round(it.x + a[0] - b[0]); it.y = Math.round(it.y + a[1] - b[1]); }
 const NUMERIC = ['size', 'w', 'lineHeight', 'letterSpacing'];
+// ---- fonts: the built-in hand-drawn letters first, then every font plugin ----
+const FONT_HAND = { id: 'hand', name: 'Hand-drawn', kind: 'Single pen line (default)' };
+const fontChoices = () => [FONT_HAND, ...FONTS.list()];
+const fontName = (id) => { const f = fontChoices().find((x) => x.id === (id || 'hand')); return f ? f.name : `${id} (not installed)`; };
+function fontListHTML(current) {
+  return fontChoices().map((f) => `<button type="button" class="font-opt" data-text-set="font=${f.id}" aria-pressed="${(current || 'hand') === f.id}" aria-label="${U.esc(f.name)}, ${U.esc(f.kind || '')}">${RENDER.thumb(TXT.prims(TXT.make({ text: f.name, font: f.id, size: 44, align: 'left' })), {})}<span class="font-kind">${U.esc(f.kind || '')}</span></button>`).join('');
+}
 function setTextProp(it, key, val) {
   if (!isText(it) || it.locked) return;
   if (NUMERIC.includes(key)) { val = +val; if (!Number.isFinite(val)) return; if (key === 'w' && val <= 0) val = 0; else val = key === 'size' || key === 'w' ? Math.round(TXT.clampTo(key, val)) : +TXT.clampTo(key, val).toFixed(2); }

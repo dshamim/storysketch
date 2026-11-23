@@ -13,7 +13,7 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - **Every style.** Crayon, marker, ink, chalk and clean all draw shapes, dashes and arrowheads; exports look the same as the page and the same project always exports the same pixels.
 - Not included: the freehand pencil, curved or bent arrows, other arrowhead shapes (the head is a "V").
 
-## Earlier — text (revamp phase 4)
+## Unreleased — text (revamp phase 4)
 - **Text tool.** Press **T** (or rail ▸ **Text** ▸ *Add a text box*), then **click** on the page to type or **drag** a box that wraps. The Text panel also has one-click styles: **Title, Heading, Body text, Caption, Number line**. Esc cancels the tool; it is one-shot.
 - **Edit in place.** Double-click a text (or press Enter on it) and type. You see the real drawing with a caret and a highlighted selection, so what you edit is what you get; click or drag in the text to move the caret or select letters, Up / Down move by drawn line, Esc or Ctrl+Enter finish. A text left empty disappears, and a whole edit is a single undo step.
 - **A normal object.** Text moves, **scales, rotates (round handle, or type degrees in the ribbon), flips**, groups, locks, lines up, copies, undoes and exports like a character or prop. Rotation turns the whole wrapped block and it stays editable. Drag the **side handles** to change the width: it re-wraps and the top corner stays put.

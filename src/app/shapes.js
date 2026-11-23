@@ -67,7 +67,7 @@ const SHAPE_NUM = ['w', 'h', 'width', 'radius', 'opacity', 'textSize'];
 function setShapeProp(it, key, val) {
   if (!isFlat(it) || (ownerOf(it) || it).locked) return;
   if (SHAPE_NUM.includes(key)) { val = +val; if (!Number.isFinite(val)) return; val = key === 'opacity' ? +SHP.clampTo(key, val).toFixed(2) : Math.round(SHP.clampTo(key, val)); }
-  it[key] = val; scheduleRender(); commit(false); renderOverlay(); if (key === 'start' || key === 'end') renderLayers(); // the layer name follows the arrowheads
+  it[key] = val; scheduleRender(); commit(false); renderOverlay(); if (key === 'start' || key === 'end' || key === 'text') { renderLayers(); if (!$('#right').hidden) $('#details-title').textContent = detailsTitle(selItems()); } // the layer name and the Details title follow the arrowheads and the words
 }
 const isFlat = (it) => isShape(it) || isLine(it);
 // controls carry data-shape="key"; buttons data-shape-step="width:1" / data-shape-set="key=value" / data-shape-color="key=#rrggbb"

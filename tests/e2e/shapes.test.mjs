@@ -208,4 +208,24 @@ test('a shape is a normal item: group with a character, line up, duplicate, copy
   await page.evaluate(() => { pg().items[0].locked = true; renderAll(); select([pg().items[0].id]); }); assert.equal(await page.locator('#overlay [data-h]').count(), 0, 'a locked shape has no handles');
   assert.deepEqual(errs, []); await page.close();
 });
+test('typing never triggers the quick keys (in place, Details words, ribbon number, search), and Esc then Enter edits again; names follow the words and arrowheads', { skip }, async () => {
+  const { page, errs } = await open(ONE(", fill: 'colour'"));
+  const tool = () => page.evaluate(() => app.tool);
+  // in place
+  const [x, y] = await screen(page, 400, 300); await page.mouse.dblclick(x, y); await page.keyboard.type('Roll a yo-yo');
+  assert.equal(await tool(), null, 'in-place typing arms nothing'); assert.equal((await items(page))[0].text, 'Roll a yo-yo');
+  // Esc, then Enter straight away (focus is not moved by hand)
+  await page.keyboard.press('Escape'); assert.equal(await page.evaluate(() => !!app.edit), false); await page.keyboard.press('Enter'); assert.equal(await page.evaluate(() => !!app.edit), true, 'Enter edits again after Esc'); await page.keyboard.press('Escape');
+  // Details > Words
+  await page.click('#details-toggle'); await page.click('#inspector [data-shape="text"]'); await page.keyboard.press('Control+a'); await page.keyboard.type('Roll a yo-yo');
+  assert.equal(await tool(), null, 'Details words arm nothing'); assert.equal((await items(page))[0].text, 'Roll a yo-yo');
+  assert.equal(await page.locator('#details-title').innerText(), 'Box “Roll a yo-yo”', 'the Details title follows the words');
+  assert.equal(await page.evaluate(() => document.activeElement.dataset.shape), 'text', 'typing in Details keeps the focus there');
+  // ribbon number box
+  await page.click('#ribbon-sel [data-shape="width"]'); await page.keyboard.type('Roll a'); assert.equal(await tool(), null, 'the ribbon number box arms nothing');
+  // search box on the Layers tab: the layer name follows the words
+  await page.click('#rail-layers'); await page.waitForTimeout(80); assert.match(await page.locator('#layers .layer .ln').first().innerText(), /Roll a yo-yo/, 'the layer name follows the words typed in Details');
+  await page.click('#lsearch'); await page.keyboard.type('Roll a yo-yo'); assert.equal(await tool(), null, 'the search box arms nothing'); assert.equal(await page.inputValue('#lsearch'), 'Roll a yo-yo');
+  assert.deepEqual(errs, []); await page.close();
+});
 test.after(async () => { if (browser) await browser.close(); server.close(); });

@@ -82,7 +82,7 @@ function init() {
       if (b?.dataset.gz) { moveZ(m.map((i) => i.id), b.dataset.gz); return; }
       select(m.map((i) => i.id)); return;
     }
-    const it = itemById(row.dataset.layer); const own = ownerOf(it) || it; const add = e.shiftKey || e.ctrlKey || e.metaKey; select(add ? (app.sel.includes(own.id) ? app.sel.filter((x) => x !== own.id) : [...app.sel, own.id]) : [own.id]);
+    const it = itemById(row.dataset.layer); const own = ownerOf(it) || it; const add = e.shiftKey || e.ctrlKey || e.metaKey || app.addMode; select(add ? (app.sel.includes(own.id) ? app.sel.filter((x) => x !== own.id) : [...app.sel, own.id]) : [own.id]);
   });
   $('#left').addEventListener('click', (e) => {
     const b = e.target.closest('button'); if (!b) return;

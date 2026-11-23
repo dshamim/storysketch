@@ -23,8 +23,8 @@ function setTool(tool) {
   const b = $('#add-textbox'); if (b) b.setAttribute('aria-pressed', String(app.tool === 'text'));
   for (const t of $$('[data-shape-add]')) t.setAttribute('aria-pressed', String(t.dataset.shapeAdd === app.tool));
   syncToolbar();
-  if (app.tool === 'text') toast('Click on the page to type, or drag to draw a box. Esc to cancel.');
-  else if (isDrawTool(app.tool)) toast(`Drag on the page to draw a ${(SHP.KINDS[app.tool] || SHP.LINES[app.tool]).name.toLowerCase()}, or just click to drop one. Esc to cancel.`);
+  if (app.tool === 'text') toast(touchUI() ? 'Tap the page to type, or drag to draw a box. Tap Select to cancel.' : 'Click on the page to type, or drag to draw a box. Esc to cancel.');
+  else if (isDrawTool(app.tool)) toast(`Drag on the page to draw a ${(SHP.KINDS[app.tool] || SHP.LINES[app.tool]).name.toLowerCase()}, or just ${touchUI() ? 'tap' : 'click'} to drop one. ${touchUI() ? 'Tap Select' : 'Esc'} to cancel.`);
 }
 
 // ---- properties ----

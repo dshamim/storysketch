@@ -362,7 +362,9 @@ Decisions and differences from the plan:
 - **Drags belong to the pointer that started them** (`pid`). A second finger cancels the first finger's drag and reverts it from the last snapshot (`STORE.revert`, after `flushCommit`), leaving no undo step and no "unsaved" mark; `pointercancel` does the same instead of committing. 6 px of slop keeps a wobbly tap a tap.
 - **A finger-down on the page cancels the browser's "compatibility" mouse events** and moves the focus off any field itself; without that, the late mouse-down stole the focus from a text box we had just started and it was deleted again as empty.
 - **Handles:** the visible handle is drawn 1.35 times larger by CSS; an invisible 44 px halo (same `data-h`, marked `data-halo`) is added behind each one after the overlay is drawn.
-- **Long-press** reuses the mini bar's More menu. **Palm rejection** is time based: touches are ignored while a pen is down and for 0.6 s after.
+- **Long-press** reuses the mini bar's More menu. **Palm rejection** is time based: touches are ignored while a pen is down and for 0.6 s after; a palm that landed BEFORE the pen has its half-made drag cancelled when the pen arrives.
+- **Overlapping halos:** for a finger or pen the handle whose centre is nearest to the touch wins (`nearestHandle`), not the one drawn last. A new primary touch makes the page forget any finger it still thinks is down (a finger lifted over the ribbon during a pinch never reports back to the page).
+- **Several** also works in the Layers list; double-tap starts typing in a text or a shape; Export, menus and popovers were size-audited too (Export labels were 28 px).
 - **Pencil was skipped in 4b**, so the tool bar has Select, Hand, Text, Shapes and a **Several** toggle (the missing Shift key). A pen is just a pointer.
 - **Hand tool:** no key (H already flips); it is on the touch tool bar, and Space-drag still works. **V** selects.
 - **No Shift on a tablet:** lines within 4 degrees of a 45 degree step snap, shapes within 6 percent of square become square (touch pointers only). Resize with proportions has no touch version.

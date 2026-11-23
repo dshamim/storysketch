@@ -25,6 +25,13 @@ function makeHalo(el, k) {
   halo.setAttribute('fill', '#fff'); halo.setAttribute('fill-opacity', '0.001');
   return halo;
 }
+// Two joints closer than 44 px have overlapping halos. For a finger or pen, the handle whose CENTRE is nearest to the touch wins, not the one drawn last.
+function nearestHandle(e) {
+  let best = null, bd = HALO_R * 1.05;
+  for (const el of $$('#overlay [data-h]:not([data-halo])')) { const r = el.getBoundingClientRect(); const d = Math.hypot(e.clientX - (r.x + r.width / 2), e.clientY - (r.y + r.height / 2)); if (d < bd) { bd = d; best = el; } }
+  return best;
+}
+function handleAt(e) { const t = e.target.closest ? e.target.closest('[data-h]') : null; if (!t || e.pointerType === 'mouse') return t; return nearestHandle(e) || t; }
 function addHalos(ov) {
   if (!touchUI()) return;
   for (const g of $$('g', ov)) {
@@ -135,9 +142,13 @@ function firePress() { // long-press on something: select it and open its "More"
   const more = $('#minibar [data-mb="more"]'); if (more && !$('#minibar').hidden) UI.showPopover(more, $('#menu-more'), { placement: 'bottom-start' });
 }
 function onPointerDown(e) {
-  if (e.pointerType === 'pen') { penDown = true; penUntil = Date.now() + PEN_QUIET_MS; }
+  if (e.pointerType === 'pen') {
+    penDown = true; penUntil = Date.now() + PEN_QUIET_MS;
+    if (touches.size || (app.drag && app.drag.pt === 'touch')) { cancelDrag(); endPress(); pinch = null; for (const id of touches.keys()) consumed.add(id); touches.clear(); } // the palm landed first: whatever it started is not wanted
+  }
   if (e.pointerType === 'touch') {
     if (penDown || Date.now() < penUntil) { e.preventDefault(); consumed.add(e.pointerId); return; } // a palm resting while the pen draws
+    if (e.isPrimary) { touches.clear(); pinch = null; endPress(); } // a primary touch is the first finger of a new gesture: forget any finger we still think is down
     touches.set(e.pointerId, [e.clientX, e.clientY]);
     if (touches.size === 2 && !pinch) { e.preventDefault(); startPinch(); return; }
     if (touches.size > 2 || pinch) { e.preventDefault(); consumed.add(e.pointerId); return; }

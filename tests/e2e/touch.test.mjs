@@ -25,7 +25,8 @@ async function openTouch(opts = LANDSCAPE, { start = false } = {}) {
   const cdp = await context.newCDPSession(page);
   return { page, cdp, errs, context };
 }
-const centre = async (page, sel) => { const l = page.locator(sel).first(); await l.waitFor({ state: 'visible', timeout: 5000 }); const b = await l.boundingBox(); return [b.x + b.width / 2, b.y + b.height / 2]; };
+// (a finger would scroll a list to the thing first, so the helper does too)
+const centre = async (page, sel) => { const l = page.locator(sel).first(); await l.waitFor({ state: 'visible', timeout: 5000 }); await l.scrollIntoViewIfNeeded(); const b = await l.boundingBox(); return [b.x + b.width / 2, b.y + b.height / 2]; };
 const tap = async (page, sel) => { const [x, y] = await centre(page, sel); await page.touchscreen.tap(x, y); await page.waitForTimeout(60); };
 const showTab = async (page, tab) => { const shown = await page.evaluate((t) => app.tab === t && !document.querySelector('#left').hidden, 'tab-' + tab); if (!shown) await tap(page, '#rail-' + tab); }; // tapping the open tab again folds the panel
 const tapAt = async (page, x, y) => { await page.touchscreen.tap(x, y); await page.waitForTimeout(60); };
@@ -159,7 +160,7 @@ test('a second finger lands mid-drag: the drag is undone, not committed, and the
   assert.deepEqual(errs, []); await context.close();
 });
 
-test('a touch that the browser cancels undoes the drag too (a pose, a move, a handle)', { skip }, async () => {
+test('a touch that the browser cancels undoes the drag too', { skip }, async () => {
   const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); const before = JSON.stringify(await items(page)); const [x, y] = await tableSpot(page);
   await touchEvt(cdp, 'touchStart', [[x, y, 1]]); for (let i = 1; i <= 5; i++) await touchEvt(cdp, 'touchMove', [[x + 10 * i, y, 1]]); assert.notEqual(JSON.stringify(await items(page)), before);
   await touchEvt(cdp, 'touchCancel', []); await page.waitForTimeout(100); await same(page, before); assert.equal(await page.evaluate(() => !!app.drag), false);
@@ -313,6 +314,71 @@ test('typing on a tablet: the text being typed is brought into view, stays above
   // a mouse user never sees the Done button
   const mp = await browser.newPage({ viewport: { width: 1180, height: 820 } }); await mp.goto(url); await mp.waitForFunction(() => typeof app !== 'undefined' && app.P); await mp.evaluate(() => { hideStart(); app.P = STORE.fresh('blank'); const it = TXT.make({ text: 'Hi' }, 500, 300); addItem(it); startEdit(it.id); });
   assert.equal(await mp.locator('#edit-done').isVisible(), false); await mp.close();
+});
+
+test('a palm that lands BEFORE the pen: what it started is thrown away and its later moves do nothing', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); const before = JSON.stringify(await items(page)); const [x, y] = await tableSpot(page); const [px, py] = await screenOf(page, 100, 120);
+  await touchEvt(cdp, 'touchStart', [[x, y, 1]]); for (let i = 1; i <= 4; i++) await touchEvt(cdp, 'touchMove', [[x + 15 * i, y + 5 * i, 1]]); assert.notEqual(JSON.stringify(await items(page)), before, 'the palm is moving the table');
+  await cdp.send('Input.dispatchMouseEvent', { type: 'mousePressed', x: px, y: py, button: 'left', buttons: 1, clickCount: 1, pointerType: 'pen' });
+  await same(page, before); for (let i = 5; i <= 8; i++) await touchEvt(cdp, 'touchMove', [[x + 15 * i, y + 5 * i, 1]]); await same(page, before); // the palm keeps moving: nothing follows
+  await touchEvt(cdp, 'touchEnd', []); await cdp.send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: px, y: py, button: 'left', buttons: 0, clickCount: 1, pointerType: 'pen' }); await page.waitForTimeout(100); await same(page, before);
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('Several works in the Layers list too (taps add to the selection)', { skip }, async () => {
+  const { page, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); await page.evaluate(() => select([])); await showTab(page, 'layers');
+  const ids = await page.evaluate(() => pg().items.filter((i) => i.type !== 'limbs').slice(0, 3).map((i) => i.id)); await tap(page, `#layers [data-layer="${ids[0]}"] .ln`); assert.deepEqual(await page.evaluate(() => app.sel), [ids[0]]);
+  await tap(page, `#layers [data-layer="${ids[1]}"] .ln`); assert.deepEqual(await page.evaluate(() => app.sel), [ids[1]], 'without Several a tap picks just that one');
+  await tap(page, '#toolbar [data-tool="several"]'); await tap(page, `#layers [data-layer="${ids[2]}"] .ln`); assert.deepEqual(await page.evaluate(() => [...app.sel].sort()), [ids[1], ids[2]].sort(), 'with Several the tap adds');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('double-tap starts typing in a text and in a shape, and shows Done typing', { skip }, async () => {
+  const { page, context, errs } = await openTouch(); await page.evaluate(() => { app.P = STORE.fresh('blank'); addItem(TXT.make({ text: 'Hello', size: 70 }, 300, 200)); addItem(SHP.make('box', 650, 450, { w: 260, h: 160, fill: 'colour' })); select([]); renderAll(); });
+  const [tx, ty] = await screenOf(page, 300, 200); await page.touchscreen.tap(tx, ty); await page.waitForTimeout(80); await page.touchscreen.tap(tx, ty); await page.waitForTimeout(150);
+  assert.equal(await page.evaluate(() => app.edit && itemById(app.edit.id).type), 'text', 'double-tap on a text edits it'); assert.equal(await page.locator('#edit-done').isVisible(), true); await tap(page, '#edit-done'); assert.equal(await page.evaluate(() => !!app.edit), false);
+  const [sx, sy] = await screenOf(page, 650, 450); await page.touchscreen.tap(sx, sy); await page.waitForTimeout(80); await page.touchscreen.tap(sx, sy); await page.waitForTimeout(150);
+  assert.equal(await page.evaluate(() => app.edit && itemById(app.edit.id).type), 'shape', 'double-tap on a shape types inside it'); assert.equal(await page.locator('#edit-done').isVisible(), true);
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('a finger the page lost track of (lifted over the ribbon during a pinch) does not turn the next tap into a pinch', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); await page.evaluate(() => select([])); const [x, y, id] = await tableSpot(page);
+  await touchEvt(cdp, 'touchStart', [[x, y, 1]]); await touchEvt(cdp, 'touchStart', [[x, y, 1], [x + 120, y, 2]]); // a pinch starts
+  await touchEvt(cdp, 'touchMove', [[300, 70, 1], [500, 70, 2]]); await touchEvt(cdp, 'touchEnd', []); await page.waitForTimeout(150); // both fingers lift over the ribbon: the page never sees them go
+  await page.evaluate(() => { zoomTo(1); select([]); }); const [x2, y2] = await tableSpot(page); const z0 = (await view(page)).z; await page.touchscreen.tap(x2, y2); await page.waitForTimeout(150);
+  assert.deepEqual(await page.evaluate(() => app.sel), [id], 'a single tap selects, it does not start a pinch'); assert.equal((await view(page)).z, z0, 'and the zoom does not change');
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('close pose handles: the one nearest the fingertip is the one that moves (halos overlap on a small figure)', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(CLASSROOM); await page.evaluate(() => { const f = pg().items.find((i) => i.cast === 'teacher'); f.s = 0.6; select([f.id]); renderAll(); }); await page.waitForTimeout(100);
+  const hs = await page.evaluate(() => [...document.querySelectorAll('#overlay [data-h]:not([data-halo])')].filter((e) => !['scale', 'rot'].includes(e.dataset.h)).map((e) => { const r = e.getBoundingClientRect(); return [e.dataset.h, r.x + r.width / 2, r.y + r.height / 2]; }));
+  let pairs = 0; // every pair of handles whose halos overlap: touch 9 px off one of them, towards the other, and the first must be the one pressed
+  for (const [ka, xa, ya] of hs) for (const [kb, xb, yb] of hs) { if (ka === kb) continue; const d = Math.hypot(xb - xa, yb - ya); if (d >= 40 || d < 20) continue; pairs++; // (20 px apart or more, so a point 9 px from one is really nearer to it than to the other)
+    const px = xa + (xb - xa) / d * 9, py = ya + (yb - ya) / d * 9; await page.evaluate(() => { app.lastPress = null; }); await touchEvt(cdp, 'touchStart', [[px, py, 1]]); await touchEvt(cdp, 'touchEnd', []); await page.waitForTimeout(80);
+    const nearest = hs.map(([k, hx, hy]) => [k, Math.hypot(px - hx, py - hy)]).sort((u, v) => u[1] - v[1])[0][0]; assert.equal(await page.evaluate(() => app.lastPress && app.lastPress.kind), nearest, `a touch 9 px from ${ka} towards ${kb} presses the nearest handle (${nearest})`); await page.waitForTimeout(450); }
+  assert.ok(pairs >= 2, 'the figure has close handles to test: ' + pairs); assert.deepEqual(errs, []); await context.close();
+});
+
+test('cancelling a shape that is being drawn: the half-drawn shape disappears when a second finger lands', { skip }, async () => {
+  const { page, cdp, context, errs } = await openTouch(); await page.evaluate(() => { app.P = STORE.fresh('blank'); renderAll(); }); const before = JSON.stringify(await items(page)); const [sx, sy] = await screenOf(page, 200, 200);
+  await page.evaluate(() => setTool('box')); await touchEvt(cdp, 'touchStart', [[sx, sy, 1]]); for (let i = 1; i <= 5; i++) await touchEvt(cdp, 'touchMove', [[sx + 30 * i, sy + 20 * i, 1]]); assert.equal((await items(page)).length, 1, 'a box is being drawn');
+  await touchEvt(cdp, 'touchStart', [[sx + 150, sy + 100, 1], [sx + 300, sy + 300, 2]]); await page.waitForTimeout(100); assert.equal(await page.evaluate(() => JSON.stringify(pg().items)), before, 'and it is gone again'); await touchEvt(cdp, 'touchEnd', []);
+  assert.deepEqual(errs, []); await context.close();
+});
+
+test('touch sizes in the menus and popovers: File menu, More menu, pose picker, Export, start screen', { skip }, async () => {
+  const { page, context, errs } = await openTouch(LANDSCAPE, { start: true }); const bad = [];
+  bad.push(...await SMALL(page, '#start')); await tap(page, '#start-cards [data-start="project:sample-classroom"]');
+  await tap(page, '#btn-file'); bad.push(...await SMALL(page, '#menu-file')); await page.keyboard.press('Escape');
+  await tap(page, '#btn-view'); bad.push(...await SMALL(page, '#menu-view')); await page.keyboard.press('Escape');
+  await tap(page, '#open-export'); bad.push(...await SMALL(page, '#export')); await tap(page, '#x-close');
+  const [x, y] = await tableSpot(page); await tapAt(page, x, y); await tap(page, '#minibar [data-mb="more"]'); bad.push(...await SMALL(page, '#menu-more')); await page.keyboard.press('Escape');
+  await tap(page, '#ribbon-sel [data-rb="menu-position"]'); bad.push(...await SMALL(page, '#menu-position')); await page.keyboard.press('Escape');
+  await tap(page, '#page-menu-btn'); bad.push(...await SMALL(page, '#menu-page')); await page.keyboard.press('Escape');
+  await page.evaluate(() => select([pg().items.find((i) => i.cast === 'teacher').id])); await tap(page, '#ribbon-sel [data-rb="pose"]'); bad.push(...await SMALL(page, '#pop-pose'));
+  assert.deepEqual([...new Set(bad)], [], 'controls smaller than 44 px in menus and popovers'); assert.deepEqual(errs, []); await context.close();
 });
 
 test.after(async () => { if (browser) await browser.close(); server.close(); });

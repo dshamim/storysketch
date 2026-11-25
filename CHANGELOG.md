@@ -5,18 +5,23 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The project file has its own `schema` number; when it changes, a migration is added in `src/core/store.js`, so old saved projects still open.
 - Each release is a git tag (`v0.1.0`, …). To get an old version back: `git checkout v0.1.0 -- .`.
 
-## Unreleased — the Park kit
+## 0.22.0 — 2026-11-26 — new interface, text and shapes, and the Home, School and Park prop kits
+
+First release published on GitHub. A redesigned interface (new shell, ribbon, details panel, search with Ctrl+K, shortcut sheet, tablet support), text and shape tools,
+bundled fonts, and three new prop kits (Home, School, Park) with sample projects. The project file format is unchanged (`schema` 2).
+
+### the Park kit
 - **22 Park props** (pack "Park props"): playground (slide with optional roof, swings that can swing, seesaw that tilts, roundabout, climbing frame with a rope net, sandpit with bucket, spade and sandcastle), nature (tree in four seasons, bush with berries, pond with ducks and lily pads, flowerbed, grassy hill with a path), fittings (park bench, fountain with water on or off, lamppost with a light, litter bin, signpost with a choice of words and arrow, railing, winding path) and picnic and play (picnic blanket with basket, kite, beach ball, scooter).
 - **New sample project "A day at the park"** (6 pages): the park gate, the playground, sandpit and seesaw, the pond, a picnic, and going home at sunset.
 - Props arrive in a new folder `plugins/props/park/`; the checker already covered it (all 22 pass, 0 problems).
 - Not built: a swing a child can sit on (use the Sit pose beside the swing), holding a kite (place it by the hand).
 
-## Unreleased — the School kit
+### the School kit
 - **20 School props** (pack "School props"): school building (flag-free front with clock gable, doors open or shut, lights on or off), school gate, school bus (door open, lights on), bus stop with shelter, zebra crossing, crossing-patrol sign, flagpole, hand bell; lockers (2 to 6 doors, one open), classroom door, assembly stage with curtain and microphone, canteen table with benches, lunch tray; football goal, ball (football, basketball, tennis), running track, trophy; backpack and lunchbox.
 - **New sample project "A day at school"** (5 pages): the bus and bus stop, the school front, the corridor, the canteen with the stage, and sports day.
 - Not built because the Home kit already has them: a wall clock (use **Home props > Wall clock**).
 
-## Unreleased — the Home kit
+### the Home kit
 - **26 Home props** (pack "Home props"): house, front door, garden gate, letterbox; sofa (2 or 3 seats), armchair, coffee table, TV on a cabinet, wall clock (set the hour and minutes), fireplace; dining table with chairs, fridge, cooker, sink and cupboard, kettle, plates and cup; bed, bunk bed, cot, bedside table with lamp, toy box, teddy bear, slippers; bath, basin and mirror; child's bicycle. Each has story states (door open, lights on, fire lit, tap running, pot on the cooker, water and bubbles in the bath…) and search words.
 - **Scale:** every seat is 80 high (a child or adult in the Sit pose fits on any of them), counters and the dining table 128, the bed mattress 80.
 - **New sample project "A day at home"** (5 pages: living room, kitchen, bedroom, bathroom, outside), built only from the scenery pieces and the Home props, with people sitting on the furniture.
@@ -24,7 +29,7 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - Small things (teddy, kettle, plates and cup) are drawn at their natural size, so they come out right at scale 1; the sample project uses scale 1 for every Home prop except the house on the last page (85 percent, to leave room for the garden). The toy box lid is a short propped panel.
 - Tests: every sample project is checked for unknown props, characters, poses, option values and pictures (this found an invalid value in the classroom sample, drawn the same as before).
 
-## Unreleased — first props of the new kits
+### first props of the new kits
 - **Scenery (8 props, pack "Scenery"):** ground (grass, sandy path, road, wooden floor), sky (day, sunset, night), hills, room wall (plain, stripes or dots; window and door), picket fence, stepping stones, clouds, and a window that can show any picture.
 - **Home: the house** (`home-house`): front view with a 340-high door (an adult fits through it), open or shut door, lights on or off, chimney.
 - **Backdrops land in the right place with one click.** Sky, ground, hills and the room wall have a `place` hint: they appear filling the page (also on other page sizes), in the right spot (the sky ends where the ground begins) and **behind everything else**, in order (sky, wall, hills, ground), wherever you add them from. Props can use `place: { x, y, rank, fit }`; the checker requires it for anything over 800 wide.
@@ -32,13 +37,13 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - A new sample scene (`scene-home-day`) is in the screenshot tests.
 - **Fixed:** library thumbnails used up the same counter as item ids, so adding props changed the ids, and with them the crayon wobble, of everything added afterwards. They now have their own counter, so new props no longer move other pictures.
 
-## Unreleased — props plan and style guide
+### props plan and style guide
 - **Props style guide for agents and contributors** (`docs/PROP-STYLE-GUIDE.md`): scale (child 250, adult 320 at scale 1; door 340; storybook scale for buildings, bus, playground), origin, point of view, line widths, colour slots, hatching, detail budget, states, ids with prefixes, tags, content and licence, a worked example and a checklist. `AGENTS.md` points agents to it.
 - **Plan for the first three kits** (`docs/PROPS-PLAN.md`): shared scenery pieces, Home, School (building and bus) and Park, about 70 props; generic, no local kit.
 - **`tools/check_props.mjs`** (`npm run check:props`, also in `test:all`): checks a prop against the guide (fields, id prefix, tags, every param value and an empty slot draw finite and identical twice in every style, size, floor line, line widths, shape and point limits, undeclared colour names, forbidden names) and writes contact sheets per style (`--sheet DIR`). The new kits are checked strictly, the airport and classroom props only for the basics. It is a lint, not a security sandbox.
 - **Props can have `tags`** (synonyms such as couch for sofa) that the Props search and Ctrl+K match.
 
-## Unreleased — fonts (revamp phase 8)
+### fonts (revamp phase 8)
 - **Five real fonts for text**, next to the hand-drawn letters: **Patrick Hand** (neat handwriting), **Comic Neue** (friendly), **Nunito** (rounded), **Crimson Pro** (book serif) and **Caveat Brush** (marker). Pick one from the new **Font** menu in the text ribbon (each option is a drawing of its own name), from **Details ▸ Font**, or with Ctrl+K (*Font: Nunito*, when a text is picked). Bold is a real Bold where the font has one (Comic Neue, Nunito, Crimson Pro), and a thickened outline for the other two.
 - **Nothing to install, ever.** The letters are stored as outlines inside StorySketch and drawn as ordinary shapes, so every drawing style (crayon, marker, ink, chalk) finishes them, a page looks the same on every computer, and exported SVG and PNG never need the font. All five are free OFL fonts; the licence of each is kept next to it (`plugins/fonts/*-OFL.txt`, `THIRD-PARTY-NOTICES.md`).
 - **Kerning and sizes:** pairs such as "AV" and "To" are tightened the way the font intends, and every font is scaled so its capital letters match the hand-drawn ones, so switching font keeps a text box about the same size. Letter spacing, line spacing, wrapping, rainbow and per-line colours, underline and in-place editing all work with every font.
@@ -47,7 +52,7 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - The text box now covers every letter's ink (tall letters, long tails, brackets), so the selection frame, click area, Export ▸ Selection and Line up are right for every font; letters get more curve detail as the text is enlarged, so big exports (up to 4×) stay smooth.
 - Styles: a font letter is a filled shape with several outlines (`more`, drawn with the even-odd rule so holes and dots work) flagged `glyph`; marker, ink and chalk draw it solid so small text stays readable. Third-party styles that ignore `more` draw only each letter's main outline.
 
-## Unreleased — polish: search, shortcuts, tips, accessibility (revamp phase 7)
+### polish: search, shortcuts, tips, accessibility (revamp phase 7)
 - **Search everything (Ctrl+K, or the magnifier in the top bar).** One box that finds and does: every action in the menus (with its shortcut and its on / off tick), tools, panels, characters (add, new, edit), props, shapes, text styles, drawing styles, samples and pages. Recent things come first. It opens from anywhere, even from a text field or the designer. Arrow keys and Enter, or tap a result.
 - **Keyboard shortcut sheet (?).** Every shortcut and mouse modifier on one page (also in Help). It is drawn from a single table that a test checks key by key.
 - **Three one-time tips** that show when they help: drag the dots to pose, double-click a text to change it, press Ctrl+K to search. Small cards in the top-left of the page, never over a tool bar, tab bar or the page strip; they finish when you dismiss them, do the thing, or ignore them twice. **Help ▸ Show the tips again** starts over.
@@ -57,7 +62,7 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - **Fixed:** pack headers in the Props panel keep their ▼ arrow (caught by the screenshot tests while adding the 24 px rule); closing the search or shortcut sheet gives the focus back properly.
 - Repeatable audit: `tools/a11y-audit.mjs` (needs `npm i --no-save lighthouse puppeteer-core`; the in-repo checks in `tests/e2e/a11y.test.mjs` always run).
 
-## Unreleased — touch and tablets (revamp phase 6)
+### touch and tablets (revamp phase 6)
 - **Touch mode.** With a finger as the main pointer (a tablet) every control is at least 44 px, swatches and layer rows are finger-sized, and the handles on the page are drawn larger with an invisible 44 px grab area behind each one. **View ▸ Touch-friendly sizes** switches it on or off by hand (handy on a touch laptop) and remembers the choice.
 - **Gestures.** Pinch to zoom, two fingers to pan; a second finger landing in the middle of a drag cancels that drag cleanly (nothing is changed or marked unsaved); a wobbly tap is still a tap; **long-press** on something selects it and opens its More menu; **palm rejection**: touches are ignored while a pen is down, and a palm that landed first has whatever it started thrown away when the pen arrives. When two handles are close together the one nearest your fingertip is the one that moves. One finger pans with the **Hand** tool.
 - **Tool bar** (touch only, floats at the bottom of the page): **Select, Hand, Text, Shapes, Several** (taps add to the selection; a finger has no Shift key). **V** now selects.
@@ -67,7 +72,7 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - **Fixed:** typing started with a tap was cancelled by the browser's late mouse event; the hint pop-ups could sit over (and catch taps meant for) the bottom bars. They now ignore touches and float at the top in touch mode.
 - Not included: the pencil (so no pencil on the tool bar; a pen is just a pointer with palm rejection), Alt free-move and Alt-click cycling (no touch version), iPad Safari (not tested).
 
-## Unreleased — designer and add-ons as panels (revamp phase 5)
+### designer and add-ons as panels (revamp phase 5)
 - **The Character designer is a side panel**, not a pop-up. It opens in the Details column with a live preview and a pose picker on top (they stay in view while you scroll), the cast as a small strip, then Name, Main colour, **Character type**, Body, Clothes, Hair, Accessories and Face. Open it with **Edit character** in the ribbon (new), Details ▸ Look ▸ *Edit this character…*, or **New character** in the Characters panel (it now really makes a new character and has its name ready to type). **Done**, the panel's X or **Esc** close it and Details return to how they were.
 - **The page stays live while you design.** Pick another figure on the page and the designer switches to its character; Undo / Redo work (every change is one step, not one big step at the end); Delete, the arrow keys, the tool keys and Ctrl+X / C / V / D / G do nothing to the page while you are in the designer (Undo and Redo still work).
 - **Character type is a picker**: "Person (stick figure)" or "Four-legged animal" as two tiles, each drawn as your character. Changing it still resets placed figures to the standing pose, and one Undo puts everything back.
@@ -75,7 +80,7 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - **Add-ons is a tab in the rail** (with its problem badge): what is installed, problems, *Refresh add-ons*, and a compact list of everything loaded.
 - **About** and the "opened a file" report are a card in the corner, not a modal. Only the Open / Save steps (older file, permission, could not save) and delete confirmations still block the page.
 
-## Unreleased — shapes and arrows (revamp phase 4b)
+### shapes and arrows (revamp phase 4b)
 - **Shapes tab** in the rail: **Box, Circle, Triangle** and **Line, Arrow, Double arrow**. Click a tile to add one to the page, or use the quick keys **R** (box), **O** (circle), **Y** (triangle), **L** (line), **A** (arrow), **Shift+A** (double arrow), then **drag** on the page to draw it. A plain click drops a default size. **Shift** gives a perfect square or circle, or keeps a line on 15 degree steps. **Esc** cancels. One undo step per drawing.
 - **Handles that fit the thing.** A shape has eight resize handles (sides and corners; the opposite side stays put; Shift on a corner keeps the proportions) and the round turn handle. A line has two round end handles. Both still move, scale, rotate, flip, group, lock, line up, copy and undo like any other object.
 - **Look.** Ribbon: fill, fill colour, outline colour, thickness, line style (solid, dashed, dotted). Details ▸ Look adds colour swatches, rounded corners (box), see-through, width and height, arrowheads for lines. Fills: none, colour, shading lines, solid (hides what is behind).
@@ -83,7 +88,7 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - **Every style.** Crayon, marker, ink, chalk and clean all draw shapes, dashes and arrowheads; exports look the same as the page and the same project always exports the same pixels.
 - Not included: the freehand pencil, curved or bent arrows, other arrowhead shapes (the head is a "V").
 
-## Unreleased — text (revamp phase 4)
+### text (revamp phase 4)
 - **Text tool.** Press **T** (or rail ▸ **Text** ▸ *Add a text box*), then **click** on the page to type or **drag** a box that wraps. The Text panel also has one-click styles: **Title, Heading, Body text, Caption, Number line**. Esc cancels the tool; it is one-shot.
 - **Edit in place.** Double-click a text (or press Enter on it) and type. You see the real drawing with a caret and a highlighted selection, so what you edit is what you get; click or drag in the text to move the caret or select letters, Up / Down move by drawn line, Esc or Ctrl+Enter finish. A text left empty disappears, and a whole edit is a single undo step.
 - **A normal object.** Text moves, **scales, rotates (round handle, or type degrees in the ribbon), flips**, groups, locks, lines up, copies, undoes and exports like a character or prop. Rotation turns the whole wrapped block and it stays editable. Drag the **side handles** to change the width: it re-wraps and the top corner stays put.
@@ -94,7 +99,7 @@ Versioning: `MAJOR.MINOR.PATCH` in `src/core/version.js`.
 - Text is saved as an item of type `text` (`text`, `font`, `size`, `color`, `weight`, `align`, `w`, `lineHeight`, `letterSpacing`, `underline`, `colors`, plus the usual `x y s rot flip mode`); no file-format change.
 - Tests: `tests/unit/text.test.mjs` (wrapping, long words, newlines, alignment, spacing, caret and click mapping, every character draws, determinism) and `tests/e2e/text.test.mjs` (create / type / edit, caret clicks, rotate by handle and by angle with the export checked, width handles, properties, all styles, undo / redo, group, lock, save and reopen); baselines grew from 25 to 28. Found on the way: the first spacing-slider change closed its own popover.
 
-## Unreleased — selection tools (revamp phase 3)
+### selection tools (revamp phase 3)
 The controls for what you have selected move out of the always-open right-hand panel into a ribbon, a small floating bar and an on-demand Details panel. Drawings, poses and files are unchanged.
 - **Ribbon** (under the top bar) follows the selection. *Nothing selected:* page settings (style, page colour, page size, styled view). *A character:* Expression, **Pose** (a picture grid), Mirror, Colour (full / faded / grey), **Position**, and a Turn box in degrees. *A prop:* its first choice (if it has one), Colour, Flip, Position, Turn. *Several:* **Line up**, **Space evenly**, Group / Ungroup, Lock, Colour, Position.
 - **Position** menu: bring to front / forward, send backward / to back, and **line up with the page** (left, centre, right, top, middle, bottom).
@@ -106,7 +111,7 @@ The controls for what you have selected move out of the always-open right-hand p
 - Fixed: pressing Esc with a ribbon menu open (and every item greyed out) used to deselect everything.
 - Tests: `tests/unit/arrange.test.mjs` (align, distribute and snap maths), `tests/e2e/selection.test.mjs` (ribbon, mini bar, Details, arrange, snapping, locks, keyboard), the pose tests now go through Details ▸ Pose, and the screenshot baselines grew from 19 to 25 (ribbon, menus, Details tabs).
 
-## Unreleased — new shell (revamp phase 2)
+### new shell (revamp phase 2)
 The first visible part of the interface revamp: the outer frame of the app is rebuilt with the new design system. Nothing about how drawings, poses or files work has changed.
 - **Top bar**: **File** (New…, Open…, Save, Save as…, Export…, Add-ons…), **Edit** (undo/redo, cut/copy/paste, duplicate, delete, select all, group, ungroup, lock — greyed out when they don't apply), **View** (styled view, zoom, library panel), project name with a **Saved ✓ / Unsaved ●** badge, Undo and Redo icons, **Export** and **Help** (About, with the version).
 - **Export** is now a small panel under the Export button instead of a window; Esc closes it.
@@ -119,7 +124,7 @@ The first visible part of the interface revamp: the outer frame of the app is re
 - Wording: *Plugins → Add-ons*, *Paper colour → Page colour*, *Preview → Styled view*.
 - Tests: new `shell.test.mjs` (start screen, menus, rail, page strip, notes, export panel, keyboard walk-through, and a checklist that every old control is still reachable), the page / new-project / dialog tests now drive the new controls, and 19 screenshot baselines were regenerated.
 
-## Unreleased — interface foundations (revamp phase 1; nothing changes on screen yet)
+### interface foundations (revamp phase 1; nothing changes on screen yet)
 - New design system in `src/ui/`: **tokens** (colour, 4 px spacing, type, radii, shadows, control sizes that grow to 44 px on touch screens), **components** (buttons, icon buttons, fields, switch, checkbox, segmented control, tabs, left rail, swatches, popover and menu, tooltip, collapsible section, tile, filmstrip, badge, empty state, top bar, ribbon, mini bar, dialog, toast) and **behaviour** (`ui.js`): keyboard-operable tooltips with shortcuts, popovers and menus, tabs with arrow keys, sections, toasts.
 - **99 icons** from Lucide (ISC) as one generated file that works from disk; `docs/ui-kit.html` shows every token, icon and component with live examples. Light theme only.
 - The app now loads these files but does not use them yet: the 13 screenshot baselines are byte-identical.

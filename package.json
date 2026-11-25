@@ -1,6 +1,6 @@
 {
   "name": "storysketch",
-  "version": "0.21.0",
+  "version": "0.22.0",
   "description": "Pose stick figures and props, layer them, and export them in a hand-drawn style (crayon, marker, ink, chalk).",
   "license": "MIT",
   "private": true,
